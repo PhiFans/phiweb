@@ -1,21 +1,22 @@
-import { PhiChartJudgeLine } from './judgeline';
+import { GameChartJudgeLine } from './judgeline';
+import { IPhiChartJudgeLine } from './judgeline';
 
 export interface IPhiChartNote {
   // readonly id: number;
   readonly type: 1 | 2 | 3 | 4;
   readonly time: number;
   readonly speed: number;
-  readonly judgeline: PhiChartJudgeLine;
+  readonly judgeline: IPhiChartJudgeLine;
   readonly isAbove: boolean;
   readonly holdTime?: number;
 }
 
-export class PhiChartNote {
+export class GameChartNote implements IPhiChartNote {
   // readonly id: number;
   readonly type: 1 | 2 | 3 | 4;
   readonly time: number;
   readonly speed: number;
-  readonly judgeline: PhiChartJudgeLine;
+  readonly judgeline: GameChartJudgeLine;
   readonly isAbove: boolean;
 
   readonly holdTime: number;
@@ -29,7 +30,7 @@ export class PhiChartNote {
     judgeline,
     isAbove,
     holdTime
-  }: IPhiChartNote) {
+  }: GameChartNote) {
     // this.id = id;
     this.type = type;
     this.time = time;

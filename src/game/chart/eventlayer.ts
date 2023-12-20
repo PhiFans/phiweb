@@ -1,19 +1,20 @@
-import { PhiChartEvent } from "./event"
+import { GameChartEvent } from './event';
+import { IPhiChartEvent } from './event';
 
 export interface IPhiChartEventLayer {
-  moveXEvents: Array<PhiChartEvent>;
-  moveYEvents: Array<PhiChartEvent>;
-  alphaEvents: Array<PhiChartEvent>;
-  rotateEvents: Array<PhiChartEvent>;
-  speedEvents: Array<PhiChartEvent>;
+  moveXEvents: Array<IPhiChartEvent>;
+  moveYEvents: Array<IPhiChartEvent>;
+  alphaEvents: Array<IPhiChartEvent>;
+  rotateEvents: Array<IPhiChartEvent>;
+  speedEvents: Array<IPhiChartEvent>;
 }
 
-export class PhiChartEventLayer {
-  moveXEvents: Array<PhiChartEvent>;
-  moveYEvents: Array<PhiChartEvent>;
-  alphaEvents: Array<PhiChartEvent>;
-  rotateEvents: Array<PhiChartEvent>;
-  speedEvents: Array<PhiChartEvent>;
+export class GameChartEventLayer implements IPhiChartEventLayer {
+  moveXEvents: Array<GameChartEvent>;
+  moveYEvents: Array<GameChartEvent>;
+  alphaEvents: Array<GameChartEvent>;
+  rotateEvents: Array<GameChartEvent>;
+  speedEvents: Array<GameChartEvent>;
 
   constructor({
     moveXEvents,
@@ -21,7 +22,7 @@ export class PhiChartEventLayer {
     alphaEvents,
     rotateEvents,
     speedEvents
-  }: IPhiChartEventLayer) {
+  }: GameChartEventLayer) {
     this.moveXEvents = [ ...moveXEvents ];
     this.moveYEvents = [ ...moveYEvents ];
     this.alphaEvents = [ ...alphaEvents ];

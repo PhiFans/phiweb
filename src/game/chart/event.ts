@@ -6,7 +6,7 @@ export interface IPhiChartEvent {
   readonly end: number;
 }
 
-export class PhiChartEvent {
+export class GameChartEvent implements IPhiChartEvent {
   readonly startTime: number;
   readonly endTime: number;
   readonly start: number;
@@ -17,7 +17,7 @@ export class PhiChartEvent {
     endTime,
     start,
     end
-  }: IPhiChartEvent) {
+  }: GameChartEvent) {
     this.startTime = startTime;
     this.endTime = endTime;
     this.start = start;

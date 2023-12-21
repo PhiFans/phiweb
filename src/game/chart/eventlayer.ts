@@ -10,11 +10,17 @@ export interface IPhiChartEventLayer {
 }
 
 export class GameChartEventLayer implements IPhiChartEventLayer {
-  moveXEvents: Array<GameChartEvent>;
-  moveYEvents: Array<GameChartEvent>;
-  alphaEvents: Array<GameChartEvent>;
-  rotateEvents: Array<GameChartEvent>;
-  speedEvents: Array<GameChartEvent>;
+  readonly moveXEvents: Array<GameChartEvent>;
+  readonly moveYEvents: Array<GameChartEvent>;
+  readonly alphaEvents: Array<GameChartEvent>;
+  readonly rotateEvents: Array<GameChartEvent>;
+  readonly speedEvents: Array<GameChartEvent>;
+
+  positionX: number;
+  positionY: number;
+  alpha: number;
+  angle: number;
+  speed: number;
 
   constructor({
     moveXEvents,
@@ -28,6 +34,13 @@ export class GameChartEventLayer implements IPhiChartEventLayer {
     this.alphaEvents = [ ...alphaEvents ];
     this.rotateEvents = [ ...rotateEvents ];
     this.speedEvents = [ ...speedEvents ];
+
+    // Init layer values
+    this.positionX = 0;
+    this.positionY = 0;
+    this.alpha = 0;
+    this.angle = 0;
+    this.speed = 1;
   }
 
   sortEvents() {
@@ -39,4 +52,28 @@ export class GameChartEventLayer implements IPhiChartEventLayer {
 
     return this;
   }
+
+  calculateValues(time: number): void {
+    this.positionX = calculateValue(time, this.moveXEvents, this.positionX);
+    this.positionY = calculateValue(time, this.moveYEvents, this.positionY);
+    this.alpha = calculateValue(time, this.alphaEvents, this.alpha);
+    this.angle = calculateValue(time, this.rotateEvents, this.angle);
+    this.speed = calculateValue(time, this.speedEvents, this.speed);
+  }
+}
+
+function calculateValue(time: number, events: Array<GameChartEvent>, fallbackValue = 0) {
+  for (let i = 0, l = events.length; i < l; i++) {
+    const event = events[i];
+    if (event.endTime < time) continue;
+    if (event.startTime > time) break;
+
+    let timeDiff = event.endTime - event.startTime,
+      timePercentStart = (event.endTime - time) / timeDiff,
+      timePercentEnd = 1 - timePercentStart;
+    
+    return event.start * timePercentStart + event.end * timePercentEnd;
+  }
+
+  return fallbackValue;
 }

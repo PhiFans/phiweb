@@ -6,7 +6,7 @@ export interface IPhiChartNote {
   readonly type: 1 | 2 | 3 | 4;
   readonly time: number;
   readonly speed: number;
-  readonly judgeline: IPhiChartJudgeLine;
+  // readonly judgeline: IPhiChartJudgeLine;
   readonly isAbove: boolean;
   readonly holdTime?: number;
 }

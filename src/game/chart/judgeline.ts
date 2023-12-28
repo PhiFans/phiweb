@@ -1,10 +1,13 @@
-import { GameChartNote } from './note';
-import { GameChartEventLayer } from './eventlayer';
+import { GameChartNote, IPhiChartNote } from './note';
+import { GameChartEventLayer, IPhiChartEventLayer } from './eventlayer';
 import { GameChartFloorPosition } from './floorposition';
 
 export interface IPhiChartJudgeLine {
   // readonly id: number;
   readonly texture?: string;
+
+  notes: Array<IPhiChartNote>;
+  eventLayers: Array<IPhiChartEventLayer>;
 }
 
 export class GameChartJudgeLine implements IPhiChartJudgeLine {

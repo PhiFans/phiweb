@@ -4,6 +4,8 @@ export function eventsSmoother(_events: Array<IPhiChartEvent>) {
   const events = [ ..._events ].sort((a, b) => a.startTime - b.startTime);
   let result: Array<IPhiChartEvent> = [];
 
+  if (events.length <= 0) return result;
+
   for (let i = 0; i < events.length; i++) {
     const lastNewEvent = result[result.length - 1];
     const newEvent: IPhiChartEvent = { ...events[i] };
@@ -35,6 +37,32 @@ export function eventsSmoother(_events: Array<IPhiChartEvent>) {
           end: newEvent.end,
         });
       }
+    }
+  }
+
+  return result;
+}
+
+export function eventsCombiner(_events: Array<IPhiChartEvent>) {
+  const events = [ ..._events ].sort((a, b) => a.startTime - b.startTime);
+  const result = [ events[0] ];
+
+  if (events.length <= 0) return [];
+
+  for (const newEvent of events) {
+    const lastNewEvent = result[result.length - 1];
+    const eventTimeDiff = lastNewEvent.endTime - lastNewEvent.startTime;
+    const newEventTimeDiff = newEvent.endTime - newEvent.startTime;
+
+    if (newEvent.startTime == newEvent.endTime) {}
+    else if (
+      lastNewEvent.end == newEvent.start &&
+      (lastNewEvent.end - lastNewEvent.start) * eventTimeDiff == (newEvent.end - newEvent.start) * newEventTimeDiff
+    ) {
+      lastNewEvent.endTime = newEvent.endTime;
+      lastNewEvent.end = newEvent.end;
+    } else {
+      result.push(newEvent);
     }
   }
 

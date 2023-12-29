@@ -1,9 +1,9 @@
 
 export interface IPhiChartEvent {
-  readonly startTime: number;
-  readonly endTime: number;
-  readonly start: number;
-  readonly end: number;
+  startTime: number;
+  endTime: number;
+  start: number;
+  end: number;
 }
 
 export class GameChartEvent implements IPhiChartEvent {

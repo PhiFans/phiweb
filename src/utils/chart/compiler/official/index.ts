@@ -1,3 +1,4 @@
+import * as Utils from '../utils';
 import { IPhiChart, IPhiChartEventLayer, IPhiChartJudgeLine, IPhiChartNote } from '../../../../game/chart';
 import * as Types from './types';
 
@@ -21,7 +22,7 @@ export function OfficialChartCompiler(json: Types.ChartFormatOfficial) : IPhiCha
       notes: [],
       eventLayers: [],
     };
-    const judgelineEvents: IPhiChartEventLayer = {
+    let judgelineEvents: IPhiChartEventLayer = {
       moveXEvents: [],
       moveYEvents: [],
       alphaEvents: [],
@@ -46,14 +47,14 @@ export function OfficialChartCompiler(json: Types.ChartFormatOfficial) : IPhiCha
       judgelineEvents.moveXEvents.push({
         startTime: calculateRealTime(rawEvent.startTime, rawJudgeline.bpm),
         endTime: calculateRealTime(rawEvent.endTime, rawJudgeline.bpm),
-        start: rawEvent.start,
-        end: rawEvent.end
+        start: (rawEvent.start - 0.5) * 2,
+        end: (rawEvent.end - 0.5) * 2
       });
       judgelineEvents.moveYEvents.push({
         startTime: calculateRealTime(rawEvent.startTime, rawJudgeline.bpm),
         endTime: calculateRealTime(rawEvent.endTime, rawJudgeline.bpm),
-        start: rawEvent.start2,
-        end: rawEvent.end2
+        start: (rawEvent.start2 - 0.5) * 2,
+        end: (rawEvent.end2 - 0.5) * 2
       });
     });
     rawJudgeline.judgeLineDisappearEvents.forEach((rawEvent) => {
@@ -81,6 +82,8 @@ export function OfficialChartCompiler(json: Types.ChartFormatOfficial) : IPhiCha
       });
     });
 
+    judgelineEvents = Utils.eventOptimizer(judgelineEvents);
+
     judgeline.eventLayers.push(judgelineEvents);
     judgelines.push(judgeline);
   });
@@ -93,5 +96,7 @@ export function OfficialChartCompiler(json: Types.ChartFormatOfficial) : IPhiCha
 }
 
 function calculateRealTime(beat: number, bpm: number) {
-  return beat / bpm * 1.875;
+  // NOTE: I guess the best way to avoid float number issues is 
+  // pre-calc values via microsecond and convert them to second before play it
+  return Math.round(beat / bpm * 1875);
 }

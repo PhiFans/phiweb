@@ -1,4 +1,14 @@
-import { IPhiChartEvent } from "../../../game/chart";
+import { IPhiChartEvent, IPhiChartEventLayer } from "../../../game/chart";
+
+export function eventOptimizer(eventLayer: IPhiChartEventLayer): IPhiChartEventLayer {
+  return {
+    moveXEvents: eventsCombiner(eventsSmoother(eventLayer.moveXEvents)),
+    moveYEvents: eventsCombiner(eventsSmoother(eventLayer.moveYEvents)),
+    alphaEvents: eventsCombiner(eventsSmoother(eventLayer.alphaEvents)),
+    rotateEvents: eventsCombiner(eventsSmoother(eventLayer.rotateEvents)),
+    speedEvents: eventsCombiner(eventsSmoother(eventLayer.speedEvents)),
+  }
+}
 
 export function eventsSmoother(_events: Array<IPhiChartEvent>) {
   const events = [ ..._events ].sort((a, b) => a.startTime - b.startTime);

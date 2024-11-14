@@ -17,6 +17,7 @@
     "vite-plugin-chunk-split": "^0.5.0"
   },
   "dependencies": {
+    "@pixi/ui": "^2.1.5",
     "pixi.js": "^8.5.2"
   }
 }

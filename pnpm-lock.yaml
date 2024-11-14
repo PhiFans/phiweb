@@ -12,12 +12,15 @@ importers:
         specifier: ^8.5.2
         version: 8.5.2
     devDependencies:
+      '@types/node':
+        specifier: ^22.9.0
+        version: 22.9.0
       typescript:
         specifier: ~5.6.2
         version: 5.6.3
       vite:
         specifier: ^5.4.10
-        version: 5.4.10
+        version: 5.4.10(@types/node@22.9.0)
 
 packages:
 
@@ -261,6 +264,9 @@ packages:
   '@types/estree@1.0.6':
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
 
+  '@types/node@22.9.0':
+    resolution: {integrity: sha512-vuyHg81vvWA1Z1ELfvLko2c8f34gyA0zaic0+Rllc5lbCnbSyuvb2Oxpm6TAUAC/2xZN3QGqxBNggD1nNR2AfQ==}
+
   '@webgpu/types@0.1.51':
     resolution: {integrity: sha512-ktR3u64NPjwIViNCck+z9QeyN0iPkQCUOQ07ZCV1RzlkfP+olLTeEZ95O1QHS+v4w9vJeY9xj/uJuSphsHy5rQ==}
 
@@ -318,6 +324,9 @@ packages:
     resolution: {integrity: sha512-hjcS1mhfuyi4WW8IWtjP7brDrG2cuDZukyrYrSauoXGNgx0S7zceP07adYkJycEr56BOUTNPzbInooiN3fn1qw==}
     engines: {node: '>=14.17'}
     hasBin: true
+
+  undici-types@6.19.8:
+    resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
 
   vite@5.4.10:
     resolution: {integrity: sha512-1hvaPshuPUtxeQ0hsVH3Mud0ZanOLwVTneA1EgbAM5LhaZEqyPWGRQ7BtaMvUrTDeEaC8pxtj6a6jku3x4z6SQ==}
@@ -483,6 +492,10 @@ snapshots:
 
   '@types/estree@1.0.6': {}
 
+  '@types/node@22.9.0':
+    dependencies:
+      undici-types: 6.19.8
+
   '@webgpu/types@0.1.51': {}
 
   '@xmldom/xmldom@0.8.10': {}
@@ -574,10 +587,13 @@ snapshots:
 
   typescript@5.6.3: {}
 
-  vite@5.4.10:
+  undici-types@6.19.8: {}
+
+  vite@5.4.10(@types/node@22.9.0):
     dependencies:
       esbuild: 0.21.5
       postcss: 8.4.47
       rollup: 4.25.0
     optionalDependencies:
+      '@types/node': 22.9.0
       fsevents: 2.3.3

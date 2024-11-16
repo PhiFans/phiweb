@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@pixi/layout':
+        specifier: ^2.0.1
+        version: 2.0.1(pixi.js@8.5.2)
       '@pixi/ui':
         specifier: ^2.1.5
         version: 2.1.5(pixi.js@8.5.2)
@@ -173,6 +176,11 @@ packages:
 
   '@pixi/colord@2.9.6':
     resolution: {integrity: sha512-nezytU2pw587fQstUu1AsJZDVEynjskwOL+kibwcdxsMBFqPsFFNA7xl0ii/gXuDi6M0xj3mfRJj8pBSc2jCfA==}
+
+  '@pixi/layout@2.0.1':
+    resolution: {integrity: sha512-xQj/w44FKLaRn71iEQACxRTYgEVU4c8SXTJKcSIDm/uXgKm3JKRylEOpQ9u6x3gWIFeV5d3gx/oHBJHdZhqAoQ==}
+    peerDependencies:
+      pixi.js: ^8.0.4
 
   '@pixi/ui@2.1.5':
     resolution: {integrity: sha512-hdraQYreymjYjWiUu/L4uQIl6VaPcREyvjB64mZpTB44SQ0WmcpiZtw4HyGvM48JRMlkQb12CiFyvxFKI8uC1Q==}
@@ -467,6 +475,10 @@ snapshots:
   '@jridgewell/sourcemap-codec@1.5.0': {}
 
   '@pixi/colord@2.9.6': {}
+
+  '@pixi/layout@2.0.1(pixi.js@8.5.2)':
+    dependencies:
+      pixi.js: 8.5.2
 
   '@pixi/ui@2.1.5(pixi.js@8.5.2)':
     dependencies:

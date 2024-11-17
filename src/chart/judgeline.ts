@@ -1,7 +1,7 @@
-import { GameChartEventSpeed, GameChartEvent } from './event';
+import { GameChartEvent } from './event';
 
 export class GameChartJudgeLine {
-  readonly speed: GameChartEventSpeed[] = new Array();
+  readonly speed: GameChartEvent[] = new Array();
   /**
    * Use percentage. The center of the X-axis is `0%`.
    */

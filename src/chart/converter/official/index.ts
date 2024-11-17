@@ -59,7 +59,7 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
     oldLine.speedEvents.forEach((oldEvent) => {
       newLine.speed.push(new GameChartEvent(
         calcRealTime(oldEvent.startTime, oldLine.bpm),
-        calcRealTime(oldEvent.endTime, oldLine.bpm),
+        oldEvent.endTime < 999999999 ? calcRealTime(oldEvent.endTime, oldLine.bpm) : Infinity,
         oldEvent.value, oldEvent.value,
         6 // Should be enough
       ));
@@ -67,7 +67,7 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
 
     oldLine.judgeLineMoveEvents.forEach((oldEvent) => {
       const startTime = calcRealTime(oldEvent.startTime, oldLine.bpm);
-      const endTime = calcRealTime(oldEvent.endTime, oldLine.bpm);
+      const endTime = oldEvent.endTime < 999999999 ? calcRealTime(oldEvent.endTime, oldLine.bpm) : Infinity;
 
       newLine.moveX.push(new GameChartEvent(
         startTime, endTime,

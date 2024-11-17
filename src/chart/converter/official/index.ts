@@ -1,7 +1,7 @@
 import { GameChart } from '@/chart';
 import { GameChartJudgeLine } from '@/chart/judgeline';
 import { IChartNoteOfficial, IChartOfficial } from './types';
-import { GameChartEventSpeed } from '@/chart/event';
+import { GameChartEvent, GameChartEventSpeed } from '@/chart/event';
 
 const ConvertOfficialChartVersion = (chart: IChartOfficial) => {
   const result: IChartOfficial = { ...chart };
@@ -61,6 +61,25 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
         calcRealTime(oldEvent.startTime, oldLine.bpm),
         calcRealTime(oldEvent.endTime, oldLine.bpm),
         oldEvent.value
+      ));
+    });
+
+    oldLine.judgeLineMoveEvents.forEach((oldEvent) => {
+      const startTime = calcRealTime(oldEvent.startTime, oldLine.bpm);
+      const endTime = calcRealTime(oldEvent.endTime, oldLine.bpm);
+
+      newLine.moveX.push(new GameChartEvent(
+        startTime, endTime,
+        (oldEvent.start - 0.5),
+        (oldEvent.end - 0.5) * 2,
+        4
+      ));
+
+      newLine.moveY.push(new GameChartEvent(
+        startTime, endTime,
+        (0.5 - oldEvent.start2) * 2,
+        (0.5 - oldEvent.end2) * 2,
+        4
       ));
     });
 

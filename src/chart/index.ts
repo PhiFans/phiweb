@@ -1,18 +1,30 @@
+import { GameChartJudgeLine } from './judgeline';
+import { ConvertFromOfficial } from './converter/official';
+import { Nullable } from '@/utils';
+import { IChartOfficial } from './converter/official/types';
+
+const ParseJSON = (string: string): Nullable<unknown> => {
+  try {
+    return JSON.parse(string) as unknown;
+  } catch (e) {
+    return null;
+  }
+}
 
 export class GameChart {
-  static from(rawData: string) {
-    return new Promise((res, rej) => {
-      try {
-        const rawDataJson: any = JSON.parse(rawData);
-        if (typeof rawDataJson.formatVersion === 'number' && rawDataJson.formatVersion > 0) {
+  lines: Array<GameChartJudgeLine> = new Array();
 
-        } else {
-          return rej('Unsupported chart format');
-        }
-      } catch (e) {
-        console.error(e);
-        return rej('Unsupported chart format');
-      }
+  static from(rawData: string): Promise<GameChart> {return new Promise((res, rej) => {
+    const rawJson = ParseJSON(rawData);
+
+    (new Promise(() => {
+      throw new Error('Promise chain!');
+    })).catch(() => {
+      // Parse official chart
+      if (!rawJson) throw new Error('Not a JSON chart file!');
+      res(ConvertFromOfficial(rawJson as IChartOfficial));
+    }).catch(() => {
+      rej('Unsupported chart format');
     });
-  }
+  });}
 }

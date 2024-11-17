@@ -84,6 +84,25 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
       ));
     });
 
+    oldLine.judgeLineRotateEvents.forEach((oldEvent) => {
+      newLine.rotate.push(new GameChartEvent(
+        calcRealTime(oldEvent.startTime, oldLine.bpm),
+        oldEvent.endTime < 999999999 ? calcRealTime(oldEvent.endTime, oldLine.bpm) : Infinity,
+        -(Math.PI / 180) * oldEvent.start,
+        -(Math.PI / 180) * oldEvent.end
+      ));
+    });
+
+    oldLine.judgeLineDisappearEvents.forEach((oldEvent) => {
+      newLine.alpha.push(new GameChartEvent(
+        calcRealTime(oldEvent.startTime, oldLine.bpm),
+        oldEvent.endTime < 999999999 ? calcRealTime(oldEvent.endTime, oldLine.bpm) : Infinity,
+        oldEvent.start,
+        oldEvent.end,
+        4
+      ));
+    });
+
     newChart.lines.push(newLine);
   });
 

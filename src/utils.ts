@@ -16,3 +16,17 @@ export const PopupReadFiles = (multiple = false, accept: string | Array<string> 
 
   fileDOM.click();
 });
+
+export const ReadFileAsText = (file: File | Blob): Promise<string> => new Promise((res, rej) => {
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    res(reader.result as string);
+  };
+
+  reader.onerror = (e) => {
+    rej(e);
+  };
+
+  reader.readAsText(file);
+});

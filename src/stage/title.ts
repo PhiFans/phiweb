@@ -1,6 +1,8 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { Button } from '@pixi/ui';
 import { Layout } from '@pixi/layout';
+import { PopupReadFiles, ReadFileAsText } from '@/utils';
+import { GameChart } from '@/chart';
 
 const createButtonView = (textStr: string) => {
   const container = new Container();
@@ -28,6 +30,21 @@ const createButtonView = (textStr: string) => {
 
 const TitleButtonLoadChart = new Button(createButtonView('Load chart'));
 const TitleButtonLoadAudio = new Button(createButtonView('Load audio'));
+
+TitleButtonLoadChart.onPress.connect(() => {
+  PopupReadFiles()
+    .then((e) => {
+      if (!e || !e[0]) return;
+      const [ chartBlob ] = e;
+
+      ReadFileAsText(chartBlob)
+        .then((e) => {
+          GameChart.from(e)
+            .then((e) => console.log(e));
+        })
+        .catch((e) => console.error(e));
+    });
+});
 
 // XXX: How do i use this??
 const TitleStage = new Layout({

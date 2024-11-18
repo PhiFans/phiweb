@@ -1,6 +1,13 @@
 import { Nullable } from "@/utils";
 
-export class GameChartEvent {
+export interface IGameChartEvent {
+  startTime: number,
+  endTime: number,
+  start: number,
+  end: number,
+}
+
+export class GameChartEvent implements IGameChartEvent {
   readonly startTime: number;
   readonly endTime: number;
   readonly start: number;

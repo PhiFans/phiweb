@@ -32,7 +32,7 @@ export const arrangeSameValueEvents = (events: IGameChartEvents) => {
       }
     }
 
-    return result.slice();
+    return result;
   };
 
   events.speed = arrangeSameValueEvent(events.speed);

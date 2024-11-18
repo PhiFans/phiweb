@@ -1,6 +1,6 @@
 import { GameChart } from '@/chart';
 import { GameChartJudgeLine } from '@/chart/judgeline';
-import { sortEvents, arrangeEvents } from '@/utils/chart';
+import { sortEvents, arrangeEvents, parseFirstLayerEvents } from '@/utils/chart';
 import { IChartNoteOfficial, IChartOfficial } from './types';
 import { GameChartEvent } from '@/chart/event';
 import { IGameChartEvents } from '@/chart';
@@ -154,6 +154,7 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
 
     sortEvents(_newEvents);
     arrangeEvents(_newEvents);
+    parseFirstLayerEvents(_newEvents);
     newChart.lines.push(convertEventsToClasses(_newEvents));
   });
 

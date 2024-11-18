@@ -109,3 +109,19 @@ export const arrangeEvents = (events: IGameChartEvents) => {
 
   return events;
 };
+
+export const parseFirstLayerEvents = (events: IGameChartEvents) => {
+  const parseFirstLayerEvent = (events: IGameChartEvent[]) => {
+    events[0].startTime = -Infinity;
+    events[events.length - 1].endTime = Infinity;
+    return events;
+  };
+
+  events.speed = parseFirstLayerEvent(events.speed);
+  events.moveX = parseFirstLayerEvent(events.moveX);
+  events.moveY = parseFirstLayerEvent(events.moveY);
+  events.rotate = parseFirstLayerEvent(events.rotate);
+  events.alpha = parseFirstLayerEvent(events.alpha);
+
+  return events;
+};

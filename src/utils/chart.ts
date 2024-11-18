@@ -39,19 +39,7 @@ export const arrangeSameVariationEvent = (events: IGameChartEvent[]) => {
   if (events.length === 1) return events;
 
   const oldEvents = [ ...events ];
-  const newEvents: IGameChartEvent[] = [{
-    startTime: -Infinity,
-    endTime: 0,
-    start: oldEvents[0].start,
-    end: oldEvents[0].start,
-  }];
-
-  oldEvents.push({
-    startTime: oldEvents[oldEvents.length - 1].endTime,
-    endTime: Infinity,
-    start: oldEvents[oldEvents.length - 1].end,
-    end: oldEvents[oldEvents.length - 1].end,
-  });
+  const newEvents: IGameChartEvent[] = [ oldEvents.shift()! ];
 
   for (const oldEvent of oldEvents) {
     const lastNewEvent = newEvents[newEvents.length - 1];

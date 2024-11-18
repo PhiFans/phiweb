@@ -146,10 +146,10 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
         oldEvent.end,
         4
       ));
-
-      sortEvents(_newEvents);
-      arrangeEvents(_newEvents);
     });
+
+    sortEvents(_newEvents);
+    arrangeEvents(_newEvents);
 
     newChart.lines.push(newLine);
   });

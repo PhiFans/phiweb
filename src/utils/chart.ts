@@ -27,9 +27,7 @@ export const arrangeSameValueEvents = (events: IGameChartEvents) => {
         result[result.length - 1].start == event.start
       ) {
         result[result.length - 1].endTime = event.endTime;
-      }
-      else
-      {
+      } else {
         result.push(event);
       }
     }

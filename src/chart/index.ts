@@ -1,6 +1,6 @@
 import { GameChartJudgeLine } from './judgeline';
 import { ConvertFromOfficial } from './converter/official';
-import { Nullable } from '@/utils';
+import { Nullable } from '@/utils/types';
 import { IChartOfficial } from './converter/official/types';
 
 const ParseJSON = (string: string): Nullable<unknown> => {

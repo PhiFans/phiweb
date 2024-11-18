@@ -1,7 +1,7 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { Button } from '@pixi/ui';
 import { Layout } from '@pixi/layout';
-import { PopupReadFiles, ReadFileAsText } from '@/utils';
+import { PopupReadFiles, ReadFileAsText } from '@/utils/file';
 import { GameChart } from '@/chart';
 
 const createButtonView = (textStr: string) => {

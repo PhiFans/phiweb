@@ -1,7 +1,4 @@
-
-/* =========== Types =========== */
-export type Nullable<T> = T | null;
-
+import { Nullable } from './types';
 
 export const PopupReadFiles = (multiple = false, accept: string | Array<string> = ''): Promise<Nullable<FileList>> => new Promise((res) => {
   const fileDOM = document.createElement('input');

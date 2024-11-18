@@ -51,13 +51,53 @@ const ConvertOfficialChartVersion = (chart: IChartOfficial) => {
   return result;
 };
 
+const convertEventsToClasses = (events: IGameChartEvents) => {
+  const result = new GameChartJudgeLine();
+
+  events.speed.forEach((e) => result.speed.push(new GameChartEvent(
+    e.startTime,
+    e.endTime,
+    e.start,
+    e.end
+  )));
+
+  events.moveX.forEach((e) => result.moveX.push(new GameChartEvent(
+    e.startTime,
+    e.endTime,
+    e.start,
+    e.end
+  )));
+
+  events.moveY.forEach((e) => result.moveY.push(new GameChartEvent(
+    e.startTime,
+    e.endTime,
+    e.start,
+    e.end
+  )));
+
+  events.rotate.forEach((e) => result.rotate.push(new GameChartEvent(
+    e.startTime,
+    e.endTime,
+    e.start,
+    e.end
+  )));
+
+  events.alpha.forEach((e) => result.alpha.push(new GameChartEvent(
+    e.startTime,
+    e.endTime,
+    e.start,
+    e.end
+  )));
+
+  return result;
+}
+
 export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
   const chartRaw = ConvertOfficialChartVersion(_chartRaw);
   const oldNotes: IChartNoteOfficial[] = [];
   const newChart = new GameChart();
 
   chartRaw.judgeLineList.forEach((oldLine, oldLineIndex, oldLines) => {
-    const newLine = new GameChartJudgeLine();
     const _newEvents: IGameChartEvents = {
       speed: [],
       moveX: [],
@@ -73,13 +113,6 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
         start: parseDoublePrecist(oldEvent.value, 6),
         end: parseDoublePrecist(oldEvent.value, 6),
       });
-
-      newLine.speed.push(new GameChartEvent(
-        calcRealTime(oldEvent.startTime, oldLine.bpm),
-        oldEvent.endTime < 999999999 ? calcRealTime(oldEvent.endTime, oldLine.bpm) : Infinity,
-        oldEvent.value, oldEvent.value,
-        6 // Should be enough
-      ));
     });
 
     oldLine.judgeLineMoveEvents.forEach((oldEvent) => {
@@ -99,20 +132,6 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
         start: parseDoublePrecist((0.5 - oldEvent.start2) * 2, 4),
         end: parseDoublePrecist((0.5 - oldEvent.end2) * 2, 4),
       });
-
-      newLine.moveX.push(new GameChartEvent(
-        startTime, endTime,
-        (oldEvent.start - 0.5),
-        (oldEvent.end - 0.5) * 2,
-        4
-      ));
-
-      newLine.moveY.push(new GameChartEvent(
-        startTime, endTime,
-        (0.5 - oldEvent.start2) * 2,
-        (0.5 - oldEvent.end2) * 2,
-        4
-      ));
     });
 
     oldLine.judgeLineRotateEvents.forEach((oldEvent) => {
@@ -122,13 +141,6 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
         start: -(Math.PI / 180) * oldEvent.start,
         end: -(Math.PI / 180) * oldEvent.end
       });
-
-      newLine.rotate.push(new GameChartEvent(
-        calcRealTime(oldEvent.startTime, oldLine.bpm),
-        oldEvent.endTime < 999999999 ? calcRealTime(oldEvent.endTime, oldLine.bpm) : Infinity,
-        -(Math.PI / 180) * oldEvent.start,
-        -(Math.PI / 180) * oldEvent.end
-      ));
     });
 
     oldLine.judgeLineDisappearEvents.forEach((oldEvent) => {
@@ -138,20 +150,11 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
         start: parseDoublePrecist(oldEvent.start, 4),
         end: parseDoublePrecist(oldEvent.end, 4),
       });
-
-      newLine.alpha.push(new GameChartEvent(
-        calcRealTime(oldEvent.startTime, oldLine.bpm),
-        oldEvent.endTime < 999999999 ? calcRealTime(oldEvent.endTime, oldLine.bpm) : Infinity,
-        oldEvent.start,
-        oldEvent.end,
-        4
-      ));
     });
 
     sortEvents(_newEvents);
     arrangeEvents(_newEvents);
-
-    newChart.lines.push(newLine);
+    newChart.lines.push(convertEventsToClasses(_newEvents));
   });
 
   return newChart;

@@ -43,3 +43,75 @@ export const arrangeSameValueEvents = (events: IGameChartEvents) => {
 
   return events;
 };
+
+export const arrangeSameVariationEvent = (events: IGameChartEvent[]) => {
+  if (events.length <= 0) return [];
+  if (events.length === 1) return events;
+
+  const oldEvents = [ ...events ];
+  const newEvents: IGameChartEvent[] = [{
+    startTime: -Infinity,
+    endTime: 0,
+    start: oldEvents[0].start,
+    end: oldEvents[0].start,
+  }];
+
+  oldEvents.push({
+    startTime: oldEvents[oldEvents.length - 1].endTime,
+    endTime: Infinity,
+    start: oldEvents[oldEvents.length - 1].end,
+    end: oldEvents[oldEvents.length - 1].end,
+  });
+
+  for (const oldEvent of oldEvents) {
+    const lastNewEvent = newEvents[newEvents.length - 1];
+
+    if (oldEvent.endTime < oldEvent.startTime) {
+      const newStartTime = oldEvent.endTime;
+      const newEndTime = oldEvent.startTime;
+
+      oldEvent.startTime = newStartTime;
+      oldEvent.endTime = newEndTime;
+    }
+
+    if (lastNewEvent.endTime < oldEvent.startTime) {
+      newEvents.push({
+        startTime: lastNewEvent.endTime,
+        endTime: oldEvent.startTime,
+        start: lastNewEvent.end,
+        end: lastNewEvent.end
+      }, oldEvent);
+    } else if (lastNewEvent.endTime == oldEvent.startTime) {
+      newEvents.push(oldEvent);
+    } else if (lastNewEvent.endTime > oldEvent.startTime) {
+      if (lastNewEvent.endTime < oldEvent.endTime) {
+        newEvents.push({
+          startTime: lastNewEvent.endTime,
+          endTime: oldEvent.endTime,
+          start: oldEvent.start + (oldEvent.end - oldEvent.start) * ((lastNewEvent.endTime - oldEvent.startTime) / (oldEvent.endTime - oldEvent.startTime)) + (lastNewEvent.end - oldEvent.start),
+          end: oldEvent.end
+        });
+      }
+    }
+  }
+
+  const result: IGameChartEvent[] = [ newEvents.shift()! ];
+  for (const newEvent of newEvents) {
+    const lastResult = result[result.length - 1];
+    const timeBetween = lastResult.endTime - lastResult.startTime;
+    const timeBetweenNext = newEvent.endTime - newEvent.startTime;
+
+    if (newEvent.startTime == newEvent.endTime) {}
+    else if (
+      lastResult.end == newEvent.start &&
+      (lastResult.end - lastResult.start) * timeBetweenNext == (newEvent.end - newEvent.start) * timeBetween
+    ) {
+      result[result.length - 1].endTime = newEvent.endTime;
+      result[result.length - 1].end     = newEvent.end;
+    } else {
+      result.push(newEvent);
+    }
+  }
+
+  return result;
+};

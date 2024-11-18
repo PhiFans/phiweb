@@ -12,36 +12,26 @@ export const sortEvents = (events: IGameChartEvents) => {
   return events;
 };
 
-export const arrangeSameValueEvents = (events: IGameChartEvents) => {
-  const arrangeSameValueEvent = (_events: IGameChartEvent[]) => {
-    if (_events.length <= 0) return [];
-    if (_events.length === 1) return _events;
+export const arrangeSameValueEvent = (_events: IGameChartEvent[]) => {
+  if (_events.length <= 0) return [];
+  if (_events.length === 1) return _events;
 
-    let events = [ ..._events ];
-    let result = [ events.shift()! ];
+  let events = [ ..._events ];
+  let result = [ events.shift()! ];
 
-    for (const event of events) {
-      if (
-        result[result.length - 1].start == result[result.length - 1].end &&
-        event.start == event.end &&
-        result[result.length - 1].start == event.start
-      ) {
-        result[result.length - 1].endTime = event.endTime;
-      } else {
-        result.push(event);
-      }
+  for (const event of events) {
+    if (
+      result[result.length - 1].start == result[result.length - 1].end &&
+      event.start == event.end &&
+      result[result.length - 1].start == event.start
+    ) {
+      result[result.length - 1].endTime = event.endTime;
+    } else {
+      result.push(event);
     }
+  }
 
-    return result;
-  };
-
-  events.speed = arrangeSameValueEvent(events.speed);
-  events.moveX = arrangeSameValueEvent(events.moveX);
-  events.moveY = arrangeSameValueEvent(events.moveY);
-  events.rotate = arrangeSameValueEvent(events.rotate);
-  events.alpha = arrangeSameValueEvent(events.alpha);
-
-  return events;
+  return result;
 };
 
 export const arrangeSameVariationEvent = (events: IGameChartEvent[]) => {
@@ -114,4 +104,20 @@ export const arrangeSameVariationEvent = (events: IGameChartEvent[]) => {
   }
 
   return result;
+};
+
+export const arrangeEvents = (events: IGameChartEvents) => {
+  events.speed = arrangeSameValueEvent(events.speed);
+  events.moveX = arrangeSameValueEvent(events.moveX);
+  events.moveY = arrangeSameValueEvent(events.moveY);
+  events.rotate = arrangeSameValueEvent(events.rotate);
+  events.alpha = arrangeSameValueEvent(events.alpha);
+
+  events.speed = arrangeSameVariationEvent(events.speed);
+  events.moveX = arrangeSameVariationEvent(events.moveX);
+  events.moveY = arrangeSameVariationEvent(events.moveY);
+  events.rotate = arrangeSameVariationEvent(events.rotate);
+  events.alpha = arrangeSameVariationEvent(events.alpha);
+
+  return events;
 };

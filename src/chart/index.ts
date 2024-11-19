@@ -2,16 +2,7 @@ import { GameChartJudgeLine } from './judgeline';
 import { GameChartNote } from './note';
 import { ConvertFromOfficial } from './converter/official';
 import { Nullable } from '@/utils/types';
-import { IGameChartEvent } from './event';
 import { IChartOfficial } from './converter/official/types';
-
-export interface IGameChartEvents {
-  speed: IGameChartEvent[],
-  moveX: IGameChartEvent[],
-  moveY: IGameChartEvent[],
-  rotate: IGameChartEvent[],
-  alpha: IGameChartEvent[],
-}
 
 const ParseJSON = (string: string): Nullable<unknown> => {
   try {

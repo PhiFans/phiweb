@@ -3,7 +3,7 @@ import { GameChartJudgeLine } from '@/chart/judgeline';
 import { sortEvents, arrangeEvents, parseFirstLayerEvents } from '@/utils/chart';
 import { IChartOfficial } from './types';
 import { GameChartEvent } from '@/chart/event';
-import { IGameChartEvents } from '@/chart';
+import { GameChartEventLayer, IGameChartEventLayer } from '@/chart/eventlayer';
 import { EGameChartNoteType, GameChartNote } from '@/chart/note';
 
 const parseDoublePrecist = (double: number, precision: number = 0) => Math.round(double * (10 ** precision)) / (10 ** precision);
@@ -63,8 +63,8 @@ const ConvertOfficialChartVersion = (chart: IChartOfficial) => {
   return result;
 };
 
-const convertEventsToClasses = (events: IGameChartEvents) => {
-  const result = new GameChartJudgeLine();
+const convertEventsToClasses = (events: IGameChartEventLayer) => {
+  const result = new GameChartEventLayer();
 
   events.speed.forEach((e) => result.speed.push(new GameChartEvent(
     e.startTime,
@@ -109,7 +109,8 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
   const newChart = new GameChart();
 
   chartRaw.judgeLineList.forEach((oldLine) => {
-    const _newEvents: IGameChartEvents = {
+    const newLine = new GameChartJudgeLine();
+    const _newEvents: IGameChartEventLayer = {
       speed: [],
       moveX: [],
       moveY: [],
@@ -166,7 +167,7 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
     sortEvents(_newEvents);
     arrangeEvents(_newEvents);
     parseFirstLayerEvents(_newEvents);
-    const newLine = convertEventsToClasses(_newEvents);
+    const newEvents = convertEventsToClasses(_newEvents);
 
     // Parsing notes
     oldLine.notesAbove.forEach((oldNote) => {
@@ -193,6 +194,7 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
       ));
     });
 
+    newLine.eventLayers.push(newEvents);
     newChart.lines.push(newLine);
   });
 

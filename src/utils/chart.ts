@@ -1,5 +1,9 @@
+import { GameChartJudgeLine } from '@/chart/judgeline';
+import { GameChartEventSingle } from '@/chart/event';
+import { parseDoublePrecist } from './math';
 import { IGameChartEvent, IGameChartEventSingle } from '@/chart/event';
 import { IGameChartEventLayer } from '@/chart/eventlayer';
+import { Nullable } from './types';
 
 export const SortFn = (a: IGameChartEvent, b: IGameChartEvent) => a.startTime - b.startTime;
 
@@ -113,6 +117,25 @@ export const arrangeSameVariationEvent = (events: IGameChartEvent[]) => {
   return result;
 };
 
+export const fillSingleEventTimeline = (_events: IGameChartEventSingle[]) => {
+  if (_events.length <= 0) return [];
+  if (_events.length === 1) {
+    _events[0].endTime = Infinity;
+    return _events;
+  }
+
+  const events = [ ..._events ];
+  const result = [ events.shift()! ];
+
+  for (const event of events) {
+    const lastResult = result[result.length - 1];
+    if (lastResult.endTime !== event.startTime) lastResult.endTime = event.startTime;
+    result.push(event);
+  }
+
+  return result;
+};
+
 export const arrangeEvents = (events: IGameChartEventLayer) => {
   events.speed = arrangeSameSingleValueEvent(events.speed);
   events.moveX = arrangeSameValueEvent(events.moveX);
@@ -120,6 +143,7 @@ export const arrangeEvents = (events: IGameChartEventLayer) => {
   events.rotate = arrangeSameValueEvent(events.rotate);
   events.alpha = arrangeSameValueEvent(events.alpha);
 
+  events.speed = fillSingleEventTimeline(events.speed);
   events.moveX = arrangeSameVariationEvent(events.moveX);
   events.moveY = arrangeSameVariationEvent(events.moveY);
   events.rotate = arrangeSameVariationEvent(events.rotate);
@@ -142,4 +166,75 @@ export const parseFirstLayerEvents = (events: IGameChartEventLayer) => {
   events.alpha = parseFirstLayerEvent<IGameChartEvent>(events.alpha);
 
   return events;
+};
+
+export const calcLineFloorPosition = (judgeline: GameChartJudgeLine) => {
+  if (judgeline.floorPositions.length > 0) throw new Error('Floor positions already calculated');
+  if (judgeline.eventLayers.length <= 0) throw new Error('No event layers in this line');
+
+  const sameTimeSpeedEvents: Record<number, boolean> = {};
+  const floorPositions: IGameChartEventSingle[] = [];
+  let currentFloorPosition = -10;
+
+  for (const eventLayer of judgeline.eventLayers) {
+    for (const event of eventLayer.speed) {
+      const startTime = event.startTime === -Infinity ? -10000 : event.startTime;
+
+      if (!sameTimeSpeedEvents[startTime]) {
+        floorPositions.push({
+          startTime: startTime,
+          endTime: NaN,
+          value: event.startTime === -Infinity ? -10 : NaN,
+        });
+      }
+      sameTimeSpeedEvents[startTime] = true;
+    }
+  }
+
+  floorPositions.sort((a, b) => a.startTime - b.startTime);
+  if (floorPositions[0].startTime >= 0) {
+    floorPositions.unshift({
+      startTime: -10000,
+      endTime: floorPositions[0] ? floorPositions[0].startTime : Infinity,
+      value: -10
+    });
+  }
+
+  for (let i = 0; i < floorPositions.length; i++) {
+    const event = floorPositions[i];
+    const eventNext = floorPositions[i + 1];
+
+    event.value = currentFloorPosition;
+    event.endTime = eventNext ? eventNext.startTime : Infinity;
+
+    if (eventNext) currentFloorPosition = parseDoublePrecist(currentFloorPosition + ((eventNext.startTime - event.startTime) / 1000) * getLineSpeedValueByTime(judgeline, event.startTime), 4);
+  }
+
+  floorPositions.forEach((event) => judgeline.floorPositions.push(new GameChartEventSingle(
+    event.startTime,
+    event.endTime,
+    event.value
+  )));
+};
+
+export const getLineSpeedValueByTime = (judgeline: GameChartJudgeLine, time: number) => {
+  let result: Nullable<number> = null;
+
+  for (const eventLayer of judgeline.eventLayers) {
+    let value: Nullable<number> = null;
+
+    for (const event of eventLayer.speed) {
+      if (event.endTime < time) continue;
+      if (event.startTime > time) break;
+      value = event.value;
+    }
+
+    if (value !== null) {
+      if (result === null) result = 0;
+      result += value;
+    }
+  }
+
+  if (result === null) return 1;
+  else return result;
 };

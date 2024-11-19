@@ -2,7 +2,7 @@ import { GameChart } from '@/chart';
 import { GameChartJudgeLine } from '@/chart/judgeline';
 import { sortEvents, arrangeEvents, parseFirstLayerEvents } from '@/utils/chart';
 import { IChartOfficial } from './types';
-import { GameChartEvent } from '@/chart/event';
+import { GameChartEvent, GameChartEventSingle } from '@/chart/event';
 import { GameChartEventLayer, IGameChartEventLayer } from '@/chart/eventlayer';
 import { EGameChartNoteType, GameChartNote } from '@/chart/note';
 
@@ -66,11 +66,10 @@ const ConvertOfficialChartVersion = (chart: IChartOfficial) => {
 const convertEventsToClasses = (events: IGameChartEventLayer) => {
   const result = new GameChartEventLayer();
 
-  events.speed.forEach((e) => result.speed.push(new GameChartEvent(
+  events.speed.forEach((e) => result.speed.push(new GameChartEventSingle(
     e.startTime,
     e.endTime,
-    e.start,
-    e.end
+    e.value
   )));
 
   events.moveX.forEach((e) => result.moveX.push(new GameChartEvent(
@@ -122,8 +121,7 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
       _newEvents.speed.push({
         startTime: calcRealTime(oldEvent.startTime, oldLine.bpm),
         endTime: oldEvent.endTime < 999999999 ? calcRealTime(oldEvent.endTime, oldLine.bpm) : Infinity,
-        start: parseDoublePrecist(oldEvent.value, 6),
-        end: parseDoublePrecist(oldEvent.value, 6),
+        value: parseDoublePrecist(oldEvent.value, 6),
       });
     });
 

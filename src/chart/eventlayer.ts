@@ -1,8 +1,8 @@
-import { GameChartEvent } from './event';
-import { IGameChartEvent } from './event';
+import { GameChartEvent, GameChartEventSingle } from './event';
+import { IGameChartEvent, IGameChartEventSingle } from './event';
 
 export interface IGameChartEventLayer {
-  speed: IGameChartEvent[],
+  speed: IGameChartEventSingle[],
   moveX: IGameChartEvent[],
   moveY: IGameChartEvent[],
   rotate: IGameChartEvent[],
@@ -10,7 +10,7 @@ export interface IGameChartEventLayer {
 }
 
 export class GameChartEventLayer {
-  readonly speed: GameChartEvent[] = new Array();
+  readonly speed: GameChartEventSingle[] = new Array();
   /**
    * Use percentage. The center of the X-axis is `0%`.
    */

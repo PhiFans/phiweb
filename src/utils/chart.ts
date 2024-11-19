@@ -1,10 +1,10 @@
-import { IGameChartEvent } from '@/chart/event';
-import { IGameChartEvents } from '@/chart';
+import { IGameChartEvent, IGameChartEventSingle } from '@/chart/event';
+import { IGameChartEventLayer } from '@/chart/eventlayer';
 
 export const SortFn = (a: IGameChartEvent, b: IGameChartEvent) => a.startTime - b.startTime;
 
-export const sortEvents = (events: IGameChartEvents) => {
-  events.speed.sort(SortFn);
+export const sortEvents = (events: IGameChartEventLayer) => {
+  events.speed.sort((a, b) => a.startTime - b.startTime);
   events.moveX.sort(SortFn);
   events.moveY.sort(SortFn);
   events.rotate.sort(SortFn);
@@ -28,6 +28,25 @@ export const arrangeSameValueEvent = (_events: IGameChartEvent[]) => {
       result[result.length - 1].endTime = event.endTime;
     } else {
       result.push(event);
+    }
+  }
+
+  return result;
+};
+
+export const arrangeSameSingleValueEvent = (_events: IGameChartEventSingle[]) => {
+  if (_events.length <= 0) return [];
+  if (_events.length === 1) return _events;
+
+  const events = [ ..._events ];
+  const result = [ events.shift()! ];
+
+  for (const event of events) {
+    const lastResult = result[result.length - 1];
+    if (lastResult.value !== event.value) {
+      result.push(event);
+    } else {
+      lastResult.endTime = event.endTime;
     }
   }
 
@@ -94,14 +113,13 @@ export const arrangeSameVariationEvent = (events: IGameChartEvent[]) => {
   return result;
 };
 
-export const arrangeEvents = (events: IGameChartEvents) => {
-  events.speed = arrangeSameValueEvent(events.speed);
+export const arrangeEvents = (events: IGameChartEventLayer) => {
+  events.speed = arrangeSameSingleValueEvent(events.speed);
   events.moveX = arrangeSameValueEvent(events.moveX);
   events.moveY = arrangeSameValueEvent(events.moveY);
   events.rotate = arrangeSameValueEvent(events.rotate);
   events.alpha = arrangeSameValueEvent(events.alpha);
 
-  events.speed = arrangeSameVariationEvent(events.speed);
   events.moveX = arrangeSameVariationEvent(events.moveX);
   events.moveY = arrangeSameVariationEvent(events.moveY);
   events.rotate = arrangeSameVariationEvent(events.rotate);
@@ -110,18 +128,18 @@ export const arrangeEvents = (events: IGameChartEvents) => {
   return events;
 };
 
-export const parseFirstLayerEvents = (events: IGameChartEvents) => {
-  const parseFirstLayerEvent = (events: IGameChartEvent[]) => {
+export const parseFirstLayerEvents = (events: IGameChartEventLayer) => {
+  const parseFirstLayerEvent = <T extends { startTime: number, endTime: number }>(events: T[]) => {
     events[0].startTime = -Infinity;
     events[events.length - 1].endTime = Infinity;
     return events;
   };
 
-  events.speed = parseFirstLayerEvent(events.speed);
-  events.moveX = parseFirstLayerEvent(events.moveX);
-  events.moveY = parseFirstLayerEvent(events.moveY);
-  events.rotate = parseFirstLayerEvent(events.rotate);
-  events.alpha = parseFirstLayerEvent(events.alpha);
+  events.speed = parseFirstLayerEvent<IGameChartEventSingle>(events.speed);
+  events.moveX = parseFirstLayerEvent<IGameChartEvent>(events.moveX);
+  events.moveY = parseFirstLayerEvent<IGameChartEvent>(events.moveY);
+  events.rotate = parseFirstLayerEvent<IGameChartEvent>(events.rotate);
+  events.alpha = parseFirstLayerEvent<IGameChartEvent>(events.alpha);
 
   return events;
 };

@@ -1,12 +1,24 @@
 import { GameChart } from '@/chart';
 import { GameChartJudgeLine } from '@/chart/judgeline';
 import { sortEvents, arrangeEvents, parseFirstLayerEvents } from '@/utils/chart';
-import { IChartNoteOfficial, IChartOfficial } from './types';
+import { IChartOfficial } from './types';
 import { GameChartEvent } from '@/chart/event';
 import { IGameChartEvents } from '@/chart';
+import { EGameChartNoteType, GameChartNote } from '@/chart/note';
 
 const parseDoublePrecist = (double: number, precision: number = 0) => Math.round(double * (10 ** precision)) / (10 ** precision);
 const calcRealTime = (time: number, bpm: number) => Math.floor(time / bpm * 1875);
+const getNoteType = (type: number) => {
+  switch (type) {
+    case 1: return EGameChartNoteType.TAP;
+    case 2: return EGameChartNoteType.DRAG;
+    case 3: return EGameChartNoteType.HOLD;
+    case 4: return EGameChartNoteType.FLICK;
+    default: {
+      throw new Error(`No such note type: ${type}`);
+    }
+  }
+};
 
 const ConvertOfficialChartVersion = (chart: IChartOfficial) => {
   const result: IChartOfficial = { ...chart };
@@ -94,10 +106,9 @@ const convertEventsToClasses = (events: IGameChartEvents) => {
 
 export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
   const chartRaw = ConvertOfficialChartVersion(_chartRaw);
-  const oldNotes: IChartNoteOfficial[] = [];
   const newChart = new GameChart();
 
-  chartRaw.judgeLineList.forEach((oldLine, oldLineIndex, oldLines) => {
+  chartRaw.judgeLineList.forEach((oldLine) => {
     const _newEvents: IGameChartEvents = {
       speed: [],
       moveX: [],
@@ -155,8 +166,37 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
     sortEvents(_newEvents);
     arrangeEvents(_newEvents);
     parseFirstLayerEvents(_newEvents);
-    newChart.lines.push(convertEventsToClasses(_newEvents));
+    const newLine = convertEventsToClasses(_newEvents);
+
+    // Parsing notes
+    oldLine.notesAbove.forEach((oldNote) => {
+      newChart.notes.push(new GameChartNote(
+        newLine,
+        getNoteType(oldNote.type),
+        true,
+        calcRealTime(oldNote.time, oldLine.bpm),
+        oldNote.speed,
+        parseDoublePrecist(oldNote.positionX, 6),
+        oldNote.type === 3 ? calcRealTime(oldNote.holdTime, oldLine.bpm) : null
+      ));
+    });
+
+    oldLine.notesBelow.forEach((oldNote) => {
+      newChart.notes.push(new GameChartNote(
+        newLine,
+        getNoteType(oldNote.type),
+        false,
+        calcRealTime(oldNote.time, oldLine.bpm),
+        oldNote.speed,
+        parseDoublePrecist(oldNote.positionX, 6),
+        oldNote.type === 3 ? calcRealTime(oldNote.holdTime, oldLine.bpm) : null
+      ));
+    });
+
+    newChart.lines.push(newLine);
   });
+
+  newChart.notes.sort((a, b) => a.time - b.time);
 
   return newChart;
 };

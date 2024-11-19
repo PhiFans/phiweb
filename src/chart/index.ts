@@ -1,4 +1,5 @@
 import { GameChartJudgeLine } from './judgeline';
+import { GameChartNote } from './note';
 import { ConvertFromOfficial } from './converter/official';
 import { Nullable } from '@/utils/types';
 import { IGameChartEvent } from './event';
@@ -22,6 +23,7 @@ const ParseJSON = (string: string): Nullable<unknown> => {
 
 export class GameChart {
   lines: Array<GameChartJudgeLine> = new Array();
+  notes: Array<GameChartNote> = new Array();
 
   static from(rawData: string): Promise<GameChart> {return new Promise((res, rej) => {
     const rawJson = ParseJSON(rawData);

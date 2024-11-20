@@ -1,6 +1,6 @@
 import { GameChart } from '@/chart';
 import { GameChartJudgeLine } from '@/chart/judgeline';
-import { sortEvents, arrangeEvents, parseFirstLayerEvents, calcLineFloorPosition } from '@/utils/chart';
+import { sortEvents, arrangeEvents, parseFirstLayerEvents, calcLineFloorPosition, getFloorPositionByTime } from '@/utils/chart';
 import { parseDoublePrecist } from '@/utils/math';
 import { IChartOfficial } from './types';
 import { GameChartEvent, GameChartEventSingle } from '@/chart/event';
@@ -170,26 +170,38 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
 
     // Parsing notes
     oldLine.notesAbove.forEach((oldNote) => {
+      const parsedSpeed = parseDoublePrecist(oldNote.speed, 6);
+      const realTime = calcRealTime(oldNote.time, oldLine.bpm);
+      const realHoldTime = oldNote.type === 3 ? calcRealTime(oldNote.holdTime, oldLine.bpm) : null;
+
       newChart.notes.push(new GameChartNote(
         newLine,
         getNoteType(oldNote.type),
         true,
-        calcRealTime(oldNote.time, oldLine.bpm),
-        oldNote.speed,
+        realTime,
+        parsedSpeed,
         parseDoublePrecist(oldNote.positionX, 6),
-        oldNote.type === 3 ? calcRealTime(oldNote.holdTime, oldLine.bpm) : null
+        getFloorPositionByTime(newLine, realTime),
+        realHoldTime,
+        oldNote.type === 3 ? parseDoublePrecist(realHoldTime! * parsedSpeed / 1000, 4) : null
       ));
     });
 
     oldLine.notesBelow.forEach((oldNote) => {
+      const parsedSpeed = parseDoublePrecist(oldNote.speed, 6);
+      const realTime = calcRealTime(oldNote.time, oldLine.bpm);
+      const realHoldTime = oldNote.type === 3 ? calcRealTime(oldNote.holdTime, oldLine.bpm) : null;
+
       newChart.notes.push(new GameChartNote(
         newLine,
         getNoteType(oldNote.type),
         false,
-        calcRealTime(oldNote.time, oldLine.bpm),
-        oldNote.speed,
+        realTime,
+        parsedSpeed,
         parseDoublePrecist(oldNote.positionX, 6),
-        oldNote.type === 3 ? calcRealTime(oldNote.holdTime, oldLine.bpm) : null
+        getFloorPositionByTime(newLine, realTime),
+        realHoldTime,
+        oldNote.type === 3 ? parseDoublePrecist(realHoldTime! * parsedSpeed / 1000, 4) : null
       ));
     });
 

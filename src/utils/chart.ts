@@ -238,3 +238,28 @@ export const getLineSpeedValueByTime = (judgeline: GameChartJudgeLine, time: num
   if (result === null) return 1;
   else return result;
 };
+
+export const getFloorPositionByTime = (judgeline: GameChartJudgeLine, time: number) => {
+  const getFloorPosition = (judgeline: GameChartJudgeLine, time: number) => {
+    if (judgeline.floorPositions.length <= 0) throw new Error('No floor positions for this line');
+
+    for (const event of judgeline.floorPositions) {
+      if (event.endTime < time) continue;
+      if (event.startTime > time) break;
+
+      return event;
+    }
+
+    return new GameChartEventSingle(
+      time,
+      Infinity,
+      time / 1000,
+      4
+    );
+  };
+
+  const speed = getLineSpeedValueByTime(judgeline, time);
+  const floorPosition = getFloorPosition(judgeline, time);
+
+  return parseDoublePrecist(floorPosition.value + (speed * ((time - floorPosition.startTime) / 1000)), 4);
+};

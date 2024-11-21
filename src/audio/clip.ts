@@ -44,7 +44,7 @@ export class GameAudioClip {
 
     this.buffer = this.audioCtx.createBufferSource();
     this.buffer.buffer = this.source;
-    this.buffer.connect(this.channel.distance);
+    this.buffer.connect(this.channel.gain);
 
     if (isNaN(this.pauseTime)) {
       this.startTime = this.clock.time;

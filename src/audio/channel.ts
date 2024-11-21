@@ -5,7 +5,7 @@ import { GameAudioClip } from './clip';
 export class GameAudioChannel {
   private readonly audioCtx: AudioContext;
   private readonly ticker: Ticker;
-  private readonly gain: GainNode;
+  readonly gain: GainNode;
   readonly playlist: Array<GameAudioClip> = new Array();
 
   private isTickerStarted = false;
@@ -15,7 +15,7 @@ export class GameAudioChannel {
     this.ticker = ticker;
 
     this.gain = this.audioCtx.createGain();
-    this.gain.connect(audio.masterGain.gain);
+    this.gain.connect(audio.masterGain);
 
     this.calcTick = this.calcTick.bind(this);
   }
@@ -54,9 +54,5 @@ export class GameAudioChannel {
 
   set volume(value: number) {
     this.gain.gain.value = value;
-  }
-
-  get distance() {
-    return this.gain;
   }
 }

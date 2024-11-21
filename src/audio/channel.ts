@@ -44,4 +44,8 @@ export class GameAudioChannel {
   set volume(value: number) {
     this.gain.gain.value = value;
   }
+
+  get distance() {
+    return this.gain.gain;
+  }
 }

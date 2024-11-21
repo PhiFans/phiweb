@@ -1,8 +1,10 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { Button } from '@pixi/ui';
 import { Layout } from '@pixi/layout';
-import { PopupReadFiles, ReadFileAsText } from '@/utils/file';
+import decodeAudio from 'audio-decode';
+import { PopupReadFiles, ReadFileAsArrayBuffer, ReadFileAsText } from '@/utils/file';
 import { GameChart } from '@/chart';
+import { GameAudio } from '@/audio';
 
 const createButtonView = (textStr: string) => {
   const container = new Container();
@@ -41,6 +43,24 @@ TitleButtonLoadChart.onPress.connect(() => {
         .then((e) => {
           GameChart.from(e)
             .then((e) => console.log(e));
+        })
+        .catch((e) => console.error(e));
+    });
+});
+
+TitleButtonLoadAudio.onPress.connect(() => {
+  PopupReadFiles()
+    .then((e) => {
+      if (!e || !e[0]) return;
+      const [ audioBlob ] = e;
+
+      ReadFileAsArrayBuffer(audioBlob)
+        .then((e) => {
+          decodeAudio(e)
+            .then((e) => {
+              console.log(GameAudio.from(e));
+            })
+            .catch((e) => console.error(e));
         })
         .catch((e) => console.error(e));
     });

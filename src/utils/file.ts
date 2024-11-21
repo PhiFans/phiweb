@@ -27,3 +27,17 @@ export const ReadFileAsText = (file: File | Blob): Promise<string> => new Promis
 
   reader.readAsText(file);
 });
+
+export const ReadFileAsArrayBuffer = (file: File | Blob): Promise<ArrayBuffer> => new Promise((res, rej) => {
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    res(reader.result as ArrayBuffer);
+  };
+
+  reader.onerror = (e) => {
+    rej(e);
+  };
+
+  reader.readAsArrayBuffer(file);
+});

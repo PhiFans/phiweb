@@ -1,5 +1,4 @@
 import { Nullable } from '@/utils/types';
-import { GameAudio } from '.';
 import { GameAudioChannel } from './channel';
 import { GameAudioClock } from './clock';
 
@@ -11,6 +10,7 @@ export enum EGameAudioClipStatus {
 
 export class GameAudioClip {
   readonly source: AudioBuffer;
+  readonly duration: number;
 
   private channel: Nullable<GameAudioChannel> = null;
   private buffer?: AudioBufferSourceNode;
@@ -21,12 +21,13 @@ export class GameAudioClip {
   startTime: number = NaN;
   pauseTime: number = NaN;
 
-  constructor(audio: GameAudio, audioBuffer: AudioBuffer, channel: Nullable<GameAudioChannel> = null) {
+  constructor(audioCtx: AudioContext, clock: GameAudioClock, audioBuffer: AudioBuffer, channel: Nullable<GameAudioChannel> = null) {
     this.source = audioBuffer;
+    this.duration = this.source.duration * 1000;
     this.channel = channel;
 
-    this.audioCtx = audio.audioCtx;
-    this.clock = audio.clock;
+    this.audioCtx = audioCtx;
+    this.clock = clock;
   }
 
   setChannel(channel: GameAudioChannel) {

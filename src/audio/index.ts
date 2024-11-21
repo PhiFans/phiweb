@@ -2,6 +2,7 @@ import { Ticker } from 'pixi.js';
 import { GameAudioClock } from './clock';
 import { resumeAudioCtx } from './utils';
 import { GameAudioChannel } from './channel';
+import { GameAudioClip } from './clip';
 
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 const GlobalAudioCtx = new AudioCtx({ latencyHint: 'interactive' });
@@ -28,6 +29,10 @@ export class GameAudio {
       music: new GameAudioChannel(this, GlobalAudioTicker),
       effect: new GameAudioChannel(this, GlobalAudioTicker),
     };
+  }
+
+  static from(buffer: AudioBuffer) {
+    return new GameAudioClip(GlobalAudioCtx, GlobalAudioClock, buffer);
   }
 
   get masterVolume() {

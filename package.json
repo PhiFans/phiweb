@@ -19,6 +19,7 @@
   "dependencies": {
     "@pixi/layout": "^2.0.1",
     "@pixi/ui": "^2.1.5",
+    "audio-decode": "^2.2.2",
     "pixi.js": "^8.5.2"
   }
 }

@@ -1,11 +1,12 @@
 import { Ticker } from 'pixi.js';
 import { GameAudio } from '.';
+import { GameAudioClip } from './clip';
 
 export class GameAudioChannel {
   private readonly audioCtx: AudioContext;
   private readonly ticker: Ticker;
   private readonly gain: GainNode;
-  readonly playlist: Array<unknown> = new Array();
+  readonly playlist: Array<GameAudioClip> = new Array();
 
   private isTickerStarted = false;
 
@@ -34,6 +35,16 @@ export class GameAudioChannel {
   private calcTick() {
     while(this.playlist.length > 0) {
       const audio = this.playlist.shift()!;
+      const buffer = this.audioCtx.createBufferSource();
+
+      buffer.buffer = audio.source;
+      buffer.connect(this.gain);
+      buffer.onended = () => {
+        buffer.stop();
+        buffer.disconnect();
+      };
+
+      buffer.start();
     }
   }
 
@@ -46,6 +57,6 @@ export class GameAudioChannel {
   }
 
   get distance() {
-    return this.gain.gain;
+    return this.gain;
   }
 }

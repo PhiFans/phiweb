@@ -1,16 +1,19 @@
 import { Layout } from '@pixi/layout';
 import { Container } from 'pixi.js';
 import { TitleStage } from './title';
+import { Game } from '@/game';
 
 export class GameStage {
   private _currentStage: Layout = TitleStage;
+  readonly game: Game;
   readonly stageContainer: Container;
   readonly stages: Record<string, Layout> = {
     title: TitleStage,
   };
 
-  constructor(stageContainer: Container) {
-    this.stageContainer = stageContainer;
+  constructor(game: Game) {
+    this.game = game;
+    this.stageContainer = this.game.renderer.containers.ui;
     this.set('title');
   }
 

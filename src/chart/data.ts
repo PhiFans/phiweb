@@ -12,11 +12,11 @@ const ParseJSON = (string: string): Nullable<unknown> => {
   }
 }
 
-export class GameChart {
+export class GameChartData {
   lines: Array<GameChartJudgeLine> = new Array();
   notes: Array<GameChartNote> = new Array();
 
-  static from(rawData: string): Promise<GameChart> {return new Promise((res, rej) => {
+  static from(rawData: string): Promise<GameChartData> {return new Promise((res, rej) => {
     const rawJson = ParseJSON(rawData);
 
     (new Promise(() => {

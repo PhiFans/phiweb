@@ -1,4 +1,4 @@
-import { GameChart } from '@/chart';
+import { GameChartData } from '@/chart/data';
 import { GameChartJudgeLine } from '@/chart/judgeline';
 import { sortEvents, arrangeEvents, parseFirstLayerEvents, calcLineFloorPosition, getFloorPositionByTime } from '@/utils/chart';
 import { parseDoublePrecist } from '@/utils/math';
@@ -105,7 +105,7 @@ const convertEventsToClasses = (events: IGameChartEventLayer) => {
 
 export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
   const chartRaw = ConvertOfficialChartVersion(_chartRaw);
-  const newChart = new GameChart();
+  const newChart = new GameChartData();
 
   chartRaw.judgeLineList.forEach((oldLine) => {
     const newLine = new GameChartJudgeLine();

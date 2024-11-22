@@ -3,7 +3,7 @@ import { Button } from '@pixi/ui';
 import { Layout } from '@pixi/layout';
 import decodeAudio from 'audio-decode';
 import { PopupReadFiles, ReadFileAsArrayBuffer, ReadFileAsText } from '@/utils/file';
-import { GameChart } from '@/chart';
+import { GameChartData } from '@/chart/data';
 import { GameAudio } from '@/audio';
 
 const createButtonView = (textStr: string) => {
@@ -41,7 +41,7 @@ TitleButtonLoadChart.onPress.connect(() => {
 
       ReadFileAsText(chartBlob)
         .then((e) => {
-          GameChart.from(e)
+          GameChartData.from(e)
             .then((e) => console.log(e));
         })
         .catch((e) => console.error(e));

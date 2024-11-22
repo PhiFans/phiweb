@@ -10,23 +10,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]
-
     steps:
     - uses: actions/checkout@v4
     - name: Get git short sha
       id: short-sha
       run: echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_OUTPUT"
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Use Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: '20.x'
         cache: 'pnpm'
     - run: npm run build
     - name: Upload build artifact
       uses: actions/upload-artifact@v4.4.3
       with:
-        name: build-${{ needs.build.outputs.sha_short }}-${{ matrix.node-version }}
+        name: build-${{ needs.build.outputs.sha_short }}
         path: dist/

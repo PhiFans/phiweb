@@ -17,15 +17,19 @@ type TGameFileAudio = {
 type TGameFile = TGameFileChart | TGameFileAudio;
 
 export class GameFiles extends Map<string, TGameFile> {
-  async from(_files: File | FileList) {
-    const files: File[] = [];
-    if (_files instanceof FileList) files.push(..._files);
-    else files.push(_files);
+  from(_files: File | FileList): Promise<this> {
+    return new Promise(async (res) => {
+      const files: File[] = [];
+      if (_files instanceof FileList) files.push(..._files);
+      else files.push(_files);
 
-    for (const file of files) {
-      await this.fromSingle(file);
+      for (const file of files) {
+        await this.fromSingle(file);
+      }
+
       console.log(this);
-    }
+      res(this);
+    });
   }
 
   getCharts() {

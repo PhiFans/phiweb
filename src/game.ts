@@ -2,11 +2,13 @@ import { AutoDetectOptions } from 'pixi.js';
 import { GameAudio } from './audio';
 import { GameRenderer } from './renderer';
 import { GameStage } from './stage';
+import { GameFiles } from './files';
 
 export class Game {
   readonly renderer: GameRenderer = new GameRenderer();
   readonly stage: GameStage = new GameStage(this);
   readonly audio: GameAudio = new GameAudio();
+  readonly files: GameFiles = new GameFiles();
 
   private videoOptions: Partial<AutoDetectOptions> = {};
 

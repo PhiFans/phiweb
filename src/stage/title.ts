@@ -1,98 +1,70 @@
-import { Container, Graphics, Text } from 'pixi.js';
-import { Button } from '@pixi/ui';
+import { Graphics, Text } from 'pixi.js';
+import { FancyButton } from '@pixi/ui';
 import { Layout } from '@pixi/layout';
-import decodeAudio from 'audio-decode';
-import { PopupReadFiles, ReadFileAsArrayBuffer, ReadFileAsText } from '@/utils/file';
-import { GameChartData } from '@/chart/data';
-import { GameAudio } from '@/audio';
+import { PopupReadFiles } from '@/utils/file';
+import { IGameStageBase } from '.';
+import { Game } from '@/game';
 
-const createButtonView = (textStr: string) => {
-  const container = new Container();
-  const graphic = new Graphics();
-  const text = new Text({
-    text: textStr,
-    style: {
-      fill: 0xFFFFFF,
-    },
+const createButtonView = (textStr: string, width: number = 160, height: number = 40) => {
+  const button = new FancyButton({
+    defaultView: new Graphics()
+      .rect(0, 0, width, height)
+      .fill(0x666666),
+    hoverView: new Graphics()
+      .rect(0, 0, width, height)
+      .fill(0xAAAAAA),
+    pressedView: new Graphics()
+      .rect(0, 0, width, height)
+      .fill(0x222222),
+    text: new Text({
+      text: textStr,
+      style: {
+        fill: 0xFFFFFF,
+        fontWeight: 'bold',
+      }
+    })
   });
-
-  graphic.fillStyle = 'grey';
-  graphic.rect(0, 0, 120, 30)
-    .fill();
-
-  text.zIndex = 10;
-  graphic.zIndex = 0;
-
-  container.addChild(text);
-  container.addChild(graphic);
-  container.sortChildren();
-
-  return container;
+  return button;
 };
 
-const TitleButtonLoadChart = new Button(createButtonView('Load chart'));
-const TitleButtonLoadAudio = new Button(createButtonView('Load audio'));
+export class GameStageTitle implements IGameStageBase {
+  readonly game: Game;
+  readonly layout: Layout;
 
-TitleButtonLoadChart.onPress.connect(() => {
-  PopupReadFiles()
-    .then((e) => {
-      if (!e || !e[0]) return;
-      const [ chartBlob ] = e;
+  constructor(game: Game) {
+    const TitleButtonLoadFiles = createButtonView('Load files');
+    const TitleButtonStart = createButtonView('Start');
 
-      ReadFileAsText(chartBlob)
-        .then((e) => {
-          GameChartData.from(e)
-            .then((e) => console.log(e));
-        })
-        .catch((e) => console.error(e));
+    TitleButtonLoadFiles.onPress.connect(() => this.onClickSelect());
+
+    this.game = game;
+    // XXX: How do i use this??
+    this.layout = new Layout({
+      content: [
+        {
+          content: TitleButtonLoadFiles,
+          styles: {
+            margin: 8,
+          },
+        },
+        {
+          content: TitleButtonStart,
+          styles: {
+            margin: 8,
+          },
+        },
+      ],
+      styles: {
+        padding: 4,
+      }
     });
-});
-
-TitleButtonLoadAudio.onPress.connect(() => {
-  PopupReadFiles()
-    .then((e) => {
-      if (!e || !e[0]) return;
-      const [ audioBlob ] = e;
-
-      ReadFileAsArrayBuffer(audioBlob)
-        .then((e) => {
-          decodeAudio(e)
-            .then((e) => {
-              console.log(GameAudio.from(e));
-            })
-            .catch((e) => console.error(e));
-        })
-        .catch((e) => console.error(e));
-    });
-});
-
-// XXX: How do i use this??
-const TitleStage = new Layout({
-  content: [
-    {
-      id: 'title',
-      content: 'Hello world',
-      styles: {
-        color: 0xFFFFFF,
-        margin: 8,
-      },
-    },
-    {
-      content: TitleButtonLoadChart.view,
-      styles: {
-        margin: 8,
-      },
-    },
-    {
-      content: TitleButtonLoadAudio.view,
-      styles: {
-        margin: 8,
-      },
-    },
-  ],
-  styles: {
-    padding: 4,
   }
-});
 
-export { TitleStage };
+  private onClickSelect() {
+    PopupReadFiles(true)
+    .then((files) => {
+      if (!files || files.length <= 0) return;
+      this.game.files.from(files);
+    });
+  }
+}

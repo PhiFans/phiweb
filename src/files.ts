@@ -24,7 +24,24 @@ export class GameFiles extends Map<string, TGameFile> {
 
     for (const file of files) {
       await this.fromSingle(file);
+      console.log(this);
     }
+  }
+
+  getCharts() {
+    const result: [ string, TGameFileChart ][] = [];
+    this.forEach((value, filename) => {
+      if (value.type === 'chart') result.push([ filename, value ]);
+    });
+    return new GameFiles(result);
+  }
+
+  getAudios() {
+    const result: [ string, TGameFileAudio ][] = [];
+    this.forEach((value, filename) => {
+      if (value.type === 'audio') result.push([ filename, value ]);
+    });
+    return new GameFiles(result);
   }
 
   private fromSingle(file: File) {
@@ -38,7 +55,6 @@ export class GameFiles extends Map<string, TGameFile> {
         type: 'chart',
         data: chartResult,
       });
-      console.log(this);
     }).catch(async () => {
       // Decode as audio file
       const arrayBuffer = await ReadFileAsArrayBuffer(file);
@@ -48,7 +64,6 @@ export class GameFiles extends Map<string, TGameFile> {
         type: 'audio',
         data: audioResult,
       });
-      console.log(this);
     }).catch(() => {
       console.error('Unsupported file type.');
     });

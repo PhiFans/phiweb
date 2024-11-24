@@ -11,6 +11,8 @@ export class GameChartJudgeLine {
   posY: number = 0;
   angle: number = 0;
   alpha: number = 0;
+  floorPosition: number = 0;
+
   sprite?: Sprite;
 
   createSprites(container: Container) {

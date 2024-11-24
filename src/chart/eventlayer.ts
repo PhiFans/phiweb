@@ -30,6 +30,7 @@ export class GameChartEventLayer {
    */
   readonly alpha: GameChartEvent[] = new Array();
 
+  _speed: number = 0;
   _posX: number = 0;
   _posY: number = 0;
   _angle: number = 0;

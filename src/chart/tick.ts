@@ -28,6 +28,7 @@ export function onChartTick(this: GameChart) {
     const { eventLayers } = line;
     const sprite = line.sprite!;
 
+    line.speed = 0;
     line.posX = 0;
     line.posY = 0;
     line.angle = 0;
@@ -39,10 +40,25 @@ export function onChartTick(this: GameChart) {
       layer._angle = valueCalculator(layer.rotate, currentTime, layer._angle);
       layer._alpha = valueCalculator(layer.alpha, currentTime, layer._alpha);
 
+      for (const event of layer.speed) {
+        if (event.endTime < currentTime) continue;
+        if (event.startTime > currentTime) break;
+
+        layer._speed = event.value;
+      }
+
+      line.speed += layer._speed;
       line.posX += layer._posX;
       line.posY += layer._posY;
       line.angle += layer._angle;
       line.alpha += layer._alpha;
+    }
+
+    for (const event of line.floorPositions) {
+      if (event.endTime < currentTime) continue;
+      if (event.startTime > currentTime) break;
+
+      line.floorPosition = (currentTime - event.startTime) / 1000 * line.speed + event.value;
     }
 
     sprite.position.x = line.posX * widthHalf;

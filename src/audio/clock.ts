@@ -27,7 +27,6 @@ export class GameAudioClock {
     });
 
     await resumeAudioCtx(this.audioCtx);
-    this.ticker.maxFPS = 60;
     this.ticker.start();
   }
 

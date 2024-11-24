@@ -148,8 +148,8 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
       _newEvents.rotate.push({
         startTime: calcRealTime(oldEvent.startTime, oldLine.bpm),
         endTime: oldEvent.endTime < 999999999 ? calcRealTime(oldEvent.endTime, oldLine.bpm) : Infinity,
-        start: -(Math.PI / 180) * oldEvent.start,
-        end: -(Math.PI / 180) * oldEvent.end
+        start: -oldEvent.start,
+        end: -oldEvent.end
       });
     });
 

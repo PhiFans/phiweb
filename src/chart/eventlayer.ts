@@ -22,7 +22,7 @@ export class GameChartEventLayer {
    */
   readonly moveY: GameChartEvent[] = new Array();
   /**
-   * Use radians.
+   * Use angles.
    */
   readonly rotate: GameChartEvent[] = new Array();
   /**
@@ -30,6 +30,8 @@ export class GameChartEventLayer {
    */
   readonly alpha: GameChartEvent[] = new Array();
 
-  posX: number = 0;
-  posY: number = 0;
+  _posX: number = 0;
+  _posY: number = 0;
+  _angle: number = 0;
+  _alpha: number = 0;
 }

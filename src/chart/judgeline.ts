@@ -9,7 +9,7 @@ export class GameChartJudgeLine {
   speed: number = 0;
   posX: number = 0;
   posY: number = 0;
-  rotate: number = 0;
+  angle: number = 0;
   alpha: number = 0;
   sprite?: Sprite;
 

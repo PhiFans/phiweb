@@ -30,16 +30,24 @@ export function onChartTick(this: GameChart) {
 
     line.posX = 0;
     line.posY = 0;
+    line.angle = 0;
+    line.alpha = 0;
 
     for (const layer of eventLayers) {
-      layer.posX = valueCalculator(layer.moveX, currentTime, layer.posX);
-      layer.posY = valueCalculator(layer.moveX, currentTime, layer.posY);
+      layer._posX = valueCalculator(layer.moveX, currentTime, layer._posX);
+      layer._posY = valueCalculator(layer.moveY, currentTime, layer._posY);
+      layer._angle = valueCalculator(layer.rotate, currentTime, layer._angle);
+      layer._alpha = valueCalculator(layer.alpha, currentTime, layer._alpha);
 
-      line.posX += layer.posX;
-      line.posY += layer.posY;
+      line.posX += layer._posX;
+      line.posY += layer._posY;
+      line.angle += layer._angle;
+      line.alpha += layer._alpha;
     }
 
     sprite.position.x = line.posX * widthHalf;
     sprite.position.y = line.posY * heightHalf;
+    sprite.angle = line.angle;
+    sprite.alpha = line.alpha;
   }
 };

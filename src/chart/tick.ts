@@ -14,7 +14,7 @@ const valueCalculator = (events: GameChartEvent[], currentTime: number, defaultV
   return defaultValue;
 };
 
-export function onChartTick(this: GameChart) {
+export function onChartTick(this: GameChart) {return new Promise((res) => {
   const { data, audio, game } = this;
   const { startTime, clock, status } = audio;
   const { time } = clock;
@@ -66,4 +66,6 @@ export function onChartTick(this: GameChart) {
     sprite.angle = line.angle;
     sprite.alpha = line.alpha;
   }
-};
+
+  res(void 0);
+});};

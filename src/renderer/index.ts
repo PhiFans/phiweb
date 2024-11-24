@@ -14,6 +14,13 @@ const DefaultRendererOptions: Partial<AutoDetectOptions> = {
 export let isWebGPUAvailable: boolean = false;
 isWebGPUSupported().then((result) => isWebGPUAvailable = result);
 
+interface IGameRendererSize {
+  width: number,
+  height: number,
+  widthHalf: number,
+  heightHalf: number,
+}
+
 export class GameRenderer {
   renderer!: Renderer;
   readonly stage: Container;
@@ -23,7 +30,15 @@ export class GameRenderer {
     game: Container,
   };
 
+  readonly size: IGameRendererSize = {
+    width: 0,
+    height: 0,
+    widthHalf: 0,
+    heightHalf: 0,
+  };
+
   readonly _stageRectangle = new Rectangle(0, 0, 0, 0);
+  readonly _stageRectangleGame = new Rectangle(0, 0, 0, 0);
 
   constructor() {
     this.stage = new Container;
@@ -39,12 +54,12 @@ export class GameRenderer {
     this.containers.game.label = 'Game container';
     this.containers.ui.label = 'UI container';
 
-    this.containers.game.sortableChildren = this.containers.ui.sortableChildren = true;
-    this.containers.game.boundsArea = this.containers.ui.boundsArea = this._stageRectangle;
+    this.containers.ui.boundsArea = this._stageRectangle;
 
+    this.containers.game.sortableChildren = this.containers.ui.sortableChildren = true;
     this.containers.game.interactive = this.containers.game.interactiveChildren = false;
     this.containers.game.cullableChildren = true;
-    this.containers.game.cullArea = this._stageRectangle;
+    this.containers.game.cullArea = this.containers.game.boundsArea = this._stageRectangleGame;
     this.containers.ui.zIndex = 10;
 
     this.stage.addChild(this.containers.game);
@@ -81,8 +96,27 @@ export class GameRenderer {
   resize(width: number, height: number, resolution: number = window.devicePixelRatio) {
     this.renderer.resize(width, height, resolution);
 
-    this._stageRectangle.width = width * resolution;
-    this._stageRectangle.height = height * resolution;
+    this.size.width = width * resolution;
+    this.size.height = height * resolution;
+
+    this.size.widthHalf = this.size.width / 2;
+    this.size.heightHalf = this.size.height / 2;
+
+    // this._stageRectangle.width = width * resolution;
+    // this._stageRectangle.height = height * resolution;
+
+    // this.stage.boundsArea = this._stageRectangle;
+    // this.containers.ui.boundsArea = this._stageRectangle;
+
+    // this._stageRectangleGame.x = 1 - (width * resolution) / 2;
+    // this._stageRectangleGame.y = 1 - (height * resolution) / 2;
+    // this._stageRectangleGame.width = (width * resolution);
+    // this._stageRectangleGame.height = (height * resolution);
+
+    // this.containers.game.boundsArea = this._stageRectangleGame;
+    // this.containers.game.cullArea = this._stageRectangleGame;
+
+    this.containers.game.position.set(this.size.widthHalf, this.size.heightHalf);
   }
 
   get canvas() {

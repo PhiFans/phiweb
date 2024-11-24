@@ -4,6 +4,8 @@ import { Layout } from '@pixi/layout';
 import { PopupReadFiles } from '@/utils/file';
 import { IGameStageBase } from '.';
 import { Game } from '@/game';
+import { GameChartData } from '@/chart/data';
+import { GameAudioClip } from '@/audio/clip';
 
 const createButtonView = (textStr: string, width: number = 160, height: number = 40) => {
   const button = new FancyButton({
@@ -63,6 +65,9 @@ export class GameStageTitle implements IGameStageBase {
   listsChart: string[] = [];
   listsAudio: string[] = [];
 
+  selectedChart?: string;
+  selectedAudio?: string;
+
   constructor(game: Game) {
     const TitleButtonLoadFiles = createButtonView('Load files');
     const TitleButtonStart = createButtonView('Start');
@@ -70,7 +75,15 @@ export class GameStageTitle implements IGameStageBase {
     this.selectorChart = createSelectView(240);
     this.selectorAudio = createSelectView(240);
 
+    this.selectorChart.onSelect.connect((_, text) => {
+      this.selectedChart = text;
+    });
+    this.selectorAudio.onSelect.connect((_, text) => {
+      this.selectedAudio = text;
+    });
+
     TitleButtonLoadFiles.onPress.connect(() => this.onClickSelect());
+    TitleButtonStart.onPress.connect(() => this.onStartGame());
 
     this.game = game;
     // XXX: How do i use this??
@@ -146,5 +159,14 @@ export class GameStageTitle implements IGameStageBase {
           this.listsChart.push(...newAudioLists);
         });
     });
+  }
+
+  private onStartGame() {
+    if (!this.selectedChart || !this.selectedAudio) return;
+
+    const chartFile = this.game.files.get(this.selectedChart)!;
+    const audioFile = this.game.files.get(this.selectedAudio)!;
+
+    this.game.startChart(chartFile.data as GameChartData, audioFile.data as GameAudioClip);
   }
 }

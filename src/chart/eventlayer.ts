@@ -29,4 +29,7 @@ export class GameChartEventLayer {
    * Use percentage.
    */
   readonly alpha: GameChartEvent[] = new Array();
+
+  posX: number = 0;
+  posY: number = 0;
 }

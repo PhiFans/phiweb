@@ -3,6 +3,7 @@ import { GameChartNote } from './note';
 import { ConvertFromOfficial } from './converter/official';
 import { Nullable } from '@/utils/types';
 import { IChartOfficial } from './converter/official/types';
+import { Container } from 'pixi.js';
 
 const ParseJSON = (string: string): Nullable<unknown> => {
   try {
@@ -29,4 +30,10 @@ export class GameChartData {
       rej('Unsupported chart format');
     });
   });}
+
+  createSprites(container: Container) {
+    for (const line of this.lines) {
+      line.createSprites(container);
+    }
+  }
 }

@@ -3,12 +3,17 @@ import { GameAudio } from './audio';
 import { GameRenderer } from './renderer';
 import { GameStage } from './stage';
 import { GameFiles } from './files';
+import { GameChart } from './chart';
+import { GameChartData } from './chart/data';
+import { GameAudioClip } from './audio/clip';
 
 export class Game {
   readonly renderer: GameRenderer = new GameRenderer();
   readonly stage: GameStage = new GameStage(this);
   readonly audio: GameAudio = new GameAudio();
   readonly files: GameFiles = new GameFiles();
+
+  chart?: GameChart;
 
   private videoOptions: Partial<AutoDetectOptions> = {};
 
@@ -29,6 +34,20 @@ export class Game {
       .catch((e) => rej(e));
   });}
 
+  startChart(chartData: GameChartData, audio: GameAudioClip) {
+    this.chart = new GameChart(
+      this,
+      chartData,
+      audio,
+      (void 0),
+    );
+    this.chart.audio.setChannel(this.audio.channels.music);
+    this.chart.createSprites(this.renderer.containers.game);
+    this.chart.start();
+
+    console.log(this);
+  }
+
   get resolution() {
     return this.videoOptions.resolution || window.devicePixelRatio;
   }
@@ -42,9 +61,7 @@ export class Game {
     const { resolution } = this;
     const { clientWidth, clientHeight } = document.documentElement;
 
-    this.renderer.renderer.resolution = resolution;
-    this.renderer.resize(clientWidth, clientHeight);
-
+    this.renderer.resize(clientWidth, clientHeight, resolution);
     this.stage.resize(clientWidth, clientHeight);
   }
 }

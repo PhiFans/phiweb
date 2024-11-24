@@ -15,7 +15,7 @@ export class GameAudioClip {
   private channel: Nullable<GameAudioChannel> = null;
   private buffer?: AudioBufferSourceNode;
   private readonly audioCtx: AudioContext;
-  private readonly clock: GameAudioClock;
+  readonly clock: GameAudioClock;
 
   status: EGameAudioClipStatus = EGameAudioClipStatus.STOP;
   startTime: number = NaN;

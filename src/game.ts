@@ -43,6 +43,7 @@ export class Game {
     );
     this.chart.audio.setChannel(this.audio.channels.music);
     this.chart.createSprites(this.renderer.containers.game);
+    this.chart.reszie(this.renderer.size);
     this.chart.start();
 
     console.log(this);
@@ -63,5 +64,6 @@ export class Game {
 
     this.renderer.resize(clientWidth, clientHeight, resolution);
     this.stage.resize(clientWidth, clientHeight);
+    if (this.chart) this.chart.reszie(this.renderer.size);
   }
 }

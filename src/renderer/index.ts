@@ -14,11 +14,17 @@ const DefaultRendererOptions: Partial<AutoDetectOptions> = {
 export let isWebGPUAvailable: boolean = false;
 isWebGPUSupported().then((result) => isWebGPUAvailable = result);
 
-interface IGameRendererSize {
+export interface IGameRendererSize {
   width: number,
   height: number,
   widthHalf: number,
   heightHalf: number,
+
+  noteScale: number,
+  noteWidth: number,
+  noteSpeed: number,
+
+  lineScale: number,
 }
 
 export class GameRenderer {
@@ -35,6 +41,12 @@ export class GameRenderer {
     height: 0,
     widthHalf: 0,
     heightHalf: 0,
+
+    noteScale: 0,
+    noteWidth: 0,
+    noteSpeed: 0,
+
+    lineScale: 0,
   };
 
   readonly _stageRectangle = new Rectangle(0, 0, 0, 0);
@@ -101,6 +113,8 @@ export class GameRenderer {
 
     this.size.widthHalf = this.size.width / 2;
     this.size.heightHalf = this.size.height / 2;
+
+    this.size.lineScale = this.size.width > this.size.height * 0.75 ? this.size.height / 18.75 : this.size.width / 14.0625;
 
     // this._stageRectangle.width = width * resolution;
     // this._stageRectangle.height = height * resolution;

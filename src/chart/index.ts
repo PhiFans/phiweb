@@ -3,6 +3,7 @@ import { GameChartData } from './data';
 import { GameAudioClip } from '@/audio/clip';
 import { onChartTick } from './tick';
 import { Game } from '@/game';
+import { IGameRendererSize } from '@/renderer';
 
 export class GameChart {
   readonly game: Game;
@@ -25,6 +26,17 @@ export class GameChart {
 
   createSprites(container: Container) {
     this.data.createSprites(container);
+  }
+
+  reszie(sizer: IGameRendererSize) {
+    const { data } = this;
+
+    // TODO: Skin loader
+    const lineScaleX = Math.round((4000 / 1920) * (sizer.width / 1350) * 1920);
+    const lineScaleY = Math.round((sizer.lineScale * 18.75 * 0.008));
+    for (const line of data.lines) {
+      line.sprite!.scale.set(lineScaleX, lineScaleY);
+    }
   }
 
   start() {

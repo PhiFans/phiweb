@@ -13,6 +13,13 @@ export class GameChartJudgeLine {
   alpha: number = 0;
   floorPosition: number = 0;
 
+  radian: number = 0;
+  cosr: number = 0;
+  sinr: number = 0;
+
+  realPosX: number = 0;
+  realPosY: number = 0;
+
   sprite?: Sprite;
 
   createSprites(container: Container) {

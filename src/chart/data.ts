@@ -35,5 +35,9 @@ export class GameChartData {
     for (const line of this.lines) {
       line.createSprites(container);
     }
+
+    for (let i = 0; i < this.notes.length; i++) {
+      this.notes[i].createSprite(container, this.lines.length + 1 + i);
+    }
   }
 }

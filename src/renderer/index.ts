@@ -19,6 +19,7 @@ export interface IGameRendererSize {
   height: number,
   widthHalf: number,
   heightHalf: number,
+  widthPercent: number,
 
   noteScale: number,
   noteWidth: number,
@@ -41,6 +42,7 @@ export class GameRenderer {
     height: 0,
     widthHalf: 0,
     heightHalf: 0,
+    widthPercent: 0,
 
     noteScale: 0,
     noteWidth: 0,
@@ -113,6 +115,12 @@ export class GameRenderer {
 
     this.size.widthHalf = this.size.width / 2;
     this.size.heightHalf = this.size.height / 2;
+
+    this.size.widthPercent = this.size.width * (9 / 160);
+
+    this.size.noteScale = this.size.width / 8000; // TODO: Settings
+    this.size.noteWidth = this.size.width * 0.117775;
+    this.size.noteSpeed = this.size.height * 0.6;
 
     this.size.lineScale = this.size.width > this.size.height * 0.75 ? this.size.height / 18.75 : this.size.width / 14.0625;
 

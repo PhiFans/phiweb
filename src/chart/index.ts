@@ -37,6 +37,11 @@ export class GameChart {
     for (const line of data.lines) {
       line.sprite!.scale.set(lineScaleX, lineScaleY);
     }
+
+    for (const note of data.notes) {
+      // TODO: Skin loader
+      note.sprite!.scale.set(sizer.noteScale * 984, sizer.noteScale * 76);
+    }
   }
 
   start() {

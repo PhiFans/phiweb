@@ -61,10 +61,34 @@ export function onChartTick(this: GameChart) {return new Promise((res) => {
       line.floorPosition = (currentTime - event.startTime) / 1000 * line.speed + event.value;
     }
 
-    sprite.position.x = line.posX * widthHalf;
-    sprite.position.y = line.posY * heightHalf;
+    line.radian = line.angle * (Math.PI / 180);
+    line.cosr = Math.cos(line.radian);
+    line.sinr = Math.sin(line.radian);
+
+    sprite.position.x = line.realPosX = line.posX * widthHalf;
+    sprite.position.y = line.realPosY = line.posY * heightHalf;
     sprite.angle = line.angle;
     sprite.alpha = line.alpha;
+  }
+
+  const { size } = renderer;
+  for (const note of data.notes) {
+    const { judgeline } = note;
+    const sprite = note.sprite!;
+
+    if (judgeline.floorPosition > note.floorPosition) {
+      sprite.visible = false;
+      continue;
+    }
+
+    const posX = size.widthPercent * note.posX;
+    const posY = (note.floorPosition - judgeline.floorPosition) * (note.type === 3 ? 1 : note.speed) * size.noteSpeed * (note.isAbove ? -1 : 1);
+    const realX = posY * judgeline.sinr * -1 + posX * judgeline.cosr + judgeline.realPosX;
+    const realY = posY * judgeline.cosr + posX * judgeline.sinr + judgeline.realPosY;
+
+    sprite.position.set(realX, realY);
+    sprite.angle = judgeline.angle + (note.isAbove ? 0 : 180);
+    if (!sprite.visible) sprite.visible = true;
   }
 
   res(void 0);

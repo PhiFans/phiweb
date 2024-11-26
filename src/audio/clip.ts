@@ -52,7 +52,7 @@ export class GameAudioClip {
     } else {
       const pausedTime = this.pauseTime - this.startTime;
       this.startTime = this.clock.time - pausedTime;
-      this.buffer.start(0, pausedTime);
+      this.buffer.start(0, pausedTime / 1000);
     }
 
     this.pauseTime = NaN;
@@ -77,12 +77,16 @@ export class GameAudioClip {
     this.status = EGameAudioClipStatus.STOP;
   }
 
+  /**
+   *
+   * @param {number} time Seek seconds
+   */
   seek(time: number) {
     if (this.status === EGameAudioClipStatus.STOP) return;
 
     const isPlayingBefore = this.status === EGameAudioClipStatus.PLAY;
     this.pause();
-    this.startTime = this.pauseTime - time;
+    this.startTime = this.pauseTime - (time * 1000);
 
     if (this.startTime > this.pauseTime) this.startTime = this.pauseTime;
     if (isPlayingBefore) this.play();

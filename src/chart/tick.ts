@@ -73,33 +73,33 @@ export function onChartTick(this: GameChart) {return new Promise((res) => {
 
   const { size } = renderer;
   for (const note of data.notes) {
-    const { judgeline, type } = note;
+    const { judgeline, type, time, holdEndTime, posX: notePosX, floorPosition, speed, isAbove, holdFloorPosition } = note;
     const sprite = note.sprite!;
 
     if (
-      (type !== 3 && note.time <= currentTime) ||
-      (type === 3 && note.holdEndTime! <= currentTime)
+      (type !== 3 && time <= currentTime) ||
+      (type === 3 && holdEndTime! <= currentTime)
     ) {
       sprite.visible = false;
       continue;
     }
 
-    if (judgeline.floorPosition > note.floorPosition && note.time > currentTime) {
+    if (judgeline.floorPosition > floorPosition && time > currentTime) {
       sprite.visible = false;
       continue;
     }
 
-    const posX = size.widthPercent * note.posX;
-    const posY = (note.floorPosition - judgeline.floorPosition) * (note.type === 3 ? 1 : note.speed) * size.noteSpeed * (note.isAbove ? -1 : 1);
+    const posX = size.widthPercent * notePosX;
+    const posY = (floorPosition - judgeline.floorPosition) * (type === 3 ? 1 : speed) * size.noteSpeed * (isAbove ? -1 : 1);
     const realXSin = posY * judgeline.sinr * -1;
     const realXCos = posX * judgeline.cosr + judgeline.realPosX;
     const realYSin = posX * judgeline.sinr + judgeline.realPosY;
     const realYCos = posY * judgeline.cosr;
 
-    if (note.type === 3 && note.time <= currentTime) {
+    if (type === 3 && time <= currentTime) {
       const [ spriteHead, spriteBody ] = sprite.children;
 
-      spriteBody.height = (note.holdFloorPosition! - judgeline.floorPosition) * size.noteSpeed / size.noteScale;
+      spriteBody.height = (holdFloorPosition! - judgeline.floorPosition) * size.noteSpeed / size.noteScale;
       sprite.position.set(realXCos, realYSin);
 
       if (spriteHead.visible) spriteHead.visible = false;
@@ -110,7 +110,7 @@ export function onChartTick(this: GameChart) {return new Promise((res) => {
     );
     }
 
-    sprite.angle = judgeline.angle + (note.isAbove ? 0 : 180);
+    sprite.angle = judgeline.angle + (isAbove ? 0 : 180);
     if (!sprite.visible) sprite.visible = true;
   }
 

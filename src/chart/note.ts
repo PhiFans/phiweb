@@ -76,6 +76,7 @@ export class GameChartNote {
       sprite.cullable = true;
 
       this.sprite = sprite;
+      this.sprite.label = 'Note';
       return container.addChild(this.sprite);
     }
 
@@ -95,6 +96,7 @@ export class GameChartNote {
     baseContainer.cullable = true;
 
     this.sprite = baseContainer;
+    this.sprite.label = 'Note';
     return container.addChild(this.sprite);
   }
 }

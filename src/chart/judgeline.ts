@@ -31,6 +31,7 @@ export class GameChartJudgeLine {
 
     this.sprite.cullable = true;
 
+    this.sprite.label = 'JudgeLine';
     container.addChild(this.sprite);
   }
 }

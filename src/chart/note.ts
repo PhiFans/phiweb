@@ -34,7 +34,7 @@ export class GameChartNote {
   readonly holdFloorPosition: Nullable<number>;
   readonly posX: number;
 
-  sprite?: Sprite;
+  sprite?: Sprite | Container;
 
   constructor(
     judgeline: GameChartJudgeLine,
@@ -61,19 +61,40 @@ export class GameChartNote {
   }
 
   createSprite(container: Container, zIndex: number = 24) {
-    if (!this.sprite) this.sprite = new Sprite(Texture.WHITE);
-
-    this.sprite.anchor.set(0.5);
-
     // TODO: Skin loader
-    if (this.type === EGameChartNoteType.TAP) this.sprite.tint = 0x0AC2FF;
-    if (this.type === EGameChartNoteType.DRAG) this.sprite.tint = 0xFFE600;
-    if (this.type === EGameChartNoteType.HOLD) this.sprite.tint = 0x00FF12;
-    if (this.type === EGameChartNoteType.FLICK) this.sprite.tint = 0xFE4343;
+    const sprite = new Sprite(Texture.WHITE);
 
-    this.sprite.zIndex = zIndex;
-    this.sprite.cullable = true;
+    sprite.anchor.set(0.5);
 
-    container.addChild(this.sprite);
+    if (this.type !== EGameChartNoteType.HOLD) {
+      // TODO: Skin loader
+      if (this.type === EGameChartNoteType.TAP) sprite.tint = 0x0AC2FF;
+      if (this.type === EGameChartNoteType.DRAG) sprite.tint = 0xFFE600;
+      if (this.type === EGameChartNoteType.FLICK) sprite.tint = 0xFE4343;
+
+      sprite.zIndex = zIndex;
+      sprite.cullable = true;
+
+      this.sprite = sprite;
+      return container.addChild(this.sprite);
+    }
+
+    const baseContainer = new Container();
+    const spriteBody = new Sprite(Texture.WHITE);
+
+    sprite.anchor.set(0.5, 0);
+    spriteBody.anchor.set(0.5, 1);
+
+    sprite.tint = spriteBody.tint = 0x0AC2FF;
+    spriteBody.zIndex = 1;
+
+    baseContainer.addChild(sprite, spriteBody);
+    baseContainer.sortChildren();
+
+    baseContainer.zIndex = zIndex;
+    baseContainer.cullable = true;
+
+    this.sprite = baseContainer;
+    return container.addChild(this.sprite);
   }
 }

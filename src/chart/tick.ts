@@ -73,20 +73,43 @@ export function onChartTick(this: GameChart) {return new Promise((res) => {
 
   const { size } = renderer;
   for (const note of data.notes) {
-    const { judgeline } = note;
+    const { judgeline, type } = note;
     const sprite = note.sprite!;
 
-    if (judgeline.floorPosition > note.floorPosition) {
+    if (
+      (type !== 3 && note.time <= currentTime) ||
+      (type === 3 && note.holdEndTime! <= currentTime)
+    ) {
+      sprite.visible = false;
+      continue;
+    }
+
+    if (judgeline.floorPosition > note.floorPosition && note.time > currentTime) {
       sprite.visible = false;
       continue;
     }
 
     const posX = size.widthPercent * note.posX;
     const posY = (note.floorPosition - judgeline.floorPosition) * (note.type === 3 ? 1 : note.speed) * size.noteSpeed * (note.isAbove ? -1 : 1);
-    const realX = posY * judgeline.sinr * -1 + posX * judgeline.cosr + judgeline.realPosX;
-    const realY = posY * judgeline.cosr + posX * judgeline.sinr + judgeline.realPosY;
+    const realXSin = posY * judgeline.sinr * -1;
+    const realXCos = posX * judgeline.cosr + judgeline.realPosX;
+    const realYSin = posX * judgeline.sinr + judgeline.realPosY;
+    const realYCos = posY * judgeline.cosr;
 
-    sprite.position.set(realX, realY);
+    if (note.type === 3 && note.time <= currentTime) {
+      const [ spriteHead, spriteBody ] = sprite.children;
+
+      spriteBody.height = (note.holdFloorPosition! - judgeline.floorPosition) * size.noteSpeed / size.noteScale;
+      sprite.position.set(realXCos, realYSin);
+
+      if (spriteHead.visible) spriteHead.visible = false;
+    } else {
+    sprite.position.set(
+      realXSin + realXCos,
+      realYCos + realYSin
+    );
+    }
+
     sprite.angle = judgeline.angle + (note.isAbove ? 0 : 180);
     if (!sprite.visible) sprite.visible = true;
   }

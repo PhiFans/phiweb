@@ -40,7 +40,14 @@ export class GameChart {
 
     for (const note of data.notes) {
       // TODO: Skin loader
-      note.sprite!.scale.set(sizer.noteScale * 984, sizer.noteScale * 76);
+      if (note.type === 3) {
+        const holdLength = note.holdLength! * sizer.noteSpeed / sizer.noteScale;
+        note.sprite!.children[1].height = holdLength;
+
+        note.sprite!.scale.set(sizer.noteScale * 984, sizer.noteScale);
+      } else {
+        note.sprite!.scale.set(sizer.noteScale * 984, sizer.noteScale * 76);
+      }
     }
   }
 

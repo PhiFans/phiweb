@@ -224,7 +224,7 @@ export const getLineSpeedValueByTime = (judgeline: GameChartJudgeLine, time: num
     let value: Nullable<number> = null;
 
     for (const event of eventLayer.speed) {
-      if (event.endTime < time) continue;
+      if (event.endTime <= time) continue;
       if (event.startTime > time) break;
       value = event.value;
     }
@@ -244,7 +244,7 @@ export const getFloorPositionByTime = (judgeline: GameChartJudgeLine, time: numb
     if (judgeline.floorPositions.length <= 0) throw new Error('No floor positions for this line');
 
     for (const event of judgeline.floorPositions) {
-      if (event.endTime < time) continue;
+      if (event.endTime <= time) continue;
       if (event.startTime > time) break;
 
       return event;

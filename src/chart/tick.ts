@@ -41,7 +41,7 @@ export function onChartTick(this: GameChart) {return new Promise((res) => {
       layer._alpha = valueCalculator(layer.alpha, currentTime, layer._alpha);
 
       for (const event of layer.speed) {
-        if (event.endTime < currentTime) continue;
+        if (event.endTime <= currentTime) continue;
         if (event.startTime > currentTime) break;
 
         layer._speed = event.value;
@@ -55,7 +55,7 @@ export function onChartTick(this: GameChart) {return new Promise((res) => {
     }
 
     for (const event of line.floorPositions) {
-      if (event.endTime < currentTime) continue;
+      if (event.endTime <= currentTime) continue;
       if (event.startTime > currentTime) break;
 
       line.floorPosition = (currentTime - event.startTime) / 1000 * line.speed + event.value;

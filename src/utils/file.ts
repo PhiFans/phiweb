@@ -1,5 +1,9 @@
+import decodeAudio from 'audio-decode';
 import JSZip from 'jszip';
+import { GameChartData } from '@/chart/data';
+import { GameAudio } from '@/audio';
 import { Nullable } from './types';
+import { IFile } from './types';
 
 export const PopupReadFiles = (multiple = false, accept: string | Array<string> = ''): Promise<Nullable<FileList>> => new Promise((res) => {
   const fileDOM = document.createElement('input');
@@ -41,6 +45,37 @@ export const ReadFileAsArrayBuffer = (file: File | Blob): Promise<ArrayBuffer> =
   };
 
   reader.readAsArrayBuffer(file);
+});
+
+export const decodeFile = (file: File): Promise<IFile | File[]> => new Promise((res, rej) => {
+  (new Promise(() => {
+    throw new Error('Promise chain!');
+  })).catch(async () => {
+    // Decode as zip file
+    const files = await unzipFile(file);
+    res(files);
+  }).catch(async () => {
+    // Decode as chart file
+    const fileText = await ReadFileAsText(file);
+    const chartResult = await GameChartData.from(fileText);
+    res({
+      filename: file.name,
+      type: 'chart',
+      data: chartResult,
+    });
+  }).catch(async () => {
+    // Decode as audio file
+    const arrayBuffer = await ReadFileAsArrayBuffer(file);
+    const audioBuffer = await decodeAudio(arrayBuffer);
+    const audioResult = GameAudio.from(audioBuffer);
+    res({
+      filename: file.name,
+      type: 'audio',
+      data: audioResult,
+    });
+  }).catch(() => {
+    rej(`Unsupported file type. File name: ${file.name}`);
+  });
 });
 
 export const unzipFile = (file: File | Blob): Promise<File[]> => new Promise((res, rej) => {

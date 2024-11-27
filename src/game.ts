@@ -42,7 +42,10 @@ export class Game {
       (void 0),
     );
     this.chart.audio.setChannel(this.audio.channels.music);
+
     this.chart.createSprites(this.renderer.containers.game);
+    this.renderer.containers.game.sortChildren();
+
     this.chart.reszie(this.renderer.size);
     this.chart.start();
 

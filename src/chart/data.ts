@@ -36,8 +36,11 @@ export class GameChartData {
       line.createSprites(container);
     }
 
+    const lineLength = this.lines.length;
     for (let i = 0; i < this.notes.length; i++) {
-      this.notes[i].createSprite(container, this.lines.length + 1 + i);
+      const note = this.notes[i];
+      const zIndex = note.type !== 3 ? lineLength + 1 + i : ((i - 10) > 0 ? i - 10 : 0);
+      this.notes[i].createSprite(container, zIndex);
     }
   }
 }

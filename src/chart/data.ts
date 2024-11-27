@@ -14,8 +14,13 @@ const ParseJSON = (string: string): Nullable<unknown> => {
 }
 
 export class GameChartData {
+  offset: number;
   lines: Array<GameChartJudgeLine> = new Array();
   notes: Array<GameChartNote> = new Array();
+
+  constructor(offset: number) {
+    this.offset = Math.round(offset);
+  }
 
   static from(rawData: string): Promise<GameChartData> {return new Promise((res, rej) => {
     const rawJson = ParseJSON(rawData);

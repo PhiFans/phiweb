@@ -105,7 +105,7 @@ const convertEventsToClasses = (events: IGameChartEventLayer) => {
 
 export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
   const chartRaw = ConvertOfficialChartVersion(_chartRaw);
-  const newChart = new GameChartData();
+  const newChart = new GameChartData(chartRaw.offset * 1000);
 
   chartRaw.judgeLineList.forEach((oldLine) => {
     const newLine = new GameChartJudgeLine();

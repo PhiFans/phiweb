@@ -20,7 +20,7 @@ export function onChartTick(this: GameChart) {return new Promise((res) => {
   const { time } = clock;
 
   if (status !== 1) return;
-  const currentTime = time - (startTime || time);
+  const currentTime = (time - (startTime || time)) - data.offset;
   const { renderer } = game;
   const { widthHalf, heightHalf } = renderer.size;
 

@@ -3,7 +3,7 @@ import { GameChartEvent } from './event';
 
 const valueCalculator = (events: GameChartEvent[], currentTime: number, defaultValue = 0) => {
   for (const event of events) {
-    if (event.endTime < currentTime) continue;
+    if (event.endTime <= currentTime) continue;
     if (event.startTime > currentTime) break;
     if (event.start === event.end) return event.start;
 

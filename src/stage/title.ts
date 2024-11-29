@@ -70,6 +70,7 @@ export class GameStageTitle implements IGameStageBase {
 
   constructor(game: Game) {
     const TitleButtonLoadFiles = createButtonView('Load files');
+    const TitleButtonLoadSkin = createButtonView('Load skin');
     const TitleButtonStart = createButtonView('Start');
 
     this.selectorChart = createSelectView(240);
@@ -83,6 +84,7 @@ export class GameStageTitle implements IGameStageBase {
     });
 
     TitleButtonLoadFiles.onPress.connect(() => this.onClickSelect());
+    TitleButtonLoadSkin.onPress.connect(() => this.onClickSelectSkin());
     TitleButtonStart.onPress.connect(() => this.onStartGame());
 
     this.game = game;
@@ -91,6 +93,12 @@ export class GameStageTitle implements IGameStageBase {
       content: [
         {
           content: TitleButtonLoadFiles,
+          styles: {
+            margin: 8,
+          },
+        },
+        {
+          content: TitleButtonLoadSkin,
           styles: {
             margin: 8,
           },
@@ -159,6 +167,15 @@ export class GameStageTitle implements IGameStageBase {
           this.listsChart.push(...newAudioLists);
         });
     });
+  }
+
+  private onClickSelectSkin() {
+    PopupReadFiles()
+      .then((files) => {
+        if (!files || !files[0]) return;
+        const [ file ] = files;
+        this.game.skins.load(file);
+      });
   }
 
   private onStartGame() {

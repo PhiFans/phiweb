@@ -1,3 +1,4 @@
+import { Game } from '@/game';
 import { GameSkinFiles } from './file';
 
 export class GameSkin {
@@ -27,5 +28,16 @@ export class GameSkin {
 }
 
 export class GameSkins extends Map<string, GameSkin> {
+  readonly game: Game;
+  private _currentSkin?: GameSkin;
 
+  constructor(game: Game) {
+    super();
+
+    this.game = game;
+  }
+
+  get currentSkin() {
+    return this._currentSkin;
+  }
 }

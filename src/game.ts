@@ -1,6 +1,7 @@
 import { AutoDetectOptions } from 'pixi.js';
 import { GameAudio } from './audio';
 import { GameRenderer } from './renderer';
+import { GameSkins } from './skins';
 import { GameStage } from './stage';
 import { GameFiles } from './files';
 import { GameChart } from './chart';
@@ -9,6 +10,7 @@ import { GameAudioClip } from './audio/clip';
 
 export class Game {
   readonly renderer: GameRenderer = new GameRenderer();
+  readonly skins: GameSkins = new GameSkins(this);
   readonly stage: GameStage = new GameStage(this);
   readonly audio: GameAudio = new GameAudio();
   readonly files: GameFiles = new GameFiles();

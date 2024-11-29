@@ -5,7 +5,7 @@ import { parseDoublePrecist } from '@/utils/math';
 import { IChartOfficial } from './types';
 import { GameChartEvent, GameChartEventSingle } from '@/chart/event';
 import { GameChartEventLayer, IGameChartEventLayer } from '@/chart/eventlayer';
-import { EGameChartNoteType, GameChartNote } from '@/chart/note';
+import { EGameChartNoteType, GameChartNote, IGameChartNote } from '@/chart/note';
 
 const calcRealTime = (time: number, bpm: number) => Math.floor(time / bpm * 1875);
 const getNoteType = (type: number) => {
@@ -106,6 +106,7 @@ const convertEventsToClasses = (events: IGameChartEventLayer) => {
 export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
   const chartRaw = ConvertOfficialChartVersion(_chartRaw);
   const newChart = new GameChartData(chartRaw.offset * 1000);
+  const _newNotes: IGameChartNote[] = [];
 
   chartRaw.judgeLineList.forEach((oldLine) => {
     const newLine = new GameChartJudgeLine();
@@ -174,17 +175,18 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
       const realTime = calcRealTime(oldNote.time, oldLine.bpm);
       const realHoldTime = oldNote.type === 3 ? calcRealTime(oldNote.holdTime, oldLine.bpm) : null;
 
-      newChart.notes.push(new GameChartNote(
-        newLine,
-        getNoteType(oldNote.type),
-        true,
-        realTime,
-        parsedSpeed,
-        parseDoublePrecist(oldNote.positionX, 6),
-        getFloorPositionByTime(newLine, realTime),
-        realHoldTime,
-        oldNote.type === 3 ? parseDoublePrecist(realHoldTime! * parsedSpeed / 1000, 4) : null
-      ));
+      _newNotes.push({
+        judgeline: newLine,
+        type: getNoteType(oldNote.type),
+        isAbove: true,
+        time: realTime,
+        speed: parsedSpeed,
+        posX: oldNote.positionX,
+        isSameTime: false,
+        floorPosition: getFloorPositionByTime(newLine, realTime),
+        holdTime: realHoldTime,
+        holdLength: oldNote.type === 3 ? parseDoublePrecist(realHoldTime! * parsedSpeed / 1000, 4) : null
+      });
     });
 
     oldLine.notesBelow.forEach((oldNote) => {
@@ -192,22 +194,42 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
       const realTime = calcRealTime(oldNote.time, oldLine.bpm);
       const realHoldTime = oldNote.type === 3 ? calcRealTime(oldNote.holdTime, oldLine.bpm) : null;
 
-      newChart.notes.push(new GameChartNote(
-        newLine,
-        getNoteType(oldNote.type),
-        false,
-        realTime,
-        parsedSpeed,
-        parseDoublePrecist(oldNote.positionX, 6),
-        getFloorPositionByTime(newLine, realTime),
-        realHoldTime,
-        oldNote.type === 3 ? parseDoublePrecist(realHoldTime! * parsedSpeed / 1000, 4) : null
-      ));
+      _newNotes.push({
+        judgeline: newLine,
+        type: getNoteType(oldNote.type),
+        isAbove: false,
+        time: realTime,
+        speed: parsedSpeed,
+        posX: oldNote.positionX,
+        isSameTime: false,
+        floorPosition: getFloorPositionByTime(newLine, realTime),
+        holdTime: realHoldTime,
+        holdLength: oldNote.type === 3 ? parseDoublePrecist(realHoldTime! * parsedSpeed / 1000, 4) : null
+      });
     });
 
     newChart.lines.push(newLine);
   });
 
+  const sameTimeNote: Record<string, number> = {};
+  _newNotes.sort((a, b) => a.time - b.time);
+  for (const note of _newNotes) sameTimeNote[`${note.time}`] = sameTimeNote[`${note.time}`] ? 2 : 1;
+  for (const note of _newNotes) note.isSameTime = sameTimeNote[`${note.time}`] === 2;
+
+  _newNotes.forEach((oldNote) => {
+    newChart.notes.push(new GameChartNote(
+      oldNote.judgeline,
+      oldNote.type,
+      oldNote.isAbove,
+      oldNote.time,
+      oldNote.speed,
+      parseDoublePrecist(oldNote.posX, 6),
+      oldNote.isSameTime,
+      oldNote.floorPosition,
+      oldNote.holdTime,
+      oldNote.holdLength
+    ));
+  });
   newChart.notes.sort((a, b) => a.time - b.time);
 
   return newChart;

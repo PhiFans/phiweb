@@ -39,7 +39,6 @@ export class GameChart {
     }
 
     for (const note of data.notes) {
-      // TODO: Skin loader
       if (note.type === 3) {
         // TODO: Support of the non-official hold rendering
         const holdLength = ((note.holdTime! / 1000) * note.speed) * sizer.noteSpeed / sizer.noteScale;

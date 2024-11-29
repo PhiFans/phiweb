@@ -135,6 +135,7 @@ export class GameSkins extends Map<string, GameSkin> {
         );
         this.set(skinMeta.name, skinResult);
         res(skinResult);
+        this.setSkin(skinMeta.name);
 
         console.log(skinMeta);
         console.log(this);

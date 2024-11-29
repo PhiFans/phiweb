@@ -16,9 +16,14 @@ export interface IFileChart extends IFileBasic {
   data: GameChartData,
 }
 
+export interface IFileImage extends IFileBasic {
+  type: 'image',
+  data: ImageBitmap,
+}
+
 export interface IFileAudio extends IFileBasic {
   type: 'audio',
   data: GameAudioClip,
 }
 
-export type IFile = IFileChart | IFileAudio;
+export type IFile = IFileChart | IFileImage | IFileAudio;

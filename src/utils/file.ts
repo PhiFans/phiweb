@@ -64,6 +64,14 @@ export const decodeFile = (file: File): Promise<IFile | File[]> => new Promise((
       data: chartResult,
     });
   }).catch(async () => {
+    // Decode as image
+    const bitmap = await window.createImageBitmap(file);
+    res({
+      filename: file.name,
+      type: 'image',
+      data: bitmap
+    });
+  }).catch(async () => {
     // Decode as audio file
     const arrayBuffer = await ReadFileAsArrayBuffer(file);
     const audioBuffer = await decodeAudio(arrayBuffer);

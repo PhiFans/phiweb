@@ -71,9 +71,9 @@ export class GameSkin {
     this.high = filesHigh;
   }
 
-  create() {
-    this.normal.create();
-    if (this.high) this.high.create();
+  create(useHighQualitySkin = false) {
+    if (this.high && useHighQualitySkin) this.high.create();
+    else this.normal.create();
   }
 
   destroy() {

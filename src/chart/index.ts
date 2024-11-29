@@ -25,7 +25,7 @@ export class GameChart {
   }
 
   createSprites(container: Container) {
-    this.data.createSprites(container);
+    this.data.createSprites(container, this.game);
   }
 
   reszie(sizer: IGameRendererSize) {
@@ -44,10 +44,11 @@ export class GameChart {
         // TODO: Support of the non-official hold rendering
         const holdLength = ((note.holdTime! / 1000) * note.speed) * sizer.noteSpeed / sizer.noteScale;
         note.sprite!.children[1].height = holdLength;
+        note.sprite!.children[2].position.y = -holdLength
 
-        note.sprite!.scale.set(sizer.noteScale * 984, sizer.noteScale);
+        note.sprite!.scale.set(sizer.noteScale, sizer.noteScale);
       } else {
-        note.sprite!.scale.set(sizer.noteScale * 984, sizer.noteScale * 76);
+        note.sprite!.scale.set(sizer.noteScale, sizer.noteScale);
       }
     }
   }

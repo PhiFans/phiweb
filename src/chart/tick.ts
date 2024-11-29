@@ -97,10 +97,13 @@ export function onChartTick(this: GameChart) {return new Promise((res) => {
     const realYCos = posY * judgeline.cosr;
 
     if (type === 3 && time <= currentTime) {
-      const [ spriteHead, spriteBody ] = sprite.children;
+      const [ spriteHead, spriteBody, spriteEnd ] = sprite.children;
 
       // TODO: Support of the non-official hold rendering
-      spriteBody.height = ((holdEndTime! - currentTime) / 1000) * speed * size.noteSpeed / size.noteScale;
+      const holdLength = ((holdEndTime! - currentTime) / 1000) * speed * size.noteSpeed / size.noteScale;
+      spriteBody.height = holdLength;
+      spriteEnd.position.y = -holdLength;
+
       sprite.position.set(realXCos, realYSin);
 
       if (spriteHead.visible) spriteHead.visible = false;

@@ -1,3 +1,4 @@
+import { Game } from '@/game';
 import { autoDetectRenderer, isWebGPUSupported, Container, Ticker, Rectangle } from 'pixi.js';
 import type { Renderer, AutoDetectOptions } from 'pixi.js';
 
@@ -29,6 +30,7 @@ export interface IGameRendererSize {
 }
 
 export class GameRenderer {
+  readonly game: Game;
   renderer!: Renderer;
   readonly stage: Container;
   readonly ticker: Ticker;
@@ -54,7 +56,8 @@ export class GameRenderer {
   readonly _stageRectangle = new Rectangle(0, 0, 0, 0);
   readonly _stageRectangleGame = new Rectangle(0, 0, 0, 0);
 
-  constructor() {
+  constructor(game: Game) {
+    this.game = game;
     this.stage = new Container;
     this.stage.label = 'Stage';
     this.stage.sortableChildren = true;
@@ -118,7 +121,7 @@ export class GameRenderer {
 
     this.size.widthPercent = this.size.width * (9 / 160);
 
-    this.size.noteScale = this.size.width / 8000; // TODO: Settings
+    this.size.noteScale = this.size.width / 8000 * (this.game.options.useHighQualitySkin ? 1 : 2); // TODO: Settings
     this.size.noteWidth = this.size.width * 0.117775;
     this.size.noteSpeed = this.size.height * 0.6;
 

@@ -4,6 +4,7 @@ import { ConvertFromOfficial } from './converter/official';
 import { Nullable } from '@/utils/types';
 import { IChartOfficial } from './converter/official/types';
 import { Container } from 'pixi.js';
+import { Game } from '@/game';
 
 const ParseJSON = (string: string): Nullable<unknown> => {
   try {
@@ -36,7 +37,7 @@ export class GameChartData {
     });
   });}
 
-  createSprites(container: Container) {
+  createSprites(container: Container, game: Game) {
     for (const line of this.lines) {
       line.createSprites(container);
     }
@@ -45,7 +46,7 @@ export class GameChartData {
     for (let i = 0; i < this.notes.length; i++) {
       const note = this.notes[i];
       const zIndex = note.type !== 3 ? lineLength + 1 + i : ((i - 10) > 0 ? i - 10 : 0);
-      this.notes[i].createSprite(container, zIndex);
+      this.notes[i].createSprite(container, game, zIndex);
     }
   }
 }

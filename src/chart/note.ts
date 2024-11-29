@@ -1,6 +1,7 @@
-import { Container, Sprite, Texture } from 'pixi.js';
+import { Container, Sprite } from 'pixi.js';
 import { Nullable } from '@/utils/types';
 import { GameChartJudgeLine } from './judgeline';
+import { Game } from '@/game';
 
 export enum EGameChartNoteType {
   TAP = 1,
@@ -60,43 +61,60 @@ export class GameChartNote {
     this.holdFloorPosition = this.type === EGameChartNoteType.HOLD ? this.floorPosition + this.holdLength! : null;
   }
 
-  createSprite(container: Container, zIndex: number = 24) {
-    // TODO: Skin loader
-    const sprite = new Sprite(Texture.WHITE);
+  createSprite(container: Container, game: Game, zIndex: number = 24) {
+    if (this.type === EGameChartNoteType.HOLD) this.createSpriteHold(game, zIndex);
+    else this.createSpriteNonHold(game, zIndex);
+
+    this.sprite!.label = 'Note';
+    return container.addChild(this.sprite!);
+  }
+
+  private createSpriteNonHold(game: Game, zIndex: number = 24) {
+    const getSpriteTexture = () => {
+      const { currentSkin } = game.skins;
+      if (!currentSkin) throw new Error('No skin set, please set a skin');
+      const { useHighQualitySkin } = game.options;
+      const quality = useHighQualitySkin && currentSkin.high ? 'high' : 'normal';
+
+      // TODO: Note highligh
+      if (this.type === EGameChartNoteType.TAP) return currentSkin[quality]!.notes.tap.normal.texture!;
+      if (this.type === EGameChartNoteType.DRAG) return currentSkin[quality]!.notes.drag.normal.texture!;
+      if (this.type === EGameChartNoteType.FLICK) return currentSkin[quality]!.notes.flick.normal.texture!;
+    };
+
+    const sprite = new Sprite(getSpriteTexture());
 
     sprite.anchor.set(0.5);
+    sprite.zIndex = zIndex;
+    sprite.cullable = true;
 
-    if (this.type !== EGameChartNoteType.HOLD) {
-      // TODO: Skin loader
-      if (this.type === EGameChartNoteType.TAP) sprite.tint = 0x0AC2FF;
-      if (this.type === EGameChartNoteType.DRAG) sprite.tint = 0xFFE600;
-      if (this.type === EGameChartNoteType.FLICK) sprite.tint = 0xFE4343;
+    this.sprite = sprite;
+  }
 
-      sprite.zIndex = zIndex;
-      sprite.cullable = true;
-
-      this.sprite = sprite;
-      this.sprite.label = 'Note';
-      return container.addChild(this.sprite);
-    }
+  private createSpriteHold(game: Game, zIndex: number = 24) {
+    const { currentSkin } = game.skins;
+    if (!currentSkin) throw new Error('No skin set, please set a skin');
+    const { useHighQualitySkin } = game.options;
+    const quality = useHighQualitySkin && currentSkin.high ? 'high' : 'normal';
 
     const baseContainer = new Container();
-    const spriteBody = new Sprite(Texture.WHITE);
+    const spriteHead = new Sprite(currentSkin[quality]!.notes.hold.head.normal.texture!); // TODO: Note highligh
+    const spriteBody = new Sprite(currentSkin[quality]!.notes.hold.body.normal.texture!); // TODO: Note highligh
+    const spriteEnd = new Sprite(currentSkin[quality]!.notes.hold.end.texture!); // TODO: Note highligh
 
-    sprite.anchor.set(0.5, 0);
+    spriteHead.anchor.set(0.5, 0);
     spriteBody.anchor.set(0.5, 1);
+    spriteEnd.anchor.set(0.5, 1);
 
-    sprite.tint = spriteBody.tint = 0x0AC2FF;
     spriteBody.zIndex = 1;
+    spriteEnd.zIndex = 2;
 
-    baseContainer.addChild(sprite, spriteBody);
+    baseContainer.addChild(spriteHead, spriteBody, spriteEnd);
     baseContainer.sortChildren();
 
     baseContainer.zIndex = zIndex;
     baseContainer.cullable = true;
 
     this.sprite = baseContainer;
-    this.sprite.label = 'Note';
-    return container.addChild(this.sprite);
   }
 }

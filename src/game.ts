@@ -9,7 +9,7 @@ import { GameChartData } from './chart/data';
 import { GameAudioClip } from './audio/clip';
 
 export class Game {
-  readonly renderer: GameRenderer = new GameRenderer();
+  readonly renderer: GameRenderer = new GameRenderer(this);
   readonly skins: GameSkins = new GameSkins(this);
   readonly stage: GameStage = new GameStage(this);
   readonly audio: GameAudio = new GameAudio();
@@ -17,6 +17,11 @@ export class Game {
 
   chart?: GameChart;
 
+  // TODO: Use another class to manage it
+  options = {
+    useHighQualitySkin: true,
+    useHighlight: true,
+  };
   private videoOptions: Partial<AutoDetectOptions> = {};
 
   constructor() {
@@ -37,6 +42,8 @@ export class Game {
   });}
 
   startChart(chartData: GameChartData, audio: GameAudioClip) {
+    if (!this.skins.currentSkin) return;
+
     this.chart = new GameChart(
       this,
       chartData,
@@ -45,6 +52,7 @@ export class Game {
     );
     this.chart.audio.setChannel(this.audio.channels.music);
 
+    this.skins.currentSkin.create(this.options.useHighQualitySkin);
     this.chart.createSprites(this.renderer.containers.game);
     this.renderer.containers.game.sortChildren();
 

@@ -1,10 +1,11 @@
 import JSZip from 'jszip';
 import { Game } from '@/game';
 import { GameSkinFiles } from './file';
+import { GameSkinFileTexture } from './file/texture';
 import { createNoteSkin } from './file/utils';
 import { Nullable } from '@/utils/types';
 import { IGameSkinFileNotes } from './file/types';
-import { GameSkinFileTexture } from './file/texture';
+import { IGameSkinMeta } from './types';
 
 type SkinInput = File | Blob | string
 // XXX: These might need move to `utils`
@@ -103,7 +104,7 @@ export class GameSkins extends Map<string, GameSkin> {
   }
 
   // TODO: Skin meta type
-  private parseSkinMeta(skinMeta: JSZip.JSZipObject): Promise<unknown> {return new Promise(async (res, rej) => {
+  private parseSkinMeta(skinMeta: JSZip.JSZipObject): Promise<IGameSkinMeta> {return new Promise(async (res, rej) => {
     if (!skinMeta) return rej('No skin.json found');
     const rawText = await skinMeta.async('text');
     const rawJson = JSON.parse(rawText);
@@ -126,13 +127,13 @@ export class GameSkins extends Map<string, GameSkin> {
 
         // TODO: Skin meta
         const skinResult = new GameSkin(
-          'Skin',
-          'Author',
-          'v1.0.0',
+          skinMeta.name,
+          skinMeta.author,
+          skinMeta.version,
           skinClassLow,
           skinClassHigh
         );
-        this.set('Skin', skinResult);
+        this.set(skinMeta.name, skinResult);
         res(skinResult);
 
         console.log(skinMeta);

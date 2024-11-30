@@ -2,9 +2,9 @@ import JSZip from 'jszip';
 import { Game } from '@/game';
 import { GameSkinFiles } from './file';
 import { GameSkinFileTexture } from './file/texture';
-import { createNoteSkin, createTextsSkin } from './file/utils';
+import { createNoteSkin, createNumbersSkin } from './file/utils';
 import { Nullable } from '@/utils/types';
-import { IGameSkinFileNotes, IGameSkinFileTexts } from './file/types';
+import { IGameSkinFileNotes, IGameSkinFileNumbers } from './file/types';
 import { EGameSkinElementType, IGameSkinElement, IGameSkinMeta } from './types';
 import { JSZipFiles, JSZipFilesMap, IGameSkinElementFiles } from './file/types';
 
@@ -86,13 +86,13 @@ const createSkinFileClass = (fileList: JSZipFilesMap, elements: IGameSkinElement
     flick: (await createNoteSkin(fileList, 'note-flick')),
   };
 
-  const textsClass: IGameSkinFileTexts = {
-    score: (await createTextsSkin(elements, EGameSkinElementType.SCORE)),
-    accurate: (await createTextsSkin(elements, EGameSkinElementType.ACCURATE)),
-    combo: (await createTextsSkin(elements, EGameSkinElementType.COMBO)),
+  const numbersClass: IGameSkinFileNumbers = {
+    score: (await createNumbersSkin(elements, EGameSkinElementType.SCORE)),
+    accurate: (await createNumbersSkin(elements, EGameSkinElementType.ACCURATE)),
+    combo: (await createNumbersSkin(elements, EGameSkinElementType.COMBO)),
   };
 
-  return res(new GameSkinFiles(noteClass, textsClass));
+  return res(new GameSkinFiles(noteClass, numbersClass));
 });
 
 export class GameSkin {

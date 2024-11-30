@@ -14,7 +14,7 @@ export const createNoteSkin = (fileList: Map<string, JSZip.JSZipObject>, name: s
   });
 });
 
-export const createTextsSkin = (elements: IGameSkinElementFiles[], type: EGameSkinElementType): Promise<GameSkinFileTexture[]> => new Promise(async (res) => {
+export const createNumbersSkin = (elements: IGameSkinElementFiles[], type: EGameSkinElementType): Promise<GameSkinFileTexture[]> => new Promise(async (res) => {
   const result: GameSkinFileTexture[] = [];
   const element = elements.find((e) => e.type === type);
   if (!element) throw new Error('No such element');

@@ -35,7 +35,7 @@ export interface IGameSkinFileNotes {
   readonly flick: IGameSkinFileNote,
 }
 
-export interface IGameSkinFileTexts {
+export interface IGameSkinFileNumbers {
   readonly score: GameSkinFileTexture[],
   readonly accurate: GameSkinFileTexture[],
   readonly combo: GameSkinFileTexture[],

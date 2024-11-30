@@ -113,8 +113,8 @@ export class GameRenderer {
   resize(width: number, height: number, resolution: number = window.devicePixelRatio) {
     this.renderer.resize(width, height, resolution);
 
-    this.size.width = width * resolution;
-    this.size.height = height * resolution;
+    this.size.width = width;
+    this.size.height = height;
 
     this.size.widthHalf = this.size.width / 2;
     this.size.heightHalf = this.size.height / 2;

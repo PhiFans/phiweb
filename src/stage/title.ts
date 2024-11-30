@@ -29,6 +29,22 @@ const createButtonView = (textStr: string, width: number = 160, height: number =
   return button;
 };
 
+const createSelectItem = (textStr: string[]) => {
+  const item = {
+    items: textStr,
+    width: 240,
+    height: 40,
+    backgroundColor: 0x666666,
+    hoverColor: 0xAAAAAA,
+    textStyle: {
+      fill: 0xFFFFFF,
+      margin: 8,
+    },
+    radius: 0,
+  };
+  return item;
+}
+
 const createSelectView = (width: number = 160, height: number = 40) => {
   const select = new Select({
     closedBG: new Graphics()
@@ -41,16 +57,7 @@ const createSelectView = (width: number = 160, height: number = 40) => {
       fill: 0xFFFFFF,
       fontWeight: 'bold',
     },
-    items: {
-      items: [],
-      width, height,
-      backgroundColor: 0x666666,
-      hoverColor: 0xAAAAAA,
-      textStyle: {
-        fill: 0xFFFFFF,
-      },
-      radius: 0,
-    },
+    items: createSelectItem([]),
   });
   return select;
 };
@@ -137,34 +144,26 @@ export class GameStageTitle implements IGameStageBase {
           const allCharts = fileList.getCharts();
           const allChartLists = [ ...allCharts.keys() ];
           const newChartLists = allChartLists.filter((e) => this.listsChart.indexOf(e) === -1);
-          this.selectorChart.addItems({
-            items: newChartLists,
-            width: 240,
-            height: 40,
-            backgroundColor: 0x666666,
-            hoverColor: 0xAAAAAA,
-            textStyle: {
-              fill: 0xFFFFFF,
-            },
-            radius: 0,
-          });
+          this.selectorChart.addItems(createSelectItem(newChartLists));
           this.listsChart.push(...newChartLists);
 
           const allAudios = fileList.getAudios();
           const allAudioLists = [ ...allAudios.keys() ];
           const newAudioLists = allAudioLists.filter((e) => this.listsAudio.indexOf(e) === -1);
-          this.selectorAudio.addItems({
-            items: newAudioLists,
-            width: 240,
-            height: 40,
-            backgroundColor: 0x666666,
-            hoverColor: 0xAAAAAA,
-            textStyle: {
-              fill: 0xFFFFFF,
-            },
-            radius: 0,
-          });
-          this.listsChart.push(...newAudioLists);
+          this.selectorAudio.addItems(createSelectItem(newAudioLists));
+          this.listsAudio.push(...newAudioLists);
+
+          // Select the first files automatically
+          this.selectorChart.value = 0;
+          this.selectorAudio.value = 0;
+          this.selectedChart = this.listsChart[this.selectorChart.value];
+          this.selectedAudio = this.listsAudio[this.selectorAudio.value];
+
+          // Update the button's text to autofit
+          // @ts-ignore 
+          this.selectorChart.openButton.setState('default', true); this.selectorChart.closeButton.setState('default', true);
+          // @ts-ignore 
+          this.selectorAudio.openButton.setState('default', true); this.selectorAudio.closeButton.setState('default', true);
         });
     });
   }
@@ -179,7 +178,10 @@ export class GameStageTitle implements IGameStageBase {
   }
 
   private onStartGame() {
-    if (!this.selectedChart || !this.selectedAudio) return;
+    if (!this.selectedChart || !this.selectedAudio) {
+      console.error('No chart or audio selected');
+      return;
+    }
 
     const chartFile = this.game.files.get(this.selectedChart)!;
     const audioFile = this.game.files.get(this.selectedAudio)!;

@@ -42,7 +42,10 @@ export class Game {
   });}
 
   startChart(chartData: GameChartData, audio: GameAudioClip) {
-    if (!this.skins.currentSkin) return;
+    if (!this.skins.currentSkin) {
+      console.error('No skin loaded');
+      return;
+    }
 
     this.chart = new GameChart(
       this,

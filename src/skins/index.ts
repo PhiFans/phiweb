@@ -2,17 +2,13 @@ import JSZip from 'jszip';
 import { Game } from '@/game';
 import { GameSkinFiles } from './file';
 import { GameSkinFileTexture } from './file/texture';
-import { createNoteSkin } from './file/utils';
+import { createNoteSkin, createTextsSkin } from './file/utils';
 import { Nullable } from '@/utils/types';
-import { IGameSkinFileNotes } from './file/types';
-import { IGameSkinMeta } from './types';
+import { IGameSkinFileNotes, IGameSkinFileTexts } from './file/types';
+import { EGameSkinElementType, IGameSkinElement, IGameSkinMeta } from './types';
+import { JSZipFiles, JSZipFilesMap, IGameSkinElementFiles } from './file/types';
 
-type SkinInput = File | Blob | string
-// XXX: These might need move to `utils`
-type JSZipFiles = {
-  [ key: string ]: JSZip.JSZipObject,
-};
-type JSZipFilesMap = Map<string, JSZip.JSZipObject>;
+type SkinInput = File | Blob | string;
 
 const RegFileExtImage = /\.(jpe?g|png)$/;
 const RegFileQualityHigh = /@2x\./;
@@ -24,6 +20,20 @@ const getFileListFromZip = (files: JSZipFiles): JSZipFilesMap => {
     if (file.dir) continue;
     result.push([ name, file ]);
   }
+  return new Map(result);
+};
+
+const getFileListByPath = (fileList: JSZipFilesMap, _pathStart: string): JSZipFilesMap => {
+  const pathStart = _pathStart.replace(/\//, '\\/');
+  const RegPath = new RegExp(`^${pathStart}-(\\d)$`);
+  const result: [ string, JSZip.JSZipObject ][] = [];
+
+  fileList.forEach((value, filename) => {
+    if (!RegPath.test(filename)) return;
+    const textId = RegPath.exec(filename)![1];
+    result.push([ textId, value ]);
+  });
+
   return new Map(result);
 };
 
@@ -41,8 +51,30 @@ const getFilesByQuality = (fileList: JSZipFilesMap, high = false): Nullable<JSZi
   else return new Map(result);
 };
 
+const createSkinElements = (elements: IGameSkinElement[], fileList: JSZipFilesMap) => {
+  const result: IGameSkinElementFiles[] = [];
+
+  for (const element of elements) {
+    switch (element.type) {
+      case EGameSkinElementType.SCORE:
+      case EGameSkinElementType.ACCURATE:
+      case EGameSkinElementType.COMBO: {
+        const fileListNumber = getFileListByPath(fileList, element.path);
+
+        result.push({
+          ...element,
+          files: fileListNumber,
+        });
+        break;
+      }
+    }
+  }
+
+  return result;
+};
+
 // XXX: This might need move to `utils`
-const createSkinFileClass = (fileList: JSZipFilesMap): Promise<GameSkinFiles> => new Promise(async (res) => {
+const createSkinFileClass = (fileList: JSZipFilesMap, elements: IGameSkinElementFiles[]): Promise<GameSkinFiles> => new Promise(async (res) => {
   const noteClass: IGameSkinFileNotes = {
     tap: (await createNoteSkin(fileList, 'note-tap')),
     drag: (await createNoteSkin(fileList, 'note-drag')),
@@ -53,7 +85,14 @@ const createSkinFileClass = (fileList: JSZipFilesMap): Promise<GameSkinFiles> =>
     },
     flick: (await createNoteSkin(fileList, 'note-flick')),
   };
-  return res(new GameSkinFiles(noteClass));
+
+  const textsClass: IGameSkinFileTexts = {
+    score: (await createTextsSkin(elements, EGameSkinElementType.SCORE)),
+    accurate: (await createTextsSkin(elements, EGameSkinElementType.ACCURATE)),
+    combo: (await createTextsSkin(elements, EGameSkinElementType.COMBO)),
+  };
+
+  return res(new GameSkinFiles(noteClass, textsClass));
 });
 
 export class GameSkin {
@@ -121,9 +160,14 @@ export class GameSkins extends Map<string, GameSkin> {
         const fileListLow = getFilesByQuality(fileList, false)!;
         const fileListHigh = getFilesByQuality(fileList, true);
 
-        const skinClassLow = await createSkinFileClass(fileListLow);
+        const skinElementsLow = createSkinElements(skinMeta.elements, fileListLow);
+        const skinClassLow = await createSkinFileClass(fileListLow, skinElementsLow);
+
         let skinClassHigh: Nullable<GameSkinFiles> = null;
-        if (fileListHigh) skinClassHigh = await createSkinFileClass(fileListHigh);
+        if (fileListHigh) {
+          const skinElementHigh = createSkinElements(skinMeta.elements, fileListHigh);
+          skinClassHigh = await createSkinFileClass(fileListHigh, skinElementHigh);
+        }
 
         // TODO: Skin meta
         const skinResult = new GameSkin(

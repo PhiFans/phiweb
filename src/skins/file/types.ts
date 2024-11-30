@@ -1,4 +1,15 @@
+import JSZip from 'jszip';
 import { GameSkinFileTexture } from './texture';
+import { IGameSkinElement } from '../types';
+
+export type JSZipFiles = {
+  [ key: string ]: JSZip.JSZipObject,
+};
+export type JSZipFilesMap = Map<string, JSZip.JSZipObject>;
+
+export type IGameSkinElementFiles = IGameSkinElement & {
+  files: JSZipFilesMap;
+};
 
 export interface IGameSkinFileBase<S = unknown, R = unknown> {
   readonly source: S,
@@ -22,4 +33,11 @@ export interface IGameSkinFileNotes {
   readonly drag: IGameSkinFileNote,
   readonly hold: IGameSkinFileNoteHold,
   readonly flick: IGameSkinFileNote,
+}
+
+export interface IGameSkinFileTexts {
+  readonly score: GameSkinFileTexture[],
+  readonly accurate: GameSkinFileTexture[],
+  readonly combo: GameSkinFileTexture[],
+  // readonly comboText: GameSkinFileTexture, // TODO: Maybe move to elements
 }

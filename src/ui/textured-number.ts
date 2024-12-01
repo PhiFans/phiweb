@@ -13,8 +13,9 @@ export class GameUITexturedNumber {
   readonly info: IGameSkinElementTexture;
 
   private readonly _view: Graphics = new Graphics();
-  private _numberText: string = '0';
-  private _numberDigits: number = 1;
+  private _numberText: string = '';
+  private _numberDigits: number = 0;
+  private _numberDigitsMin: number = 0;
 
   // TODO: Skin meta
   constructor(textures: GameSkinFileTexture[], info: IGameSkinElementTexture) {
@@ -30,12 +31,18 @@ export class GameUITexturedNumber {
   }
 
   private updateSprites() {
-    const { textures, info, _numberText, _numberDigits, _view } = this;
+    const { textures, info, _numberText, _numberDigits, _numberDigitsMin, _view } = this;
     const result: Texture[] = [];
 
     for (let i = 0; i < _numberDigits; i++) {
       const number = _numberText[i];
       result.push(textures[number].texture!);
+    }
+
+    if (_numberDigitsMin !== 0) {
+      while (result.length < _numberDigitsMin) {
+        result.unshift(textures['0'].texture!);
+      }
     }
 
     const textureLength = calculateTextureLength(result);
@@ -48,7 +55,8 @@ export class GameUITexturedNumber {
   }
 
   set number(number: number | string) {
-    if (`${number}` === this._numberText) return;
+    const { _numberText } = this;
+    if (`${number}` === _numberText) return;
 
     this._numberText = `${number}`;
     this._numberDigits = this._numberText.length;
@@ -57,5 +65,9 @@ export class GameUITexturedNumber {
 
   get view() {
     return this._view;
+  }
+
+  set minDigits(value: number) {
+    this._numberDigitsMin = value;
   }
 }

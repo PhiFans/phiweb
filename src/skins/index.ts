@@ -88,7 +88,7 @@ const createSkinFileClass = (fileList: JSZipFilesMap, elements: IGameSkinElement
 
   const numbersClass: IGameSkinFileNumbers = {
     score: (await createNumbersSkin(elements, EGameSkinElementType.SCORE)),
-    accurate: (await createNumbersSkin(elements, EGameSkinElementType.ACCURATE, true)),
+    accurate: (await createNumbersSkin(elements, EGameSkinElementType.ACCURATE, true, true)),
     combo: (await createNumbersSkin(elements, EGameSkinElementType.COMBO)),
   };
 

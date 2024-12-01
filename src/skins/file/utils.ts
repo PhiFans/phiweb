@@ -14,7 +14,7 @@ export const createNoteSkin = (fileList: Map<string, JSZip.JSZipObject>, name: s
   });
 });
 
-export const createNumbersSkin = (elements: IGameSkinElementFiles[], type: EGameSkinElementType): Promise<GameSkinFileTexture[]> => new Promise(async (res) => {
+export const createNumbersSkin = (elements: IGameSkinElementFiles[], type: EGameSkinElementType, includeDot = false, includePercent = false): Promise<GameSkinFileTexture[]> => new Promise(async (res) => {
   const result: GameSkinFileTexture[] = [];
   const element = elements.find((e) => e.type === type);
   if (!element) throw new Error('No such element');
@@ -25,6 +25,11 @@ export const createNumbersSkin = (elements: IGameSkinElementFiles[], type: EGame
     result.push(new GameSkinFileTexture((await window.createImageBitmap((await file.async('blob'))))));
   }
 
-  if (result.length !== 10) throw new Error(`No enough textures for type: ${type}`);
+  if (includeDot) {
+    result.push(new GameSkinFileTexture((await window.createImageBitmap((await element.files.get('dot')!.async('blob'))))));
+    if (includePercent) result.push(new GameSkinFileTexture((await window.createImageBitmap((await element.files.get('percent')!.async('blob'))))));
+  }
+
+  if (result.length < 10) throw new Error(`No enough textures for type: ${type}`);
   return res(result);
 });

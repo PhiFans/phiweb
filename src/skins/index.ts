@@ -25,7 +25,7 @@ const getFileListFromZip = (files: JSZipFiles): JSZipFilesMap => {
 
 const getFileListByPath = (fileList: JSZipFilesMap, _pathStart: string): JSZipFilesMap => {
   const pathStart = _pathStart.replace(/\//, '\\/');
-  const RegPath = new RegExp(`^${pathStart}-(\\d)$`);
+  const RegPath = new RegExp(`^${pathStart}-(\\d|dot|percent)$`);
   const result: [ string, JSZip.JSZipObject ][] = [];
 
   fileList.forEach((value, filename) => {
@@ -88,7 +88,7 @@ const createSkinFileClass = (fileList: JSZipFilesMap, elements: IGameSkinElement
 
   const numbersClass: IGameSkinFileNumbers = {
     score: (await createNumbersSkin(elements, EGameSkinElementType.SCORE)),
-    accurate: (await createNumbersSkin(elements, EGameSkinElementType.ACCURATE)),
+    accurate: (await createNumbersSkin(elements, EGameSkinElementType.ACCURATE, true)),
     combo: (await createNumbersSkin(elements, EGameSkinElementType.COMBO)),
   };
 

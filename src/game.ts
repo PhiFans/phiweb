@@ -21,6 +21,8 @@ export class Game {
   options = {
     useHighQualitySkin: true,
     useHighlight: true,
+    challengeMode: false,
+    autoPlay: true,
   };
   private videoOptions: Partial<AutoDetectOptions> = {};
 

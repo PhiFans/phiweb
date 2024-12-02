@@ -2,7 +2,7 @@ import { Container, Sprite } from 'pixi.js';
 import { Nullable } from '@/utils/types';
 import { GameChartJudgeLine } from './judgeline';
 import { Game } from '@/game';
-import { IGameChartScoreNote, EGameChartScoreType } from './score/types';
+import { IGameChartScoreNote, EGameChartScoreJudgeType } from './score/types';
 
 export enum EGameChartNoteType {
   TAP = 1,
@@ -68,7 +68,7 @@ export class GameChartNote {
   readonly score: IGameChartScoreNote = {
     isScored: false,
     isScoreAnimated: false,
-    score: EGameChartScoreType.UNSCORED,
+    score: EGameChartScoreJudgeType.UNSCORED,
     timeBetween: 0,
     isHolding: false,
     animationTime: NaN

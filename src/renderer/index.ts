@@ -98,6 +98,9 @@ export class GameRenderer {
             this.renderer.render(this.stage);
           });
 
+          // Prevent right-click menu on canvas
+          this.renderer.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
           this.resize(
             newInitOptions.width || document.documentElement.clientWidth,
             newInitOptions.height || document.documentElement.clientHeight,

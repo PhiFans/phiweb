@@ -9,6 +9,9 @@ export default defineConfig(({ mode }) => {
         strategy: 'default',
       }),
     ],
+    server: {
+      host: '0.0.0.0',
+    },
     resolve: {
       alias: {
         '@': resolve(__dirname, './src'),

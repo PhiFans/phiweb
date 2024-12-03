@@ -6,6 +6,8 @@ import { GameAudioChannel } from '@/audio/channel';
 import { GameChartNote } from '../note';
 import { EGameChartScoreJudgeType } from './types';
 import { GameChartScoreInputs } from './inputs';
+import { GameChartScoreJudge } from './judge';
+import { IGameRendererSize } from '@/renderer';
 
 interface IGameScoreJudgeRange {
   readonly perfect: number,
@@ -43,20 +45,21 @@ const ScoreJudgeRanges: {
 export class GameChartScore {
   readonly chart: GameChart;
   readonly notes: GameChartNote[];
+  readonly size: IGameRendererSize;
   readonly skin: GameSkin;
   readonly audioChannel: GameAudioChannel;
   readonly ticker: Ticker = new Ticker();
   readonly notesCount: number;
 
   readonly inputs: GameChartScoreInputs;
-
-  readonly onScoreTick: () => void;
+  readonly judges: GameChartScoreJudge[] = [];
+  readonly onScoreTick: (currentTime: number) => void;
 
   private readonly scorePerNote: number;
   private readonly scorePerCombo: number;
   private readonly scorePerComboGood: number;
-  private readonly judgeRange: IGameScoreJudgeRange;
-  private readonly isAutoPlay: boolean;
+  readonly judgeRange: IGameScoreJudgeRange;
+  readonly isAutoPlay: boolean;
   private readonly judgeCount: IGameScoreJudgeCount = [ 0, 0, 0, 0 ];
 
   private score: number = 0;
@@ -69,6 +72,7 @@ export class GameChartScore {
   constructor(chart: GameChart) {
     this.chart = chart;
     this.notes = this.chart.data.notes;
+    this.size = this.chart.game.renderer.size;
     this.notesCount = this.notes.length; // TODO: Fake notes
 
     const { skins, audio, options } = this.chart.game;

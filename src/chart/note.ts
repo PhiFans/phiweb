@@ -62,6 +62,9 @@ export class GameChartNote {
   readonly holdFloorPosition: Nullable<number>;
   readonly posX: number;
 
+  realPosX: number = 0;
+  realPosY: number = 0;
+
   /**
    * The score detail of the note
    */

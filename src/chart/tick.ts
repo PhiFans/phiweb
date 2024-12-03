@@ -104,16 +104,16 @@ export function onChartTick(this: GameChart) {return new Promise((res) => {
       spriteBody.height = holdLength;
       spriteEnd.position.y = -holdLength;
 
-      sprite.position.set(realXCos, realYSin);
+      note.realPosX = realXCos;
+      note.realPosY = realYSin;
 
       if (spriteHead.visible) spriteHead.visible = false;
     } else {
-    sprite.position.set(
-      realXSin + realXCos,
-      realYCos + realYSin
-    );
+      note.realPosX = realXSin + realXCos;
+      note.realPosY = realYCos + realYSin;
     }
 
+    sprite.position.set(note.realPosX, note.realPosY);
     sprite.angle = judgeline.angle + (isAbove ? 0 : 180);
     if (!sprite.visible) sprite.visible = true;
   }

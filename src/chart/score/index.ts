@@ -5,6 +5,7 @@ import { GameSkin } from '@/skins';
 import { GameAudioChannel } from '@/audio/channel';
 import { GameChartNote } from '../note';
 import { EGameChartScoreJudgeType } from './types';
+import { GameChartScoreInputs } from './inputs';
 
 interface IGameScoreJudgeRange {
   readonly perfect: number,
@@ -47,6 +48,8 @@ export class GameChartScore {
   readonly ticker: Ticker = new Ticker();
   readonly notesCount: number;
 
+  readonly inputs: GameChartScoreInputs;
+
   readonly onScoreTick: () => void;
 
   private readonly scorePerNote: number;
@@ -84,6 +87,7 @@ export class GameChartScore {
     this.scorePerComboGood = this.scorePerNote * 0.65;
     this.isAutoPlay = options.autoPlay;
 
+    this.inputs = new GameChartScoreInputs(this.chart.game);
     this.onScoreTick = onScoreTick.bind(this);
   }
 

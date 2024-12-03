@@ -55,31 +55,35 @@ export class GameChartScoreInput {
   }
 }
 
-export class GameChartScoreInputs extends Array<GameChartScoreInput> {
-  readonly canvas: HTMLCanvasElement;
+export class GameChartScoreInputs {
+  private readonly canvas: HTMLCanvasElement;
+  readonly list: GameChartScoreInput[] = [];
 
   constructor(game: Game) {
-    super();
-
     this.canvas = game.renderer.renderer.canvas;
+
+    this.init();
   }
 
   private add(type: TGameScoreInputType, id: number | string, x: number, y: number) {
+    const { list } = this;
     this.remove(type, id);
-    this.push(new GameChartScoreInput(
+    list.push(new GameChartScoreInput(
       type, id,
       type !== 'keyboard' ? x : NaN, type !== 'keyboard' ? y : NaN
     ));
   }
 
   private move(type: TGameScoreInputType, id: number | string, x: number, y: number) {
-    const input = this.find(e => e.type === type && e.id === id);
+    const { list } = this;
+    const input = list.find(e => e.type === type && e.id === id);
     if (input) input.move(x, y);
   }
 
   private remove(type: TGameScoreInputType, id: number | string) {
-    const oldInput = this.findIndex(e => e.type === type && e.id === id);
-    if (oldInput !== -1) this.splice(oldInput, 1);
+    const { list } = this;
+    const oldInput = list.findIndex(e => e.type === type && e.id === id);
+    if (oldInput !== -1) list.splice(oldInput, 1);
   }
 
   private init() {

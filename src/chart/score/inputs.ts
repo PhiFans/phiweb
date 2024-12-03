@@ -93,16 +93,27 @@ export class GameChartScoreInputs extends Array<GameChartScoreInput> {
   private onTouchStart(e: TouchEvent) {
     e.preventDefault();
 
-
+    for (const i of e.changedTouches) {
+      const { clientX, clientY, identifier } = i;
+      this.add('touch', identifier, clientX, clientY);
+    }
   }
 
   private onTouchMove(e: TouchEvent) {
     e.preventDefault();
 
+    for (const i of e.changedTouches) {
+      const { clientX, clientY, identifier } = i;
+      this.move('touch', identifier, clientX, clientY);
+    }
   }
 
   private onTouchEnd(e: TouchEvent) {
     e.preventDefault();
 
+    for (const i of e.changedTouches) {
+      const { identifier } = i;
+      this.remove('touch', identifier);
+    }
   }
 }

@@ -87,11 +87,21 @@ export class GameChartScoreInputs {
   }
 
   private init() {
+    // Touchscreen
+    const { canvas } = this;
     const passive = { passive: false };
-    this.canvas.addEventListener('touchstart', (e) => this.onTouchStart(e), passive);
-    this.canvas.addEventListener('touchmove', (e) => this.onTouchMove(e), passive);
-    this.canvas.addEventListener('touchend', (e) => this.onTouchEnd(e));
-    this.canvas.addEventListener('touchcancel', (e) => this.onTouchEnd(e));
+    canvas.addEventListener('touchstart', (e) => this.onTouchStart(e), passive);
+    canvas.addEventListener('touchmove', (e) => this.onTouchMove(e), passive);
+    canvas.addEventListener('touchend', (e) => this.onTouchEnd(e));
+    canvas.addEventListener('touchcancel', (e) => this.onTouchEnd(e));
+
+    // Mouse
+    canvas.addEventListener('mousedown', (e) => this.onMouseStart(e));
+    canvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
+    canvas.addEventListener('mouseup', (e) => this.onMouseEnd(e));
+    canvas.addEventListener('mouseout', (e) => this.onMouseEnd(e));
+
+    // TODO: Keyboard support
   }
 
   private onTouchStart(e: TouchEvent) {
@@ -119,5 +129,22 @@ export class GameChartScoreInputs {
       const { identifier } = i;
       this.remove('touch', identifier);
     }
+  }
+
+  private onMouseStart(e: MouseEvent) {
+    e.preventDefault();
+    const { clientX, clientY, button } = e;
+    this.add('mouse', button, clientX, clientY);
+  }
+
+  private onMouseMove(e: MouseEvent) {
+    const { clientX, clientY, button } = e;
+    if (!clientX && !clientY) return;
+    this.move('mouse', button, clientX, clientY);
+  }
+
+  private onMouseEnd(e: MouseEvent) {
+    const { button } = e;
+    this.remove('mouse', button);
   }
 }

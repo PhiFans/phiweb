@@ -44,7 +44,9 @@ export class Game {
   });}
 
   startChart(chartData: GameChartData, audio: GameAudioClip) {
-    if (!this.skins.currentSkin) {
+    const { options, skins } = this;
+    const { currentSkin } = skins;
+    if (!currentSkin) {
       console.error('No skin loaded');
       return;
     }
@@ -57,8 +59,11 @@ export class Game {
     );
     this.chart.audio.setChannel(this.audio.channels.music);
 
-    this.skins.currentSkin.create(this.options.useHighQualitySkin);
-    this.chart.createSprites(this.renderer.containers.game);
+    currentSkin.create(options.useHighQualitySkin)
+    const skinTextures = currentSkin[currentSkin.high && options.useHighQualitySkin ? 'high' : 'normal']!;
+    const skinHitsounds = currentSkin.hitsounds;
+
+    this.chart.createSprites(this.renderer.containers.game, skinTextures, skinHitsounds);
     this.renderer.containers.game.sortChildren();
 
     this.chart.reszie(this.renderer.size);

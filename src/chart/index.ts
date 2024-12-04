@@ -5,6 +5,8 @@ import { GameChartScore } from './score';
 import { onChartTick } from './tick';
 import { Game } from '@/game';
 import { IGameRendererSize } from '@/renderer';
+import { GameSkinFiles } from '@/skins/file';
+import { IGameSkinHitsounds } from '@/skins/file/types';
 
 export class GameChart {
   readonly game: Game;
@@ -28,8 +30,8 @@ export class GameChart {
     this.onTick = this.onTick.bind(this);
   }
 
-  createSprites(container: Container) {
-    this.data.createSprites(container, this.game);
+  createSprites(container: Container, skinFiles: GameSkinFiles, skinHitSounds: IGameSkinHitsounds) {
+    this.data.createSprites(container, this.game, skinFiles);
   }
 
   reszie(sizer: IGameRendererSize) {

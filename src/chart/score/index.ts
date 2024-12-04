@@ -55,9 +55,9 @@ export class GameChartScore {
   readonly judges: GameChartScoreJudge[] = [];
   readonly onScoreTick: (currentTime: number) => void;
 
-  private readonly scorePerNote: number;
   private readonly scorePerCombo: number;
-  private readonly scorePerComboGood: number;
+  private readonly scorePerNote: number;
+  private readonly scorePerNoteGood: number;
   readonly judgeRange: IGameScoreJudgeRange;
   readonly isAutoPlay: boolean;
   private readonly judgeCount: IGameScoreJudgeCount = [ 0, 0, 0, 0 ];
@@ -81,14 +81,14 @@ export class GameChartScore {
 
     if (options.challengeMode) {
       this.judgeRange = ScoreJudgeRanges.challenge;
-      this.scorePerNote = 1000000 / this.notesCount;
-      this.scorePerCombo = 0;
+      this.scorePerCombo = 1000000 / this.notesCount;
+      this.scorePerNote = 0;
     } else {
       this.judgeRange = ScoreJudgeRanges.normal;
-      this.scorePerNote = 900000 / this.notesCount;
-      this.scorePerCombo = 100000 / this.notesCount;
+      this.scorePerCombo = 900000 / this.notesCount;
+      this.scorePerNote = 100000 / this.notesCount;
     }
-    this.scorePerComboGood = this.scorePerNote * 0.65;
+    this.scorePerNoteGood = this.scorePerNote * 0.65;
     this.isAutoPlay = options.autoPlay;
 
     this.inputs = new GameChartScoreInputs(this.chart.game);
@@ -108,11 +108,11 @@ export class GameChartScore {
       this.combo = 0;
     }
 
-    // FIXME: Something went wrong
     this.score = Math.round(
-      (this.scorePerNote + this.scoredNotes) +
-      (this.judgeCount[3] * this.scorePerCombo) + (this.judgeCount[2] * this.scorePerComboGood)
+      (this.maxCombo * this.scorePerCombo) +
+      (this.scorePerNote * this.judgeCount[3] + this.scorePerNoteGood * this.judgeCount[2])
     );
+
     this.accurate = (this.judgeCount[3] + this.judgeCount[2] * 0.65) / this.notesCount;
     this.accurateText = `${this.accurate * 100}`;
   }

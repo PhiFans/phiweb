@@ -47,10 +47,14 @@ export const ReadFileAsArrayBuffer = (file: File | Blob): Promise<ArrayBuffer> =
   reader.readAsArrayBuffer(file);
 });
 
-export const ReadFileAsAudioBuffer = (file: File | Blob): Promise<AudioBuffer> => new Promise(async (res) => {
-  const arrayBuffer = await ReadFileAsArrayBuffer(file);
-  const audioBuffer = await decodeAudio(arrayBuffer);
-  res(audioBuffer);
+export const ReadFileAsAudioBuffer = (file: File | Blob): Promise<AudioBuffer> => new Promise(async (res, rej) => {
+  try {
+    const arrayBuffer = await ReadFileAsArrayBuffer(file);
+    const audioBuffer = await decodeAudio(arrayBuffer);
+    res(audioBuffer);
+  } catch (e) {
+    rej(e);
+  }
 });
 
 export const decodeFile = (file: File): Promise<IFile | File[]> => new Promise((res, rej) => {

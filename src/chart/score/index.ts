@@ -65,7 +65,6 @@ export class GameChartScore {
   score: number = 0;
   combo: number = 0;
   maxCombo: number = 0;
-  scoredNotes: number = 0;
   accurate: number = 0;
   accurateText: string = '0.00%';
 
@@ -96,11 +95,12 @@ export class GameChartScore {
   }
 
   updateScore(type: EGameChartScoreJudgeType) {
-    if (this.isAutoPlay) this.judgeCount[3] += 1;
-    else this.judgeCount[type] += 1;
+    const { isAutoPlay, judgeCount, scorePerCombo, scorePerNote, scorePerNoteGood, notesCount } = this;
+
+    if (isAutoPlay) judgeCount[3] += 1;
+    else judgeCount[type] += 1;
 
     if (type >= EGameChartScoreJudgeType.GOOD) {
-      this.scoredNotes += 1;
       this.combo += 1;
       if (this.maxCombo < this.combo) this.maxCombo = this.combo;
     } else {
@@ -109,11 +109,11 @@ export class GameChartScore {
     }
 
     this.score = Math.round(
-      (this.maxCombo * this.scorePerCombo) +
-      (this.scorePerNote * this.judgeCount[3] + this.scorePerNoteGood * this.judgeCount[2])
+      (this.maxCombo * scorePerCombo) +
+      (scorePerNote * judgeCount[3] + scorePerNoteGood * judgeCount[2])
     );
 
-    this.accurate = (this.judgeCount[3] + this.judgeCount[2] * 0.65) / this.notesCount;
+    this.accurate = (judgeCount[3] + judgeCount[2] * 0.65) / notesCount;
     this.accurateText = `${this.accurate * 100}`;
   }
 }

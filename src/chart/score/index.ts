@@ -7,7 +7,7 @@ import { GameChartScoreInputs } from './inputs';
 import { GameChartScoreJudge } from './judge';
 import { IGameRendererSize } from '@/renderer';
 import { IGameSkinHitsounds } from '@/skins/file/types';
-import { AnimatedSprite, Container, Sprite, Texture } from 'pixi.js';
+import { AnimatedSprite, Container, Sprite, Texture, Rectangle } from 'pixi.js';
 import { GameSkinFileTextureAnimated } from '@/skins/file/texture';
 import { GameSkinFiles } from '@/skins/file';
 
@@ -117,6 +117,8 @@ export class GameChartScore {
     if (!this.hitEffectContainer) this.hitEffectContainer = new Container();
 
     this.hitEffectContainer.label = 'Hit effect container';
+    this.hitEffectContainer.interactive = this.hitEffectContainer.interactiveChildren = false;
+    this.hitEffectContainer.boundsArea = new Rectangle(0, 0, 0, 0);
     this.hitEffectContainer.zIndex = 2;
 
     container.addChild(this.hitEffectContainer);

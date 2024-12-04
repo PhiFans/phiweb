@@ -15,7 +15,7 @@ const isInArea = (
 };
 
 export function onScoreTick(this: GameChartScore, currentTime: number) {
-  const { notes, inputs, judges, judgeRange, isAutoPlay, size, hitEffects } = this;
+  const { notes, inputs, judges, judgeRange, isAutoPlay, size } = this;
   const { list: inputList } = inputs;
 
   judges.length = 0;

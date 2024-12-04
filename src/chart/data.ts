@@ -3,7 +3,7 @@ import { GameChartNote } from './note';
 import { ConvertFromOfficial } from './converter/official';
 import { Nullable } from '@/utils/types';
 import { IChartOfficial } from './converter/official/types';
-import { Container } from 'pixi.js';
+import { Container, Rectangle } from 'pixi.js';
 import { Game } from '@/game';
 import { GameSkinFiles } from '@/skins/file';
 
@@ -19,6 +19,8 @@ export class GameChartData {
   offset: number;
   lines: Array<GameChartJudgeLine> = new Array();
   notes: Array<GameChartNote> = new Array();
+
+  container?: Container;
 
   constructor(offset: number) {
     this.offset = Math.round(offset);
@@ -39,16 +41,25 @@ export class GameChartData {
   });}
 
   createSprites(container: Container, game: Game, skinFiles: GameSkinFiles) {
+    if (!this.container) this.container = new Container();
+
+    this.container.label = 'Chart sprites container';
+    this.container.interactive = this.container.interactiveChildren = false;
+    this.container.boundsArea = new Rectangle(0, 0, 0, 0);
+    this.container.zIndex = 1;
+
     for (const line of this.lines) {
       // TODO: Line texture maybe
-      line.createSprites(container);
+      line.createSprites(this.container);
     }
 
     const lineLength = this.lines.length;
     for (let i = 0; i < this.notes.length; i++) {
       const note = this.notes[i];
       const zIndex = note.type !== 3 ? lineLength + 1 + i : ((i - 10) > 0 ? i - 10 : 0);
-      this.notes[i].createSprite(container, game, skinFiles, zIndex);
+      this.notes[i].createSprite(this.container, game, skinFiles, zIndex);
     }
+
+    container.addChild(this.container);
   }
 }

@@ -1,4 +1,5 @@
 import { Game } from '@/game';
+import { IGameRendererSize } from '@/renderer';
 
 type TGameScoreInputType = 'touch' | 'mouse' | 'keyboard';
 
@@ -57,27 +58,33 @@ export class GameChartScoreInput {
 
 export class GameChartScoreInputs {
   private readonly canvas: HTMLCanvasElement;
+  private size: IGameRendererSize;
   readonly list: GameChartScoreInput[] = [];
 
   constructor(game: Game) {
     this.canvas = game.renderer.renderer.canvas;
+    this.size = game.renderer.size;
 
     this.init();
   }
 
+  resize(size: IGameRendererSize) {
+    this.size = size;
+  }
+
   private add(type: TGameScoreInputType, id: number | string, x: number, y: number) {
-    const { list } = this;
+    const { list, size } = this;
     this.remove(type, id);
     list.push(new GameChartScoreInput(
       type, id,
-      type !== 'keyboard' ? x : NaN, type !== 'keyboard' ? y : NaN
+      type !== 'keyboard' ? (x - size.widthHalf) : NaN, type !== 'keyboard' ? (y - size.heightHalf) : NaN
     ));
   }
 
   private move(type: TGameScoreInputType, id: number | string, x: number, y: number) {
-    const { list } = this;
+    const { list, size } = this;
     const input = list.find(e => e.type === type && e.id === id);
-    if (input) input.move(x, y);
+    if (input) input.move(x - size.widthHalf, y - size.heightHalf);
   }
 
   private remove(type: TGameScoreInputType, id: number | string) {

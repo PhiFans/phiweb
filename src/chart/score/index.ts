@@ -7,6 +7,9 @@ import { GameChartScoreInputs } from './inputs';
 import { GameChartScoreJudge } from './judge';
 import { IGameRendererSize } from '@/renderer';
 import { IGameSkinHitsounds } from '@/skins/file/types';
+import { AnimatedSprite, Container, Sprite, Texture } from 'pixi.js';
+import { GameSkinFileTextureAnimated } from '@/skins/file/texture';
+import { GameSkinFiles } from '@/skins/file';
 
 interface IGameScoreJudgeRange {
   readonly perfect: number,
@@ -23,6 +26,16 @@ interface IGameScoreJudgeCount extends Array<number> {
   1: number,
   /** Miss */
   0: number,
+}
+
+interface IGameScoreHitEffect {
+  type: EGameChartScoreJudgeType,
+  x: number,
+  y: number,
+  sprite: Sprite | AnimatedSprite,
+  startTime: number,
+  frames: number,
+  fps: number,
 }
 
 const ScoreJudgeRanges: {
@@ -45,9 +58,14 @@ export class GameChartScore {
   readonly chart: GameChart;
   readonly notes: GameChartNote[];
   readonly size: IGameRendererSize;
-  readonly skinHitsounds: IGameSkinHitsounds;
   readonly audioChannel: GameAudioChannel;
   readonly notesCount: number;
+
+  skinHitEffects!: GameSkinFileTextureAnimated;
+  skinHitEffectsTexture!: Texture[];
+  skinHitsounds!: IGameSkinHitsounds;
+  hitEffectContainer?: Container<AnimatedSprite>;
+  readonly hitEffects: IGameScoreHitEffect[] = [];
 
   readonly inputs: GameChartScoreInputs;
   readonly judges: GameChartScoreJudge[] = [];
@@ -72,8 +90,7 @@ export class GameChartScore {
     this.size = this.chart.game.renderer.size;
     this.notesCount = this.notes.length; // TODO: Fake notes
 
-    const { skins, audio, options } = this.chart.game;
-    this.skinHitsounds = skins.currentSkin!.hitsounds;
+    const { audio, options } = this.chart.game;
     this.audioChannel = audio.channels.effect;
 
     if (options.challengeMode) {
@@ -90,6 +107,19 @@ export class GameChartScore {
 
     this.inputs = new GameChartScoreInputs(this.chart.game);
     this.onScoreTick = onScoreTick.bind(this);
+  }
+
+  createSprites(container: Container, skinTextures: GameSkinFiles, skinHitsounds: IGameSkinHitsounds) {
+    this.skinHitEffects = skinTextures.hitEffects;
+    this.skinHitEffectsTexture = this.skinHitEffects.textures!;
+    this.skinHitsounds = skinHitsounds;
+
+    if (!this.hitEffectContainer) this.hitEffectContainer = new Container();
+
+    this.hitEffectContainer.label = 'Hit effect container';
+    this.hitEffectContainer.zIndex = 2;
+
+    container.addChild(this.hitEffectContainer);
   }
 
   updateScore(type: EGameChartScoreJudgeType) {
@@ -115,10 +145,34 @@ export class GameChartScore {
     this.accurateText = `${this.accurate * 100}`;
   }
 
-  playHitSound(noteType: EGameChartNoteType = 1) {
-    const { audioChannel, skinHitsounds } = this;
+  playHitEffects(x: number, y: number, judgeType: EGameChartScoreJudgeType, playHitsound: boolean = true, noteType: EGameChartNoteType = 1) {
+    const { size, audioChannel, skinHitEffectsTexture, skinHitsounds, hitEffectContainer } = this;
     const { playlist } = audioChannel;
 
+    if (judgeType >= EGameChartScoreJudgeType.GOOD) {
+      const animation = new AnimatedSprite(skinHitEffectsTexture, true);
+
+      animation.position.set(x, y);
+      animation.anchor.set(0.5);
+      animation.scale.set(size.noteScale * 5.6)
+      animation.tint = judgeType === 3 ? 0xFFECA0 : 0xB4E1FF;
+      animation.loop = false;
+
+      animation.onFrameChange = () => {
+        animation.alpha = 1 - (animation.currentFrame / animation.totalFrames);
+      };
+
+      animation.onComplete = () => {
+        animation.removeFromParent();
+        animation.stop();
+        animation.destroy();
+      };
+
+      hitEffectContainer!.addChild(animation);
+      animation.play();
+    }
+
+    if (!playHitsound) return;
     if (noteType === 1 || noteType === 3) playlist[playlist.length] = skinHitsounds.tap.clip!;
     if (noteType === 2) playlist[playlist.length] = skinHitsounds.drag.clip!;
     if (noteType === 4) playlist[playlist.length] = skinHitsounds.flick.clip!;

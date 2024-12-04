@@ -15,7 +15,7 @@ const isInArea = (
 };
 
 export function onScoreTick(this: GameChartScore, currentTime: number) {
-  const { notes, inputs, judges, judgeRange, isAutoPlay, size } = this;
+  const { notes, inputs, judges, judgeRange, isAutoPlay, size, hitEffects } = this;
   const { list: inputList } = inputs;
 
   judges.length = 0;
@@ -26,7 +26,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
   }
 
   for (const note of notes) {
-    const { time, score, type, holdEndTime, realPosX, realPosY, judgeline, sprite } = note;
+    const { time, score, type, holdEndTime, realPosX, realPosY, realLinePosX, realLinePosY, judgeline, sprite } = note;
     if (score.isScored && score.isScoreAnimated) continue;
 
     const timeBetween = time - currentTime,
@@ -90,7 +90,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
           sprite!.visible = false;
           score.isScoreAnimated = true;
 
-          this.playHitSound(type);
+          this.playHitEffects(realLinePosX, realLinePosY, score.score, true, type);
         }
 
         this.updateScore(score.score);
@@ -103,7 +103,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         // Calculate score & play effects later
         sprite!.visible = false;
         score.isScoreAnimated = true;
-        this.playHitSound(type);
+        this.playHitEffects(realLinePosX, realLinePosY, score.score, true, type);
         this.updateScore(score.score);
       } else for (let i = 0; i < judges.length; i++) {
         const { type, x, y } = judges[i];
@@ -144,7 +144,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         if (timeBetweenReal <= judgeRange.perfect) score.score = EGameChartScoreJudgeType.PERFECT;
         else EGameChartScoreJudgeType.GOOD;
 
-        this.playHitSound(type);
+        this.playHitEffects(realLinePosX, realLinePosY, score.score, true, type);
 
         score.isScored = true;
         score.timeBetween = timeBetween;
@@ -168,7 +168,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         // Calculate score & play effects later
         sprite!.visible = false;
         score.isScoreAnimated = true;
-        this.playHitSound(type);
+        this.playHitEffects(realLinePosX, realLinePosY, score.score, true, type);
         this.updateScore(score.score);
       } else for (let i = 0; i < judges.length; i++) {
         const { type, x, y, input } = judges[i];

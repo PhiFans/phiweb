@@ -32,6 +32,7 @@ export class GameChart {
 
   createSprites(container: Container, skinFiles: GameSkinFiles, skinHitSounds: IGameSkinHitsounds) {
     this.data.createSprites(container, this.game, skinFiles);
+    this.score.createSprites(container, skinFiles, skinHitSounds);
   }
 
   reszie(sizer: IGameRendererSize) {

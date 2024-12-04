@@ -4,21 +4,24 @@ import { GameSkinFiles } from './file';
 import { GameSkinFileTexture } from './file/texture';
 import { createNoteSkin, createNumbersSkin } from './file/utils';
 import { Nullable } from '@/utils/types';
-import { IGameSkinFileNotes, IGameSkinFileNumbers } from './file/types';
+import { IGameSkinFileNotes, IGameSkinFileNumbers, IGameSkinHitsounds } from './file/types';
 import { EGameSkinElementType, IGameSkinElement, IGameSkinMeta } from './types';
 import { JSZipFiles, JSZipFilesMap, IGameSkinElementFiles } from './file/types';
+import { GameAudio } from '@/audio';
+import { ReadFileAsAudioBuffer } from '@/utils/file';
+import { GameSkinFileSound } from './file/sound';
 
 type SkinInput = File | Blob | string;
 
-const RegFileExtImage = /\.(jpe?g|png)$/;
-const RegFileQualityHigh = /@2x\./;
+const RegFileExt = /\.([a-zA-Z\d]+)$/;
+const RegFileQualityHigh = /@2x$/;
 
 const getFileListFromZip = (files: JSZipFiles): JSZipFilesMap => {
   const result: [ string, JSZip.JSZipObject ][] = [];
   for (const name in files) {
     const file = files[name];
     if (file.dir) continue;
-    result.push([ name, file ]);
+    result.push([ name.replace(RegFileExt, ''), file ]);
   }
   return new Map(result);
 };
@@ -40,11 +43,11 @@ const getFileListByPath = (fileList: JSZipFilesMap, _pathStart: string): JSZipFi
 const getFilesByQuality = (fileList: JSZipFilesMap, high = false): Nullable<JSZipFilesMap> => {
   const result: [ string, JSZip.JSZipObject ][] = [];
   fileList.forEach((value, filename) => {
-    if (!RegFileExtImage.test(filename)) return;
+    const isHighQuality = RegFileQualityHigh.test(filename);
+    const realFileName = filename.replace('@2x', '');
 
-    const realFileName = filename.replace(RegFileExtImage, '').replace('@2x', '');
-    if (RegFileQualityHigh.test(filename) && high) result.push([ realFileName, value ]);
-    else if (!RegFileQualityHigh.test(filename) && !high) result.push([ realFileName, value ]);
+    if (isHighQuality && high) result.push([ realFileName, value ]);
+    else if (!isHighQuality && !high) result.push([ realFileName, value ]);
   });
 
   if (result.length <= 0) return null;
@@ -100,24 +103,40 @@ export class GameSkin {
   readonly author: string;
   readonly version: string;
   readonly normal: GameSkinFiles;
+  readonly hitsounds: IGameSkinHitsounds;
   readonly high: Nullable<GameSkinFiles> = null;
 
-  constructor(name: string, author: string, version: string, filesNormal: GameSkinFiles, filesHigh: Nullable<GameSkinFiles> = null) {
+  constructor(name: string, author: string, version: string, filesNormal: GameSkinFiles, fileHitsounds: IGameSkinHitsounds, filesHigh: Nullable<GameSkinFiles> = null) {
     this.name = name;
     this.author = author;
     this.version = version;
     this.normal = filesNormal;
+    this.hitsounds = fileHitsounds;
     this.high = filesHigh;
   }
 
   create(useHighQualitySkin = false) {
+    this.createHitsounds();
     if (this.high && useHighQualitySkin) this.high.create();
     else this.normal.create();
   }
 
   destroy() {
+    this.destroyHitsounds();
     this.normal.destroy();
     if (this.high) this.high.destroy();
+  }
+
+  private createHitsounds() {
+    this.hitsounds.tap.create();
+    this.hitsounds.drag.create();
+    this.hitsounds.flick.create();
+  }
+
+  private destroyHitsounds() {
+    this.hitsounds.tap.destroy();
+    this.hitsounds.drag.destroy();
+    this.hitsounds.flick.destroy();
   }
 }
 
@@ -169,12 +188,19 @@ export class GameSkins extends Map<string, GameSkin> {
           skinClassHigh = await createSkinFileClass(fileListHigh, skinElementHigh);
         }
 
+        const fileHitsounds: IGameSkinHitsounds = {
+          tap: new GameSkinFileSound((await ReadFileAsAudioBuffer((await fileList.get('hitsound-tap')!.async('blob'))))),
+          drag: new GameSkinFileSound((await ReadFileAsAudioBuffer((await fileList.get('hitsound-drag')!.async('blob'))))),
+          flick: new GameSkinFileSound((await ReadFileAsAudioBuffer((await fileList.get('hitsound-flick')!.async('blob')))))
+        };
+
         // TODO: Skin meta
         const skinResult = new GameSkin(
           skinMeta.name,
           skinMeta.author,
           skinMeta.version,
           skinClassLow,
+          fileHitsounds,
           skinClassHigh
         );
         this.set(skinMeta.name, skinResult);

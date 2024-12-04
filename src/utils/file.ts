@@ -47,6 +47,12 @@ export const ReadFileAsArrayBuffer = (file: File | Blob): Promise<ArrayBuffer> =
   reader.readAsArrayBuffer(file);
 });
 
+export const ReadFileAsAudioBuffer = (file: File | Blob): Promise<AudioBuffer> => new Promise(async (res) => {
+  const arrayBuffer = await ReadFileAsArrayBuffer(file);
+  const audioBuffer = await decodeAudio(arrayBuffer);
+  res(audioBuffer);
+});
+
 export const decodeFile = (file: File): Promise<IFile | File[]> => new Promise((res, rej) => {
   (new Promise(() => {
     throw new Error('Promise chain!');
@@ -73,8 +79,7 @@ export const decodeFile = (file: File): Promise<IFile | File[]> => new Promise((
     });
   }).catch(async () => {
     // Decode as audio file
-    const arrayBuffer = await ReadFileAsArrayBuffer(file);
-    const audioBuffer = await decodeAudio(arrayBuffer);
+    const audioBuffer = await ReadFileAsAudioBuffer(file);
     const audioResult = GameAudio.from(audioBuffer);
     res({
       filename: file.name,

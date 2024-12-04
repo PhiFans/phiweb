@@ -1,6 +1,8 @@
 import JSZip from 'jszip';
 import { GameSkinFileTexture } from './texture';
 import { IGameSkinElement } from '../types';
+import { GameAudioClip } from '@/audio/clip';
+import { GameSkinFileSound } from './sound';
 
 export type JSZipFiles = {
   [ key: string ]: JSZip.JSZipObject,
@@ -40,4 +42,10 @@ export interface IGameSkinFileNumbers {
   readonly accurate: GameSkinFileTexture[],
   readonly combo: GameSkinFileTexture[],
   // readonly comboText: GameSkinFileTexture, // TODO: Maybe move to elements
+}
+
+export interface IGameSkinHitsounds {
+  tap: GameSkinFileSound,
+  drag: GameSkinFileSound,
+  flick: GameSkinFileSound,
 }

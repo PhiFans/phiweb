@@ -138,7 +138,9 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         if (type !== 1) continue;
         if (!isInArea(x, y, realPosX, realPosY, judgeline.cosr, judgeline.sinr, size.noteWidth)) continue;
 
-        score.score = EGameChartScoreJudgeType.PERFECT;
+        if (timeBetweenReal <= judgeRange.perfect) score.score = EGameChartScoreJudgeType.PERFECT;
+        else EGameChartScoreJudgeType.GOOD;
+
         score.isScored = true;
         score.timeBetween = timeBetween;
         score.isHolding = true;

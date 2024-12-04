@@ -108,6 +108,7 @@ export class GameChartScore {
       this.combo = 0;
     }
 
+    // FIXME: Something went wrong
     this.score = Math.round(
       (this.scorePerNote + this.scoredNotes) +
       (this.judgeCount[3] * this.scorePerCombo) + (this.judgeCount[2] * this.scorePerComboGood)

@@ -1,8 +1,8 @@
 import JSZip from 'jszip';
-import { GameSkinFileTexture } from './texture';
-import { IGameSkinFileNote } from './types';
+import { GameSkinFileTexture, GameSkinFileTextureAnimated } from './texture';
+import { IGameSkinFileNote, JSZipFilesMap } from './types';
 import { IGameSkinElementFiles } from './types';
-import { EGameSkinElementType } from '../types';
+import { IGameSkinElementTextureAnimated, TGameSkinElementType, TGameSkinElementTypeTextureAnimated } from '../types';
 
 export const createNoteSkin = (fileList: Map<string, JSZip.JSZipObject>, name: string): Promise<IGameSkinFileNote> => new Promise(async (res) => {
   const normalBlob = await fileList.get(name)!.async('blob');
@@ -14,7 +14,7 @@ export const createNoteSkin = (fileList: Map<string, JSZip.JSZipObject>, name: s
   });
 });
 
-export const createNumbersSkin = (elements: IGameSkinElementFiles[], type: EGameSkinElementType, includeDot = false, includePercent = false): Promise<GameSkinFileTexture[]> => new Promise(async (res) => {
+export const createNumbersSkin = (elements: IGameSkinElementFiles[], type: TGameSkinElementType, includeDot = false, includePercent = false): Promise<GameSkinFileTexture[]> => new Promise(async (res) => {
   const result: GameSkinFileTexture[] = [];
   const element = elements.find((e) => e.type === type);
   if (!element) throw new Error('No such element');
@@ -32,4 +32,18 @@ export const createNumbersSkin = (elements: IGameSkinElementFiles[], type: EGame
 
   if (result.length < 10) throw new Error(`No enough textures for type: ${type}`);
   return res(result);
+});
+
+export const createAnimatedSkin = (elements: IGameSkinElementFiles[], type: TGameSkinElementTypeTextureAnimated): Promise<GameSkinFileTextureAnimated> => new Promise(async (res) => {
+  const result: ImageBitmap[] = [];
+  const element = elements.find(e => e.type === type) as IGameSkinElementTextureAnimated & { files: JSZipFilesMap };
+  if (!element) throw new Error(`No such element type: ${type}`);
+
+  for (let i = 0, l = element.files.size; i < l; i++) {
+    const file = element.files.get(`${i}`);
+    if (!file) throw new Error(`Cannot found texture ID: ${i} for type: ${type}`);
+    result.push((await window.createImageBitmap((await file.async('blob')))));
+  }
+
+  return res(new GameSkinFileTextureAnimated(result, element.fps));
 });

@@ -1,19 +1,4 @@
 
-export enum EGameSkinElementType {
-  // Textures
-  SCORE = 'score',
-  ACCURATE = 'accurate',
-  COMBO = 'combo',
-  COMBO_TEXT = 'combo-text',
-  IMAGE = 'image',
-
-  // Text
-  SONG_NAME = 'song-name',
-  SONG_LEVEL = 'song-level',
-  SONG_ARTIST = 'song-artist',
-  TEXT = 'text',
-}
-
 export interface IGameSkinMeta {
   name: string,
   author: string,
@@ -21,22 +6,13 @@ export interface IGameSkinMeta {
   elements: IGameSkinElement[]
 }
 
-export type TGameSkinElementTypeTexture = (
-  EGameSkinElementType.SCORE |
-  EGameSkinElementType.ACCURATE |
-  EGameSkinElementType.COMBO |
-  EGameSkinElementType.COMBO_TEXT |
-  EGameSkinElementType.IMAGE
-);
-export type TGameSkinElementTypeText = (
-  EGameSkinElementType.SONG_NAME |
-  EGameSkinElementType.SONG_LEVEL |
-  EGameSkinElementType.SONG_ARTIST |
-  EGameSkinElementType.TEXT
-);
+export type TGameSkinElementTypeTexture = 'score' | 'accurate' | 'combo' | 'combo-text' | 'image';
+export type TGameSkinElementTypeTextureAnimated = 'hit-effect' | 'image';
+export type TGameSkinElementTypeText = 'song-name' | 'song-level' | 'song-artist' | 'text';
+export type TGameSkinElementType = TGameSkinElementTypeTexture | TGameSkinElementTypeTextureAnimated | TGameSkinElementTypeText;
 
 export interface IGameSkinElementBase {
-  type: string,
+  type: TGameSkinElementType,
   enabled: boolean,
   align: 'left' | 'center' | 'right',
   anchor: IGameSkinElementCoordinate,
@@ -45,17 +21,23 @@ export interface IGameSkinElementBase {
 }
 
 export interface IGameSkinElementTexture extends IGameSkinElementBase {
-  type: TGameSkinElementTypeTexture,
+  type: 'score' | 'accurate' | 'combo' | 'combo-text' | 'image',
   path: string,
 }
 
+export interface IGameSkinElementTextureAnimated extends IGameSkinElementBase {
+  type: 'hit-effect' | 'image',
+  path: string,
+  fps: number,
+}
+
 export interface IGameSkinElementText extends IGameSkinElementBase {
-  type: TGameSkinElementTypeText,
+  type: 'song-name' | 'song-level' | 'song-artist' | 'text',
   fontFamily: string,
   size: number,
 }
 
-export type IGameSkinElement = IGameSkinElementTexture | IGameSkinElementText;
+export type IGameSkinElement = IGameSkinElementTexture | IGameSkinElementTextureAnimated | IGameSkinElementText;
 
 export interface IGameSkinElementCoordinate {
   x: number,

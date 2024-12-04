@@ -1,5 +1,5 @@
 import { Texture, TextureSource } from 'pixi.js';
-import { IGameSkinFileBase } from './types';
+import { IGameSkinFileAnimated, IGameSkinFileBase } from './types';
 
 export class GameSkinFileTexture implements IGameSkinFileBase<ImageBitmap, Texture<TextureSource<ImageBitmap>>> {
   readonly source: ImageBitmap;
@@ -22,5 +22,33 @@ export class GameSkinFileTexture implements IGameSkinFileBase<ImageBitmap, Textu
 
   get texture() {
     return this._texture;
+  }
+}
+
+export class GameSkinFileTextureAnimated implements IGameSkinFileAnimated<ImageBitmap[], Texture<TextureSource<ImageBitmap>>[]> {
+  readonly sources: ImageBitmap[];
+  readonly fps: number;
+  private _textures?: Texture<TextureSource<ImageBitmap>>[];
+
+  constructor(sources: ImageBitmap[], fps: number = 60) {
+    this.sources = [ ...sources ];
+    this.fps = fps;
+  }
+
+  create() {
+    const result = [];
+    for (const source of this.sources) result.push(Texture.from(source));
+    this._textures = result;
+    return this._textures;
+  }
+
+  destroy() {
+    if (!this._textures) return;
+    for (const texture of this._textures) texture.destroy();
+    this._textures = (void 0);
+  }
+
+  get textures() {
+    return this._textures;
   }
 }

@@ -1,23 +1,27 @@
-import { GameSkinFileTexture } from './texture';
+import { GameSkinFileTexture, GameSkinFileTextureAnimated } from './texture';
 import { IGameSkinFileNote, IGameSkinFileNotes, IGameSkinFileNumbers } from './types';
 
 export class GameSkinFiles {
   readonly notes: IGameSkinFileNotes;
   readonly numbers: IGameSkinFileNumbers;
+  readonly hitEffects: GameSkinFileTextureAnimated;
 
-  constructor(notes: IGameSkinFileNotes, numbers: IGameSkinFileNumbers) {
+  constructor(notes: IGameSkinFileNotes, numbers: IGameSkinFileNumbers, hitEffects: GameSkinFileTextureAnimated) {
     this.notes = notes;
     this.numbers = numbers;
+    this.hitEffects = hitEffects;
   }
 
   create() {
     this.createTextureNote();
     this.createTextureNumbers();
+    this.hitEffects.create();
   }
 
   destroy() {
     this.destroyTextureNote();
     this.destroyTextureNumbers();
+    this.hitEffects.destroy();
   }
 
   private createTextureNote() {

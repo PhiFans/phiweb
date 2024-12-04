@@ -2,12 +2,11 @@ import JSZip from 'jszip';
 import { Game } from '@/game';
 import { GameSkinFiles } from './file';
 import { GameSkinFileTexture } from './file/texture';
-import { createNoteSkin, createNumbersSkin } from './file/utils';
+import { createAnimatedSkin, createNoteSkin, createNumbersSkin } from './file/utils';
 import { Nullable } from '@/utils/types';
 import { IGameSkinFileNotes, IGameSkinFileNumbers, IGameSkinHitsounds } from './file/types';
-import { EGameSkinElementType, IGameSkinElement, IGameSkinMeta } from './types';
+import { IGameSkinElement, IGameSkinMeta } from './types';
 import { JSZipFiles, JSZipFilesMap, IGameSkinElementFiles } from './file/types';
-import { GameAudio } from '@/audio';
 import { ReadFileAsAudioBuffer } from '@/utils/file';
 import { GameSkinFileSound } from './file/sound';
 
@@ -40,6 +39,21 @@ const getFileListByPath = (fileList: JSZipFilesMap, _pathStart: string): JSZipFi
   return new Map(result);
 };
 
+const getFilesAnimated = (fileList: JSZipFilesMap, _pathStart: string): JSZipFilesMap => {
+  const pathStart = _pathStart.replace(/\//, '\\/');
+  const RegPath = new RegExp(`^${pathStart}-(\\d+)$`);
+  const result: [ string, JSZip.JSZipObject ][] = [];
+
+  fileList.forEach((value, filename) => {
+    if (!RegPath.test(filename)) return;
+    const textId = RegPath.exec(filename)![1];
+    result.push([ textId, value ]);
+  });
+
+  result.sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
+  return new Map(result);
+};
+
 const getFilesByQuality = (fileList: JSZipFilesMap, high = false): Nullable<JSZipFilesMap> => {
   const result: [ string, JSZip.JSZipObject ][] = [];
   fileList.forEach((value, filename) => {
@@ -59,15 +73,22 @@ const createSkinElements = (elements: IGameSkinElement[], fileList: JSZipFilesMa
 
   for (const element of elements) {
     switch (element.type) {
-      case EGameSkinElementType.SCORE:
-      case EGameSkinElementType.ACCURATE:
-      case EGameSkinElementType.COMBO: {
+      case 'score':
+      case 'accurate':
+      case 'combo': {
         const fileListNumber = getFileListByPath(fileList, element.path);
-
         result.push({
           ...element,
           files: fileListNumber,
         });
+        break;
+      }
+      case 'hit-effect': {
+        const fileListAnimated = getFilesAnimated(fileList, element.path);
+        result.push({
+          ...element,
+          files: fileListAnimated,
+        })
         break;
       }
     }
@@ -90,12 +111,14 @@ const createSkinFileClass = (fileList: JSZipFilesMap, elements: IGameSkinElement
   };
 
   const numbersClass: IGameSkinFileNumbers = {
-    score: (await createNumbersSkin(elements, EGameSkinElementType.SCORE)),
-    accurate: (await createNumbersSkin(elements, EGameSkinElementType.ACCURATE, true, true)),
-    combo: (await createNumbersSkin(elements, EGameSkinElementType.COMBO)),
+    score: (await createNumbersSkin(elements, 'score')),
+    accurate: (await createNumbersSkin(elements, 'accurate', true, true)),
+    combo: (await createNumbersSkin(elements, 'combo')),
   };
 
-  return res(new GameSkinFiles(noteClass, numbersClass));
+  const hitEffectsClass = await createAnimatedSkin(elements, 'hit-effect');
+
+  return res(new GameSkinFiles(noteClass, numbersClass, hitEffectsClass));
 });
 
 export class GameSkin {

@@ -14,13 +14,9 @@ const valueCalculator = (events: GameChartEvent[], currentTime: number, defaultV
   return defaultValue;
 };
 
-export function onChartTick(this: GameChart) {return new Promise((res) => {
-  const { data, audio, game } = this;
-  const { startTime, clock, status } = audio;
-  const { time } = clock;
+export function onChartTick(this: GameChart, currentTime: number) {
+  const { data, game } = this;
 
-  if (status !== 1) return;
-  const currentTime = (time - (startTime || time)) - data.offset;
   const { renderer } = game;
   const { widthHalf, heightHalf } = renderer.size;
 
@@ -73,17 +69,10 @@ export function onChartTick(this: GameChart) {return new Promise((res) => {
 
   const { size } = renderer;
   for (const note of data.notes) {
-    const { judgeline, type, time, holdEndTime, posX: notePosX, floorPosition, speed, isAbove } = note;
+    const { score, judgeline, type, time, holdEndTime, posX: notePosX, floorPosition, speed, isAbove } = note;
     const sprite = note.sprite!;
 
-    if (
-      (type !== 3 && time <= currentTime) ||
-      (type === 3 && holdEndTime! <= currentTime)
-    ) {
-      sprite.visible = false;
-      continue;
-    }
-
+    if (score.isScored && score.isScoreAnimated) continue;
     if (judgeline.floorPosition > floorPosition && time > currentTime) {
       sprite.visible = false;
       continue;
@@ -117,6 +106,4 @@ export function onChartTick(this: GameChart) {return new Promise((res) => {
     sprite.angle = judgeline.angle + (isAbove ? 0 : 180);
     if (!sprite.visible) sprite.visible = true;
   }
-
-  res(void 0);
-});};
+};

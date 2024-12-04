@@ -15,7 +15,7 @@ export class GameChart {
   readonly background: unknown;
   readonly ticker: Ticker = new Ticker();
 
-  readonly onChartTick: () => void;
+  readonly onChartTick: (currentTime: number) => void;
 
   constructor(game: Game, data: GameChartData, audio: GameAudioClip, background: unknown) {
     this.game = game;
@@ -25,6 +25,7 @@ export class GameChart {
     this.background = background;
 
     this.onChartTick = onChartTick.bind(this);
+    this.onTick = this.onTick.bind(this);
   }
 
   createSprites(container: Container) {
@@ -54,9 +55,21 @@ export class GameChart {
   }
 
   start() {
-    this.ticker.add(this.onChartTick);
+    this.ticker.add(this.onTick);
     this.ticker.start();
 
     this.audio.play();
+  }
+
+  private onTick() {
+    const { data, audio } = this;
+    const { startTime, clock, status } = audio;
+    const { time } = clock;
+
+    if (status !== 1) return;
+    const currentTime = (time - (startTime || time)) - data.offset;
+
+    this.onChartTick(currentTime);
+    this.score.onScoreTick(currentTime);
   }
 }

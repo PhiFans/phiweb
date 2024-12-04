@@ -28,17 +28,33 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
   }
 
   for (const note of notes) {
-    const { time, score, type, realPosX, realPosY, judgeline, sprite } = note;
-    if (score.isScored) continue;
+    const { time, score, type, holdEndTime, realPosX, realPosY, judgeline, sprite } = note;
+    if (score.isScored && score.isScoreAnimated) continue;
 
     const timeBetween = time - currentTime,
       timeBetweenReal = timeBetween > 0 ? timeBetween : -timeBetween;
-    if (timeBetween < -judgeRange.bad) {
-      score.isScored = true;
-      score.score = EGameChartScoreJudgeType.MISS;
-      continue;
-    }
-    if (timeBetween > judgeRange.bad) break;
+
+    if (timeBetween <= 0) {
+      // Handle miss animation
+      if (type !== 3) sprite!.alpha = 1 + (timeBetween / judgeRange.bad);
+      else if (currentTime >= holdEndTime!) {
+        sprite!.visible = false;
+        score.isScoreAnimated = true;
+        continue;
+      }
+
+      if (timeBetween <= -judgeRange.bad) {
+        score.isScored = true;
+        score.score = EGameChartScoreJudgeType.MISS;
+        score.timeBetween = NaN;
+
+        if (type !== 3) {
+          sprite!.visible = false;
+          score.isScoreAnimated = true;
+        } else sprite!.alpha = 0.5;
+        continue;
+      }
+    } else if (timeBetween > judgeRange.bad) break;
 
     if (isAutoPlay) {
       if (type === 1) {

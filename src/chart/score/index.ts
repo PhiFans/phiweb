@@ -1,4 +1,3 @@
-import { Ticker } from 'pixi.js';
 import { GameChart } from '..';
 import { onScoreTick } from './tick';
 import { GameSkin } from '@/skins';
@@ -48,7 +47,6 @@ export class GameChartScore {
   readonly size: IGameRendererSize;
   readonly skin: GameSkin;
   readonly audioChannel: GameAudioChannel;
-  readonly ticker: Ticker = new Ticker();
   readonly notesCount: number;
 
   readonly inputs: GameChartScoreInputs;

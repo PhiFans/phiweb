@@ -32,6 +32,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
     const timeBetween = time - currentTime,
       timeBetweenReal = timeBetween > 0 ? timeBetween : -timeBetween;
 
+    // Handle hold animation
     if (type === 3 && currentTime >= holdEndTime!) {
       if (score.score !== EGameChartScoreJudgeType.MISS) this.updateScore(score.score);
       sprite!.visible = false;
@@ -40,9 +41,9 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
     }
 
     if (!score.isScored && timeBetween <= 0) {
-      // Handle miss animation
-      if (type !== 3) sprite!.alpha = 1 + (timeBetween / judgeRange.bad);
+      if (type !== 3) sprite!.alpha = 1 + (timeBetween / judgeRange.bad); // Handle missing animation
 
+      // Handle miss
       if (timeBetween <= -judgeRange.bad) {
         score.isScored = true;
         score.score = EGameChartScoreJudgeType.MISS;
@@ -71,7 +72,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
       }
     }
 
-    if (type === 1) {
+    if (type === 1) { // Handle Tap
       for (let i = 0; i < judges.length; i++) {
         const { type, x, y, input } = judges[i];
 
@@ -95,8 +96,9 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         judges.splice(i, 1);
         break;
       }
-    } else if (type === 2) {
+    } else if (type === 2) { // Handle Drag
       if (score.isScored && score.score !== EGameChartScoreJudgeType.MISS && timeBetween <= 0) {
+        // Calculate score & play effects later
         sprite!.visible = false;
         score.isScoreAnimated = true;
         this.updateScore(score.score);
@@ -112,8 +114,8 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
 
         break;
       }
-    } else if (type === 3) {
-      // TODO: Hold judge
+    } else if (type === 3) { // Handle Hold
+      // Skip if hold is missed
       if (score.score === EGameChartScoreJudgeType.MISS) continue;
 
       if (score.isScored) {
@@ -154,8 +156,9 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         sprite!.alpha = 0.5;
         this.updateScore(score.score);
       }
-    } else if (type === 4) {
+    } else if (type === 4) { // Handle Flick
       if (score.isScored && score.score !== EGameChartScoreJudgeType.MISS && timeBetween <= 0) {
+        // Calculate score & play effects later
         sprite!.visible = false;
         score.isScoreAnimated = true;
         this.updateScore(score.score);

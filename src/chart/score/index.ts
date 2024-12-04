@@ -62,12 +62,12 @@ export class GameChartScore {
   readonly isAutoPlay: boolean;
   private readonly judgeCount: IGameScoreJudgeCount = [ 0, 0, 0, 0 ];
 
-  private score: number = 0;
-  private combo: number = 0;
-  private maxCombo: number = 0;
-  private scoredNotes: number = 0;
-  private accurate: number = 0;
-  private accurateText: string = '0.00%';
+  score: number = 0;
+  combo: number = 0;
+  maxCombo: number = 0;
+  scoredNotes: number = 0;
+  accurate: number = 0;
+  accurateText: string = '0.00%';
 
   constructor(chart: GameChart) {
     this.chart = chart;

@@ -58,14 +58,14 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
 
     if (isAutoPlay) {
       if (type === 1) {
-        if (timeBetween <= judgeRange.perfect) judges[judges.length] = new GameChartScoreJudge(1, realPosX, realPosY);
+        if (timeBetween <= 0) judges[judges.length] = new GameChartScoreJudge(1, realPosX, realPosY);
       } else if (type === 2) {
-        if (timeBetween <= judgeRange.perfect) judges[judges.length] = new GameChartScoreJudge(3, realPosX, realPosY);
+        if (timeBetween <= 0) judges[judges.length] = new GameChartScoreJudge(3, realPosX, realPosY);
       } else if (type === 3) {
         if (score.isHolding) judges[judges.length] = new GameChartScoreJudge(3, realPosX, realPosY);
-        else if (timeBetween <= judgeRange.perfect) judges[judges.length] = new GameChartScoreJudge(1, realPosX, realPosY);
+        else if (timeBetween <= 0) judges[judges.length] = new GameChartScoreJudge(1, realPosX, realPosY);
       } else if (type === 4) {
-        if (timeBetween <= judgeRange.perfect) judges[judges.length] = new GameChartScoreJudge(2, realPosX, realPosY);
+        if (timeBetween <= 0) judges[judges.length] = new GameChartScoreJudge(2, realPosX, realPosY);
       }
     }
 

@@ -1,12 +1,12 @@
 import { GameChart } from '..';
 import { onScoreTick } from './tick';
-import { GameSkin } from '@/skins';
 import { GameAudioChannel } from '@/audio/channel';
-import { GameChartNote } from '../note';
+import { EGameChartNoteType, GameChartNote } from '../note';
 import { EGameChartScoreJudgeType } from './types';
 import { GameChartScoreInputs } from './inputs';
 import { GameChartScoreJudge } from './judge';
 import { IGameRendererSize } from '@/renderer';
+import { IGameSkinHitsounds } from '@/skins/file/types';
 
 interface IGameScoreJudgeRange {
   readonly perfect: number,
@@ -45,7 +45,7 @@ export class GameChartScore {
   readonly chart: GameChart;
   readonly notes: GameChartNote[];
   readonly size: IGameRendererSize;
-  readonly skin: GameSkin;
+  readonly skinHitsounds: IGameSkinHitsounds;
   readonly audioChannel: GameAudioChannel;
   readonly notesCount: number;
 
@@ -73,7 +73,7 @@ export class GameChartScore {
     this.notesCount = this.notes.length; // TODO: Fake notes
 
     const { skins, audio, options } = this.chart.game;
-    this.skin = skins.currentSkin!;
+    this.skinHitsounds = skins.currentSkin!.hitsounds;
     this.audioChannel = audio.channels.effect;
 
     if (options.challengeMode) {
@@ -113,5 +113,13 @@ export class GameChartScore {
 
     this.accurate = (judgeCount[3] + judgeCount[2] * 0.65) / notesCount;
     this.accurateText = `${this.accurate * 100}`;
+  }
+
+  playHitSound(noteType: EGameChartNoteType = 1) {
+    const { audioChannel, skinHitsounds } = this;
+
+    if (noteType === 1 || noteType === 3) audioChannel.playlist.push(skinHitsounds.tap.clip!);
+    if (noteType === 2) audioChannel.playlist.push(skinHitsounds.drag.clip!);
+    if (noteType === 4) audioChannel.playlist.push(skinHitsounds.flick.clip!);
   }
 }

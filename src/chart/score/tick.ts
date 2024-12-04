@@ -89,6 +89,8 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         if (score.score !== EGameChartScoreJudgeType.BAD) {
           sprite!.visible = false;
           score.isScoreAnimated = true;
+
+          this.playHitSound(type);
         }
 
         this.updateScore(score.score);
@@ -101,6 +103,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         // Calculate score & play effects later
         sprite!.visible = false;
         score.isScoreAnimated = true;
+        this.playHitSound(type);
         this.updateScore(score.score);
       } else for (let i = 0; i < judges.length; i++) {
         const { type, x, y } = judges[i];
@@ -141,6 +144,8 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         if (timeBetweenReal <= judgeRange.perfect) score.score = EGameChartScoreJudgeType.PERFECT;
         else EGameChartScoreJudgeType.GOOD;
 
+        this.playHitSound(type);
+
         score.isScored = true;
         score.timeBetween = timeBetween;
         score.isHolding = true;
@@ -163,6 +168,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         // Calculate score & play effects later
         sprite!.visible = false;
         score.isScoreAnimated = true;
+        this.playHitSound(type);
         this.updateScore(score.score);
       } else for (let i = 0; i < judges.length; i++) {
         const { type, x, y, input } = judges[i];

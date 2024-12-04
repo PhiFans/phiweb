@@ -58,6 +58,7 @@ export class GameChart {
     this.ticker.add(this.onTick);
     this.ticker.start();
 
+    this.game.audio.channels.effect.startTicker();
     this.audio.play();
   }
 

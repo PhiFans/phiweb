@@ -81,9 +81,10 @@ export function onChartTick(this: GameChart, currentTime: number) {
     const posX = size.widthPercent * notePosX;
     const posY = (floorPosition - judgeline.floorPosition) * (type === 3 ? 1 : speed) * size.noteSpeed * (isAbove ? -1 : 1);
     const realXSin = posY * judgeline.sinr * -1;
-    const realXCos = posX * judgeline.cosr + judgeline.realPosX;
-    const realYSin = posX * judgeline.sinr + judgeline.realPosY;
     const realYCos = posY * judgeline.cosr;
+
+    note.realPosX = note.realLinePosX = posX * judgeline.cosr + judgeline.realPosX;
+    note.realPosY = note.realLinePosY = posX * judgeline.sinr + judgeline.realPosY;
 
     if (type === 3 && time <= currentTime) {
       const [ spriteHead, spriteBody, spriteEnd ] = sprite.children;
@@ -93,13 +94,10 @@ export function onChartTick(this: GameChart, currentTime: number) {
       spriteBody.height = holdLength;
       spriteEnd.position.y = -holdLength;
 
-      note.realPosX = realXCos;
-      note.realPosY = realYSin;
-
       if (spriteHead.visible) spriteHead.visible = false;
     } else {
-      note.realPosX = realXSin + realXCos;
-      note.realPosY = realYCos + realYSin;
+      note.realPosX += realXSin;
+      note.realPosY += realYCos;
     }
 
     sprite.position.set(note.realPosX, note.realPosY);

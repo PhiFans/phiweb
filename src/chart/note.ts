@@ -63,6 +63,8 @@ export class GameChartNote {
   readonly holdFloorPosition: Nullable<number>;
   readonly posX: number;
 
+  realLinePosX: number = 0;
+  realLinePosY: number = 0;
   realPosX: number = 0;
   realPosY: number = 0;
 

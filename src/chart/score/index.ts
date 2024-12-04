@@ -95,7 +95,7 @@ export class GameChartScore {
     this.onScoreTick = onScoreTick.bind(this);
   }
 
-  private updateScore(type: EGameChartScoreJudgeType) {
+  updateScore(type: EGameChartScoreJudgeType) {
     if (this.isAutoPlay) this.judgeCount[3] += 1;
     else this.judgeCount[type] += 1;
 

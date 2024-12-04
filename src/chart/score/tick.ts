@@ -48,6 +48,8 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         score.score = EGameChartScoreJudgeType.MISS;
         score.timeBetween = NaN;
 
+        this.updateScore(score.score);
+
         if (type !== 3) {
           sprite!.visible = false;
           score.isScoreAnimated = true;
@@ -88,6 +90,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
           score.isScoreAnimated = true;
         }
 
+        this.updateScore(score.score);
         judges.splice(i, 1);
         break;
       }

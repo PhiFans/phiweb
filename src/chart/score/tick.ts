@@ -32,14 +32,16 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
     const timeBetween = time - currentTime,
       timeBetweenReal = timeBetween > 0 ? timeBetween : -timeBetween;
 
-    if (timeBetween <= 0) {
+    if (type === 3 && currentTime >= holdEndTime!) {
+      if (score.score !== EGameChartScoreJudgeType.MISS) this.updateScore(score.score);
+      sprite!.visible = false;
+      score.isScoreAnimated = true;
+      continue;
+    }
+
+    if (!score.isScored && timeBetween <= 0) {
       // Handle miss animation
       if (type !== 3) sprite!.alpha = 1 + (timeBetween / judgeRange.bad);
-      else if (currentTime >= holdEndTime!) {
-        sprite!.visible = false;
-        score.isScoreAnimated = true;
-        continue;
-      }
 
       if (timeBetween <= -judgeRange.bad) {
         score.isScored = true;
@@ -112,6 +114,46 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
       }
     } else if (type === 3) {
       // TODO: Hold judge
+      if (score.score === EGameChartScoreJudgeType.MISS) continue;
+
+      if (score.isScored) {
+        if (score.isHolding) {
+          score.isHolding = false;
+
+          for (let i = 0; i < judges.length; i++) {
+            const { type, x, y } = judges[i];
+
+            if (type !== 3) continue;
+            if (!isInArea(x, y, realPosX, realPosY, judgeline.cosr, judgeline.sinr, size.noteWidth)) continue;
+
+            score.isHolding = true;
+            break;
+          }
+        }
+      } else for (let i = 0; i < judges.length; i++) {
+        const { type, x, y, input } = judges[i];
+
+        if (type !== 1) continue;
+        if (!isInArea(x, y, realPosX, realPosY, judgeline.cosr, judgeline.sinr, size.noteWidth)) continue;
+
+        score.score = EGameChartScoreJudgeType.PERFECT;
+        score.isScored = true;
+        score.timeBetween = timeBetween;
+        score.isHolding = true;
+
+        if (input) input.isTapped = true;
+        judges.splice(i, 1);
+        break;
+      }
+
+      if (score.isScored && !score.isHolding) {
+        score.score = EGameChartScoreJudgeType.MISS;
+        score.timeBetween = NaN;
+        score.isHolding = false;
+
+        sprite!.alpha = 0.5;
+        this.updateScore(score.score);
+      }
     } else if (type === 4) {
       if (score.isScored && score.score !== EGameChartScoreJudgeType.MISS && timeBetween <= 0) {
         sprite!.visible = false;

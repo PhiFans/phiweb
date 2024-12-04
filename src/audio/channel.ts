@@ -39,11 +39,6 @@ export class GameAudioChannel {
 
       buffer.buffer = audio.source;
       buffer.connect(this.gain);
-      buffer.onended = () => {
-        buffer.stop();
-        buffer.disconnect();
-      };
-
       buffer.start();
     }
   }

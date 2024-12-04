@@ -117,9 +117,10 @@ export class GameChartScore {
 
   playHitSound(noteType: EGameChartNoteType = 1) {
     const { audioChannel, skinHitsounds } = this;
+    const { playlist } = audioChannel;
 
-    if (noteType === 1 || noteType === 3) audioChannel.playlist.push(skinHitsounds.tap.clip!);
-    if (noteType === 2) audioChannel.playlist.push(skinHitsounds.drag.clip!);
-    if (noteType === 4) audioChannel.playlist.push(skinHitsounds.flick.clip!);
+    if (noteType === 1 || noteType === 3) playlist[playlist.length] = skinHitsounds.tap.clip!;
+    if (noteType === 2) playlist[playlist.length] = skinHitsounds.drag.clip!;
+    if (noteType === 4) playlist[playlist.length] = skinHitsounds.flick.clip!;
   }
 }

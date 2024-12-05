@@ -32,6 +32,18 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
     const timeBetween = time - currentTime,
       timeBetweenReal = timeBetween > 0 ? timeBetween : -timeBetween;
 
+    // Handle bad animation
+    if (score.animationTime !== null) {
+      const percent = (currentTime - score.animationTime) / 500;
+      sprite!.alpha = 1 - percent;
+
+      if (percent >= 1) {
+        sprite!.removeFromParent();
+        score.isScoreAnimated = true;
+      }
+      continue;
+    }
+
     // Handle hold animation
     if (type === 3 && currentTime >= holdEndTime!) {
       if (score.score !== EGameChartScoreJudgeType.MISS) this.updateScore(score.score);
@@ -84,13 +96,16 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
 
         if (timeBetweenReal <= judgeRange.perfect) score.score = EGameChartScoreJudgeType.PERFECT;
         else if (timeBetweenReal <= judgeRange.good) score.score = EGameChartScoreJudgeType.GOOD;
-        else EGameChartScoreJudgeType.BAD;
+        else score.score = EGameChartScoreJudgeType.BAD;
 
         if (score.score !== EGameChartScoreJudgeType.BAD) {
           sprite!.removeFromParent();
           score.isScoreAnimated = true;
 
           this.playHitEffects(realLinePosX, realLinePosY, score.score, true, type);
+        } else {
+          sprite!.tint = 0x6C4343;
+          score.animationTime = currentTime;
         }
 
         this.updateScore(score.score);

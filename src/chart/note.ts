@@ -87,7 +87,7 @@ export class GameChartNote {
     score: EGameChartScoreJudgeType.UNSCORED,
     timeBetween: 0,
     isHolding: false,
-    animationTime: NaN
+    animationTime: null
   };
 
   sprite?: Sprite | Container;

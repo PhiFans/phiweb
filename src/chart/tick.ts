@@ -96,7 +96,7 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
     const floorPositionDiff = (floorPosition - judgeline.floorPosition) * (type === 3 ? 1 : speed);
     const sprite = note.sprite!;
 
-    if (score.isScored && score.isScoreAnimated) continue;
+    if (score.isScored && (score.isScoreAnimated || score.animationTime !== null)) continue;
     // TODO: Made as an option
     if (floorPositionDiff * 0.6 > 2 || (floorPositionDiff < 0 && time > currentTime)) {
       if (sprite.parent) sprite.removeFromParent();

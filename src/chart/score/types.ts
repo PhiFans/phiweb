@@ -1,3 +1,4 @@
+import { Nullable } from '@/utils/types';
 
 export enum EGameChartScoreJudgeType {
   PERFECT = 3,
@@ -40,7 +41,7 @@ export interface IGameChartScoreNote {
   isHolding: boolean,
   /**
    * Bad animation started time.
-   * @default NaN
+   * @default null
    */
-  animationTime: number,
+  animationTime: Nullable<number>,
 }

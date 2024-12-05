@@ -15,7 +15,7 @@ const isInArea = (
 };
 
 export function onScoreTick(this: GameChartScore, currentTime: number) {
-  const { notes, inputs, judges, judgeRange, isAutoPlay, size } = this;
+  const { notes, inputs, judges, judgeRange, isAutoPlay, size, hitParticles } = this;
   const { list: inputList } = inputs;
 
   judges.length = 0;
@@ -25,6 +25,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
     judges[judges.length] = new GameChartScoreJudge(3, input.x, input.y);
   }
 
+  const { noteWidth } = size;
   for (const note of notes) {
     const { time, score, type, holdEndTime, realPosX, realPosY, realLinePosX, realLinePosY, judgeline, sprite } = note;
     if (score.isScored && score.isScoreAnimated) continue;
@@ -89,7 +90,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         const { type, x, y, input } = judges[i];
 
         if (type !== 1) continue;
-        if (!isInArea(x, y, realPosX, realPosY, judgeline.cosr, judgeline.sinr, size.noteWidth)) continue;
+        if (!isInArea(x, y, realPosX, realPosY, judgeline.cosr, judgeline.sinr, noteWidth)) continue;
 
         score.isScored = true;
         score.timeBetween = timeBetween;
@@ -102,7 +103,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
           sprite!.removeFromParent();
           score.isScoreAnimated = true;
 
-          this.playHitEffects(realLinePosX, realLinePosY, score.score, true, type);
+          this.playHitEffects(realLinePosX, realLinePosY, score.score, currentTime, true, type);
         } else {
           sprite!.tint = 0x6C4343;
           score.animationTime = currentTime;
@@ -118,13 +119,13 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         // Calculate score & play effects later
         sprite!.removeFromParent();
         score.isScoreAnimated = true;
-        this.playHitEffects(realLinePosX, realLinePosY, score.score, true, type);
+        this.playHitEffects(realLinePosX, realLinePosY, score.score, currentTime, true, type);
         this.updateScore(score.score);
       } else for (let i = 0; i < judges.length; i++) {
         const { type, x, y } = judges[i];
 
         if (type !== 3) continue;
-        if (!isInArea(x, y, realPosX, realPosY, judgeline.cosr, judgeline.sinr, size.noteWidth)) continue;
+        if (!isInArea(x, y, realPosX, realPosY, judgeline.cosr, judgeline.sinr, noteWidth)) continue;
 
         score.score = EGameChartScoreJudgeType.PERFECT;
         score.isScored = true;
@@ -144,7 +145,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
             const { type, x, y } = judges[i];
 
             if (type !== 3) continue;
-            if (!isInArea(x, y, realPosX, realPosY, judgeline.cosr, judgeline.sinr, size.noteWidth)) continue;
+            if (!isInArea(x, y, realPosX, realPosY, judgeline.cosr, judgeline.sinr, noteWidth)) continue;
 
             score.isHolding = true;
             break;
@@ -154,12 +155,12 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         const { type, x, y, input } = judges[i];
 
         if (type !== 1) continue;
-        if (!isInArea(x, y, realPosX, realPosY, judgeline.cosr, judgeline.sinr, size.noteWidth)) continue;
+        if (!isInArea(x, y, realPosX, realPosY, judgeline.cosr, judgeline.sinr, noteWidth)) continue;
 
         if (timeBetweenReal <= judgeRange.perfect) score.score = EGameChartScoreJudgeType.PERFECT;
         else EGameChartScoreJudgeType.GOOD;
 
-        this.playHitEffects(realLinePosX, realLinePosY, score.score, true, type);
+        this.playHitEffects(realLinePosX, realLinePosY, score.score, currentTime, true, type);
 
         score.isScored = true;
         score.timeBetween = timeBetween;
@@ -183,13 +184,13 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         // Calculate score & play effects later
         sprite!.removeFromParent();
         score.isScoreAnimated = true;
-        this.playHitEffects(realLinePosX, realLinePosY, score.score, true, type);
+        this.playHitEffects(realLinePosX, realLinePosY, score.score, currentTime, true, type);
         this.updateScore(score.score);
       } else for (let i = 0; i < judges.length; i++) {
         const { type, x, y, input } = judges[i];
 
         if (type !== 2) continue;
-        if (!isInArea(x, y, realPosX, realPosY, judgeline.cosr, judgeline.sinr, size.noteWidth)) continue;
+        if (!isInArea(x, y, realPosX, realPosY, judgeline.cosr, judgeline.sinr, noteWidth)) continue;
 
         score.score = EGameChartScoreJudgeType.PERFECT;
         score.isScored = true;
@@ -199,6 +200,34 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         judges.splice(i, 1);
         break;
       }
+    }
+  }
+
+  const { hitParticleScale } = size;
+  for (const particle of hitParticles) {
+    const { time, particleLength, sprites, distance, cosr, sinr, x, y } = particle;
+    const progress = (currentTime - time) / 500;
+    if (progress >= 1) {
+      particle.destroy();
+      continue;
+    }
+
+    const scale = (((0.2078 * progress - 1.6524) * progress + 1.6399) * progress + 0.4988) * hitParticleScale;
+
+    for (let i = 0; i < particleLength; i++) {
+      const sprite = sprites[i];
+      const _distance = distance[i] * (9 * progress / (8 * progress + 1)) * hitParticleScale;
+
+      sprite.alpha = 1 - progress;
+      sprite.scale.set(scale);
+      sprite.position.set(_distance * cosr[i] + x, _distance * sinr[i] + y);
+    }
+  }
+
+  for (let i = 0; i < hitParticles.length; i++) {
+    if (hitParticles[i].isDestroyed) {
+      hitParticles.splice(i, 1);
+      i--;
     }
   }
 }

@@ -30,6 +30,8 @@ export interface IGameRendererSize {
   noteWidth: number,
   noteSpeed: number,
 
+  hitParticleScale: number,
+
   lineScale: number,
 }
 
@@ -55,6 +57,8 @@ export class GameRenderer {
     noteScale: 0,
     noteWidth: 0,
     noteSpeed: 0,
+
+    hitParticleScale: 0,
 
     lineScale: 0,
   };
@@ -133,9 +137,11 @@ export class GameRenderer {
 
     this.size.widthPercent = this.size.width * (9 / 160);
 
-    this.size.noteScale = this.size.width / 8000 * (this.game.options.useHighQualitySkin ? 1 : 2); // TODO: Settings
+    this.size.noteScale = this.size.width / 8080 * (this.game.options.useHighQualitySkin ? 1 : 2); // TODO: Settings
     this.size.noteWidth = this.size.width * 0.117775;
     this.size.noteSpeed = this.size.height * 0.6;
+
+    this.size.hitParticleScale = this.size.noteScale * 6;
 
     this.size.lineScale = this.size.width > this.size.height * 0.75 ? this.size.height / 18.75 : this.size.width / 14.0625;
 

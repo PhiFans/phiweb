@@ -7,8 +7,8 @@ import { GameChartScoreInputs } from './inputs';
 import { GameChartScoreJudge } from './judge';
 import { IGameRendererSize } from '@/renderer';
 import { IGameSkinHitsounds } from '@/skins/file/types';
-import { AnimatedSprite, Container, Sprite, Rectangle } from 'pixi.js';
-import { GameSkinFileTextureAnimated } from '@/skins/file/texture';
+import { AnimatedSprite, Container, Rectangle, Texture, Sprite } from 'pixi.js';
+import { GameSkinFileTexture, GameSkinFileTextureAnimated } from '@/skins/file/texture';
 import { GameSkinFiles } from '@/skins/file';
 
 interface IGameScoreJudgeRange {
@@ -28,16 +28,6 @@ interface IGameScoreJudgeCount extends Array<number> {
   0: number,
 }
 
-interface IGameScoreHitEffect {
-  type: EGameChartScoreJudgeType,
-  x: number,
-  y: number,
-  sprite: Sprite | AnimatedSprite,
-  startTime: number,
-  frames: number,
-  fps: number,
-}
-
 const ScoreJudgeRanges: {
   readonly normal: IGameScoreJudgeRange,
   readonly challenge: IGameScoreJudgeRange
@@ -54,6 +44,52 @@ const ScoreJudgeRanges: {
   }
 };
 
+class GameScoreHitParticle {
+  readonly particleLength = 3;
+  readonly time: number;
+  readonly x: number;
+  readonly y: number;
+  readonly angle: number[] = [];
+  readonly cosr: number[] = [];
+  readonly sinr: number[] = [];
+  readonly distance: number[] = [];
+  readonly sprites: Sprite[] = [];
+  isDestroyed = false;
+
+  // TODO: Use `ParticleContainer` and `Particle`
+  constructor(type: EGameChartScoreJudgeType, time: number, x: number, y: number, texture: Texture, container: Container) {
+    this.time = time;
+    this.x = x;
+    this.y = y;
+
+    const { particleLength, angle, cosr, sinr, distance, sprites } = this;
+    let i = 0;
+    while (i < particleLength) {
+      const _angle = Math.random() * 2 * Math.PI;
+
+      distance[i] = Math.random() * 80 + 185;
+      angle[i] = _angle;
+      cosr[i] = Math.cos(_angle);
+      sinr[i] = Math.sin(_angle);
+
+      sprites[i] = new Sprite({
+        texture, x, y,
+        scale: 1,
+        anchor: 0.5,
+        tint: type === 3 ? 0xFFECA0 : 0xB4E1FF,
+      });
+      i++;
+    }
+
+    container.addChild(...sprites);
+  }
+
+  destroy() {
+    this.isDestroyed = true;
+    for (const particle of this.sprites) particle.removeFromParent();
+  }
+}
+
 export class GameChartScore {
   readonly chart: GameChart;
   readonly notes: GameChartNote[];
@@ -62,9 +98,11 @@ export class GameChartScore {
   readonly notesCount: number;
 
   skinHitEffects!: GameSkinFileTextureAnimated;
+  skinHitParticle!: GameSkinFileTexture;
   skinHitsounds!: IGameSkinHitsounds;
   hitEffectContainer?: Container<AnimatedSprite>;
-  readonly hitEffects: IGameScoreHitEffect[] = [];
+  hitParticleContainer?: Container<Sprite>;
+  readonly hitParticles: GameScoreHitParticle[] = [];
 
   readonly inputs: GameChartScoreInputs;
   readonly judges: GameChartScoreJudge[] = [];
@@ -110,6 +148,7 @@ export class GameChartScore {
 
   createSprites(container: Container, skinTextures: GameSkinFiles, skinHitsounds: IGameSkinHitsounds) {
     this.skinHitEffects = skinTextures.hitEffects;
+    this.skinHitParticle = skinTextures.hitParticle;
     this.skinHitsounds = skinHitsounds;
 
     if (!this.hitEffectContainer) this.hitEffectContainer = new Container();
@@ -119,7 +158,15 @@ export class GameChartScore {
     this.hitEffectContainer.boundsArea = new Rectangle(0, 0, 0, 0);
     this.hitEffectContainer.zIndex = 2;
 
+    if (!this.hitParticleContainer) this.hitParticleContainer = new Container();
+
+    this.hitParticleContainer.label = 'Hit particle container';
+    this.hitParticleContainer.interactive = this.hitEffectContainer.interactiveChildren = false;
+    this.hitParticleContainer.boundsArea = new Rectangle(0, 0, 0, 0);
+    this.hitParticleContainer.zIndex = 3;
+
     container.addChild(this.hitEffectContainer);
+    container.addChild(this.hitParticleContainer);
   }
 
   updateScore(type: EGameChartScoreJudgeType) {
@@ -145,8 +192,8 @@ export class GameChartScore {
     this.accurateText = `${this.accurate * 100}`;
   }
 
-  playHitEffects(x: number, y: number, judgeType: EGameChartScoreJudgeType, playHitsound: boolean = true, noteType: EGameChartNoteType = 1) {
-    const { size, audioChannel, skinHitEffects, skinHitsounds, hitEffectContainer } = this;
+  playHitEffects(x: number, y: number, judgeType: EGameChartScoreJudgeType, currentTime: number, playHitsound: boolean = true, noteType: EGameChartNoteType = 1) {
+    const { size, audioChannel, skinHitEffects, skinHitParticle, skinHitsounds, hitEffectContainer, hitParticleContainer, hitParticles } = this;
     const { playlist } = audioChannel;
 
     if (judgeType >= EGameChartScoreJudgeType.GOOD) {
@@ -172,6 +219,8 @@ export class GameChartScore {
 
       hitEffectContainer!.addChild(animation);
       animation.play();
+
+      hitParticles[hitParticles.length] = new GameScoreHitParticle(judgeType, currentTime, x, y, skinHitParticle.texture!, hitParticleContainer!);
     }
 
     if (!playHitsound) return;

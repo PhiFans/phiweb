@@ -155,6 +155,7 @@ export class GameChartScore {
 
     this.hitEffectContainer.label = 'Hit effect container';
     this.hitEffectContainer.interactive = this.hitEffectContainer.interactiveChildren = false;
+    this.hitEffectContainer.cullable = this.hitEffectContainer.cullableChildren = false;
     this.hitEffectContainer.boundsArea = new Rectangle(0, 0, 0, 0);
     this.hitEffectContainer.zIndex = 2;
 
@@ -162,6 +163,7 @@ export class GameChartScore {
 
     this.hitParticleContainer.label = 'Hit particle container';
     this.hitParticleContainer.interactive = this.hitEffectContainer.interactiveChildren = false;
+    this.hitParticleContainer.cullable = this.hitParticleContainer.cullableChildren = false;
     this.hitParticleContainer.boundsArea = new Rectangle(0, 0, 0, 0);
     this.hitParticleContainer.zIndex = 3;
 

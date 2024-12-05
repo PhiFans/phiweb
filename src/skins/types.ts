@@ -28,7 +28,7 @@ export interface IGameSkinElementTexture extends IGameSkinElementBase {
 export interface IGameSkinElementTextureAnimated extends IGameSkinElementBase {
   type: 'hit-effect' | 'image',
   path: string,
-  fps: number,
+  speed: number,
 }
 
 export interface IGameSkinElementText extends IGameSkinElementBase {

@@ -7,7 +7,7 @@ import { GameChartScoreInputs } from './inputs';
 import { GameChartScoreJudge } from './judge';
 import { IGameRendererSize } from '@/renderer';
 import { IGameSkinHitsounds } from '@/skins/file/types';
-import { AnimatedSprite, Container, Sprite, Texture, Rectangle } from 'pixi.js';
+import { AnimatedSprite, Container, Sprite, Rectangle } from 'pixi.js';
 import { GameSkinFileTextureAnimated } from '@/skins/file/texture';
 import { GameSkinFiles } from '@/skins/file';
 
@@ -62,7 +62,6 @@ export class GameChartScore {
   readonly notesCount: number;
 
   skinHitEffects!: GameSkinFileTextureAnimated;
-  skinHitEffectsTexture!: Texture[];
   skinHitsounds!: IGameSkinHitsounds;
   hitEffectContainer?: Container<AnimatedSprite>;
   readonly hitEffects: IGameScoreHitEffect[] = [];
@@ -111,7 +110,6 @@ export class GameChartScore {
 
   createSprites(container: Container, skinTextures: GameSkinFiles, skinHitsounds: IGameSkinHitsounds) {
     this.skinHitEffects = skinTextures.hitEffects;
-    this.skinHitEffectsTexture = this.skinHitEffects.textures!;
     this.skinHitsounds = skinHitsounds;
 
     if (!this.hitEffectContainer) this.hitEffectContainer = new Container();
@@ -148,16 +146,18 @@ export class GameChartScore {
   }
 
   playHitEffects(x: number, y: number, judgeType: EGameChartScoreJudgeType, playHitsound: boolean = true, noteType: EGameChartNoteType = 1) {
-    const { size, audioChannel, skinHitEffectsTexture, skinHitsounds, hitEffectContainer } = this;
+    const { size, audioChannel, skinHitEffects, skinHitsounds, hitEffectContainer } = this;
     const { playlist } = audioChannel;
 
     if (judgeType >= EGameChartScoreJudgeType.GOOD) {
-      const animation = new AnimatedSprite(skinHitEffectsTexture, true);
+      const { speed, textures } = skinHitEffects;
+      const animation = new AnimatedSprite(textures!, true);
 
       animation.position.set(x, y);
       animation.anchor.set(0.5);
       animation.scale.set(size.noteScale * 5.6)
       animation.tint = judgeType === 3 ? 0xFFECA0 : 0xB4E1FF;
+      animation.animationSpeed = speed;
       animation.loop = false;
 
       animation.onFrameChange = () => {

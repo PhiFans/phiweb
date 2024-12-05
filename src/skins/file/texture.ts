@@ -27,12 +27,12 @@ export class GameSkinFileTexture implements IGameSkinFileBase<ImageBitmap, Textu
 
 export class GameSkinFileTextureAnimated implements IGameSkinFileAnimated<ImageBitmap[], Texture<TextureSource<ImageBitmap>>[]> {
   readonly sources: ImageBitmap[];
-  readonly fps: number;
+  readonly speed: number;
   private _textures?: Texture<TextureSource<ImageBitmap>>[];
 
-  constructor(sources: ImageBitmap[], fps: number = 60) {
+  constructor(sources: ImageBitmap[], speed: number = 1) {
     this.sources = [ ...sources ];
-    this.fps = fps;
+    this.speed = speed;
   }
 
   create() {

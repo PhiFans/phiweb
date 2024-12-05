@@ -108,17 +108,17 @@ export class GameChartNote {
     this.holdFloorPosition = this.type === EGameChartNoteType.HOLD ? this.floorPosition + this.holdLength! : null;
   }
 
-  createSprite(container: Container, game: Game, skinFiles: GameSkinFiles, zIndex: number = 24) {
+  createSprite(game: Game, skinFiles: GameSkinFiles, zIndex: number = 24) {
     if (!skinFiles) throw new Error('No skin set, please set a skin');
 
-    if (this.type === EGameChartNoteType.HOLD) this.createSpriteHold(game, skinFiles, zIndex);
-    else this.createSpriteNonHold(game, skinFiles, zIndex);
+    if (this.type === EGameChartNoteType.HOLD) this.createSpriteHold(game, skinFiles);
+    else this.createSpriteNonHold(game, skinFiles);
 
+    this.sprite!.zIndex = zIndex;
     this.sprite!.label = 'Note';
-    return container.addChild(this.sprite!);
   }
 
-  private createSpriteNonHold(game: Game, skinFiles: GameSkinFiles, zIndex: number = 24) {
+  private createSpriteNonHold(game: Game, skinFiles: GameSkinFiles) {
     const getSpriteTexture = () => {
       const { useHighlight } = game.options;
       const highlight = useHighlight && this.isSameTime ? 'highlight' : 'normal';
@@ -131,13 +131,10 @@ export class GameChartNote {
     const sprite = new Sprite(getSpriteTexture());
 
     sprite.anchor.set(0.5);
-    sprite.zIndex = zIndex;
-    sprite.cullable = true;
-
     this.sprite = sprite;
   }
 
-  private createSpriteHold(game: Game, skinFiles: GameSkinFiles, zIndex: number = 24) {
+  private createSpriteHold(game: Game, skinFiles: GameSkinFiles) {
     const { useHighlight } = game.options;
     const highlight = useHighlight && this.isSameTime ? 'highlight' : 'normal';
 
@@ -155,9 +152,6 @@ export class GameChartNote {
 
     baseContainer.addChild(spriteHead, spriteBody, spriteEnd);
     baseContainer.sortChildren();
-
-    baseContainer.zIndex = zIndex;
-    baseContainer.cullable = true;
 
     this.sprite = baseContainer;
   }

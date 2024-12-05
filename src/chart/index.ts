@@ -17,7 +17,7 @@ export class GameChart {
   readonly background: unknown;
   readonly ticker: Ticker = new Ticker();
 
-  readonly onChartTick: (currentTime: number) => void;
+  readonly onChartTick: (currentTime: number, container: Container) => void;
 
   constructor(game: Game, data: GameChartData, audio: GameAudioClip, background: unknown) {
     this.game = game;
@@ -69,11 +69,12 @@ export class GameChart {
     const { data, audio } = this;
     const { startTime, clock, status } = audio;
     const { time } = clock;
+    const { offset, container } = data;
 
     if (status !== 1) return;
-    const currentTime = (time - (startTime || time)) - data.offset;
+    const currentTime = (time - (startTime || time)) - offset;
 
-    this.onChartTick(currentTime);
+    this.onChartTick(currentTime, container!);
     this.score.onScoreTick(currentTime);
   }
 }

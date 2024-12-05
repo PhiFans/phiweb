@@ -45,6 +45,7 @@ export class GameChartData {
 
     this.container.label = 'Chart sprites container';
     this.container.interactive = this.container.interactiveChildren = false;
+    this.container.cullableChildren = false;
     this.container.boundsArea = new Rectangle(0, 0, 0, 0);
     this.container.zIndex = 1;
 
@@ -57,7 +58,7 @@ export class GameChartData {
     for (let i = 0; i < this.notes.length; i++) {
       const note = this.notes[i];
       const zIndex = note.type !== 3 ? lineLength + 1 + i : ((i - 10) > 0 ? i - 10 : 0);
-      this.notes[i].createSprite(this.container, game, skinFiles, zIndex);
+      this.notes[i].createSprite(game, skinFiles, zIndex);
     }
 
     container.addChild(this.container);

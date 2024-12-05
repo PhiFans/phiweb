@@ -35,7 +35,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
     // Handle hold animation
     if (type === 3 && currentTime >= holdEndTime!) {
       if (score.score !== EGameChartScoreJudgeType.MISS) this.updateScore(score.score);
-      sprite!.visible = false;
+      sprite!.removeFromParent();
       score.isScoreAnimated = true;
       continue;
     }
@@ -52,7 +52,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         this.updateScore(score.score);
 
         if (type !== 3) {
-          sprite!.visible = false;
+          sprite!.removeFromParent();
           score.isScoreAnimated = true;
         } else sprite!.alpha = 0.5;
         continue;
@@ -87,7 +87,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         else EGameChartScoreJudgeType.BAD;
 
         if (score.score !== EGameChartScoreJudgeType.BAD) {
-          sprite!.visible = false;
+          sprite!.removeFromParent();
           score.isScoreAnimated = true;
 
           this.playHitEffects(realLinePosX, realLinePosY, score.score, true, type);
@@ -101,7 +101,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
     } else if (type === 2) { // Handle Drag
       if (score.isScored && score.score !== EGameChartScoreJudgeType.MISS && timeBetween <= 0) {
         // Calculate score & play effects later
-        sprite!.visible = false;
+        sprite!.removeFromParent();
         score.isScoreAnimated = true;
         this.playHitEffects(realLinePosX, realLinePosY, score.score, true, type);
         this.updateScore(score.score);
@@ -166,7 +166,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
     } else if (type === 4) { // Handle Flick
       if (score.isScored && score.score !== EGameChartScoreJudgeType.MISS && timeBetween <= 0) {
         // Calculate score & play effects later
-        sprite!.visible = false;
+        sprite!.removeFromParent();
         score.isScoreAnimated = true;
         this.playHitEffects(realLinePosX, realLinePosY, score.score, true, type);
         this.updateScore(score.score);

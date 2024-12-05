@@ -1,3 +1,4 @@
+import { Container } from 'pixi.js';
 import { GameChart } from '.';
 import { GameChartEvent } from './event';
 
@@ -14,7 +15,7 @@ const valueCalculator = (events: GameChartEvent[], currentTime: number, defaultV
   return defaultValue;
 };
 
-export function onChartTick(this: GameChart, currentTime: number) {
+export function onChartTick(this: GameChart, currentTime: number, container: Container) {
   const { data, game } = this;
 
   const { renderer } = game;
@@ -70,16 +71,17 @@ export function onChartTick(this: GameChart, currentTime: number) {
   const { size } = renderer;
   for (const note of data.notes) {
     const { score, judgeline, type, time, holdEndTime, posX: notePosX, floorPosition, speed, isAbove } = note;
+    const floorPositionDiff = (floorPosition - judgeline.floorPosition) * (type === 3 ? 1 : speed);
     const sprite = note.sprite!;
 
     if (score.isScored && score.isScoreAnimated) continue;
-    if (judgeline.floorPosition > floorPosition && time > currentTime) {
-      sprite.visible = false;
+    if (floorPositionDiff * 0.6 > 2 || (floorPositionDiff < 0 && time > currentTime)) {
+      if (sprite.parent) sprite.removeFromParent();
       continue;
     }
 
     const posX = size.widthPercent * notePosX;
-    const posY = (floorPosition - judgeline.floorPosition) * (type === 3 ? 1 : speed) * size.noteSpeed * (isAbove ? -1 : 1);
+    const posY = floorPositionDiff * size.noteSpeed * (isAbove ? -1 : 1);
     const realXSin = posY * judgeline.sinr * -1;
     const realYCos = posY * judgeline.cosr;
 
@@ -102,6 +104,6 @@ export function onChartTick(this: GameChart, currentTime: number) {
 
     sprite.position.set(note.realPosX, note.realPosY);
     sprite.angle = judgeline.angle + (isAbove ? 0 : 180);
-    if (!sprite.visible) sprite.visible = true;
+    if (!sprite.parent) container.addChild(sprite);
   }
 };

@@ -75,8 +75,8 @@ export class GameRenderer {
 
     this.containers.game.sortableChildren = this.containers.ui.sortableChildren = true;
     this.containers.game.interactive = this.containers.game.interactiveChildren = false;
-    this.containers.game.cullableChildren = true;
-    this.containers.game.cullArea = this.containers.game.boundsArea = this._stageRectangleGame;
+    this.containers.game.cullableChildren = false;
+    this.containers.game.boundsArea = this._stageRectangleGame;
     this.containers.ui.zIndex = 10;
 
     this.stage.addChild(this.containers.game);

@@ -5,7 +5,7 @@ import { GameSkinFileTexture } from './file/texture';
 import { createAnimatedSkin, createNoteSkin, createNumbersSkin } from './file/utils';
 import { Nullable } from '@/utils/types';
 import { IGameSkinFileNotes, IGameSkinFileNumbers, IGameSkinHitsounds } from './file/types';
-import { IGameSkinElement, IGameSkinMeta } from './types';
+import { IGameSkinElement, IGameSkinElementTexture, IGameSkinMeta } from './types';
 import { JSZipFiles, JSZipFilesMap, IGameSkinElementFiles } from './file/types';
 import { ReadFileAsAudioBuffer } from '@/utils/file';
 import { GameSkinFileSound } from './file/sound';
@@ -116,9 +116,11 @@ const createSkinFileClass = (fileList: JSZipFilesMap, elements: IGameSkinElement
     combo: (await createNumbersSkin(elements, 'combo')),
   };
 
+  const hitEffectElement = elements.find(e => e.type === 'hit-effect')! as IGameSkinElementTexture;
   const hitEffectsClass = await createAnimatedSkin(elements, 'hit-effect');
+  const hitParticleFile = new GameSkinFileTexture((await window.createImageBitmap((await fileList.get(`${hitEffectElement.path}-particle`)!.async('blob')))));
 
-  return res(new GameSkinFiles(noteClass, numbersClass, hitEffectsClass));
+  return res(new GameSkinFiles(noteClass, numbersClass, hitEffectsClass, hitParticleFile));
 });
 
 export class GameSkin {

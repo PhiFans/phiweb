@@ -5,23 +5,27 @@ export class GameSkinFiles {
   readonly notes: IGameSkinFileNotes;
   readonly numbers: IGameSkinFileNumbers;
   readonly hitEffects: GameSkinFileTextureAnimated;
+  readonly hitParticle: GameSkinFileTexture;
 
-  constructor(notes: IGameSkinFileNotes, numbers: IGameSkinFileNumbers, hitEffects: GameSkinFileTextureAnimated) {
+  constructor(notes: IGameSkinFileNotes, numbers: IGameSkinFileNumbers, hitEffects: GameSkinFileTextureAnimated, hitParticle: GameSkinFileTexture) {
     this.notes = notes;
     this.numbers = numbers;
     this.hitEffects = hitEffects;
+    this.hitParticle = hitParticle;
   }
 
   create() {
     this.createTextureNote();
     this.createTextureNumbers();
     this.hitEffects.create();
+    this.hitParticle.create();
   }
 
   destroy() {
     this.destroyTextureNote();
     this.destroyTextureNumbers();
     this.hitEffects.destroy();
+    this.hitParticle.destroy();
   }
 
   private createTextureNote() {

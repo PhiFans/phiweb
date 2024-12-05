@@ -185,7 +185,7 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
         isSameTime: false,
         floorPosition: getFloorPositionByTime(newLine, realTime),
         holdTime: realHoldTime,
-        holdLength: oldNote.type === 3 ? parseDoublePrecist(realHoldTime! * parsedSpeed / 1000, 4) : null
+        holdLength: oldNote.type === 3 ? parseDoublePrecist((realHoldTime! * parsedSpeed) / 1000 * parsedSpeed, 4) : null
       });
     });
 
@@ -204,7 +204,7 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
         isSameTime: false,
         floorPosition: getFloorPositionByTime(newLine, realTime),
         holdTime: realHoldTime,
-        holdLength: oldNote.type === 3 ? parseDoublePrecist(realHoldTime! * parsedSpeed / 1000, 4) : null
+        holdLength: oldNote.type === 3 ? parseDoublePrecist((realHoldTime! * parsedSpeed) / 1000 * parsedSpeed, 4) : null
       });
     });
 

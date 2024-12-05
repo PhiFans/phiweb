@@ -21,6 +21,10 @@ export interface IGameRendererSize {
   widthHalf: number,
   heightHalf: number,
   widthPercent: number,
+  /** Used for culling notes */
+  widthHalfBorder: number,
+  /** Used for culling notes */
+  heightHalfBorder: number,
 
   noteScale: number,
   noteWidth: number,
@@ -45,6 +49,8 @@ export class GameRenderer {
     widthHalf: 0,
     heightHalf: 0,
     widthPercent: 0,
+    widthHalfBorder: 0,
+    heightHalfBorder: 0,
 
     noteScale: 0,
     noteWidth: 0,
@@ -121,6 +127,9 @@ export class GameRenderer {
 
     this.size.widthHalf = this.size.width / 2;
     this.size.heightHalf = this.size.height / 2;
+
+    this.size.widthHalfBorder = this.size.widthHalf * 1.2;
+    this.size.heightHalfBorder = this.size.heightHalf * 1.2;
 
     this.size.widthPercent = this.size.width * (9 / 160);
 

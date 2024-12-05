@@ -2,6 +2,17 @@ import { Container } from 'pixi.js';
 import { GameChart } from '.';
 import { GameChartEvent } from './event';
 
+interface IAreaPoint extends Array<number> {
+  /** Start X */
+  0: number,
+  /** Start Y */
+  1: number,
+  /** End X */
+  2: number,
+  /** End Y */
+  3: number,
+}
+
 const valueCalculator = (events: GameChartEvent[], currentTime: number, defaultValue = 0) => {
   for (const event of events) {
     if (event.endTime <= currentTime) continue;
@@ -13,6 +24,16 @@ const valueCalculator = (events: GameChartEvent[], currentTime: number, defaultV
   }
 
   return defaultValue;
+};
+
+const isPointInArea = (x: number, y: number, area: IAreaPoint): Boolean => {
+  return x >= area[0] && x <= area[2] && y >= area[1] && y <= area[3];
+};
+
+const isInArea = (point: IAreaPoint, area: IAreaPoint): Boolean => {
+  const [ pointStartX, pointStartY, pointEndX, pointEndY ] = point;
+  if (isPointInArea(pointStartX, pointStartY, area) || isPointInArea(pointEndX, pointEndY, area)) return true;
+  return false;
 };
 
 export function onChartTick(this: GameChart, currentTime: number, container: Container) {
@@ -69,12 +90,14 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
   }
 
   const { size } = renderer;
+  const { widthHalfBorder, heightHalfBorder } = size;
   for (const note of data.notes) {
-    const { score, judgeline, type, time, holdEndTime, posX: notePosX, floorPosition, speed, isAbove } = note;
+    const { score, judgeline, type, time, holdEndTime, posX: notePosX, floorPosition, speed, isAbove, holdLength } = note;
     const floorPositionDiff = (floorPosition - judgeline.floorPosition) * (type === 3 ? 1 : speed);
     const sprite = note.sprite!;
 
     if (score.isScored && score.isScoreAnimated) continue;
+    // TODO: Made as an option
     if (floorPositionDiff * 0.6 > 2 || (floorPositionDiff < 0 && time > currentTime)) {
       if (sprite.parent) sprite.removeFromParent();
       continue;
@@ -85,21 +108,40 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
     const realXSin = posY * judgeline.sinr * -1;
     const realYCos = posY * judgeline.cosr;
 
-    note.realPosX = note.realLinePosX = posX * judgeline.cosr + judgeline.realPosX;
-    note.realPosY = note.realLinePosY = posX * judgeline.sinr + judgeline.realPosY;
+    note.realLinePosX = posX * judgeline.cosr + judgeline.realPosX;
+    note.realLinePosY = posX * judgeline.sinr + judgeline.realPosY;
 
-    if (type === 3 && time <= currentTime) {
-      const [ spriteHead, spriteBody, spriteEnd ] = sprite.children;
+    note.realHoldEndPosX = note.realPosX = note.realLinePosX + realXSin;
+    note.realHoldEndPosY = note.realPosY = note.realLinePosY + realYCos;
 
-      // TODO: Support of the non-official hold rendering
-      const holdLength = ((holdEndTime! - currentTime) / 1000) * speed * size.noteSpeed / size.noteScale;
-      spriteBody.height = holdLength;
-      spriteEnd.position.y = -holdLength;
+    if (type === 3) {
+      let realHoldLength = holdLength! * size.noteSpeed / size.noteScale;
+      if (time <= currentTime) {
+        // TODO: Support of the non-official hold rendering
+        realHoldLength = ((holdEndTime! - currentTime) / 1000) * speed * size.noteSpeed / size.noteScale;
 
-      if (spriteHead.visible) spriteHead.visible = false;
-    } else {
-      note.realPosX += realXSin;
-      note.realPosY += realYCos;
+        const [ spriteHead, spriteBody, spriteEnd ] = sprite.children;
+
+        spriteBody.height = realHoldLength;
+        spriteEnd.position.y = -realHoldLength;
+
+        note.realPosX -= realXSin;
+        note.realPosY -= realYCos;
+
+        if (spriteHead.visible) spriteHead.visible = false;
+      }
+
+      const realHoldLengthY = realHoldLength + posY;
+      note.realHoldEndPosX = note.realLinePosX + realHoldLengthY * judgeline.sinr * -1;
+      note.realHoldEndPosY = note.realLinePosY + realHoldLengthY * judgeline.cosr;
+    }
+
+    if (!isInArea(
+      [ note.realPosX, note.realPosY, note.realHoldEndPosX, note.realHoldEndPosY ],
+      [ -widthHalfBorder, -heightHalfBorder, widthHalfBorder, heightHalfBorder ]
+    )) {
+      if (sprite.parent) sprite.removeFromParent();
+      continue;
     }
 
     sprite.position.set(note.realPosX, note.realPosY);

@@ -63,10 +63,20 @@ export class GameChartNote {
   readonly holdFloorPosition: Nullable<number>;
   readonly posX: number;
 
+  /** The real note position when on line. Only be used & calculaed when ticking */
   realLinePosX: number = 0;
+  /** The real note position when on line. Only be used & calculaed when ticking */
   realLinePosY: number = 0;
+
+  /** The real note position. Only be used & calculaed when ticking */
   realPosX: number = 0;
+  /** The real note position. Only be used & calculaed when ticking */
   realPosY: number = 0;
+
+  /** The real hold end position. Only be used & calculaed when ticking */
+  realHoldEndPosX: number = 0;
+  /** The real hold end position. Only be used & calculaed when ticking */
+  realHoldEndPosY: number = 0;
 
   /**
    * The score detail of the note

@@ -127,14 +127,16 @@ export class GameSkin {
   readonly name: string;
   readonly author: string;
   readonly version: string;
+  readonly elements: IGameSkinElement[];
   readonly normal: GameSkinFiles;
   readonly hitsounds: IGameSkinHitsounds;
   readonly high: Nullable<GameSkinFiles> = null;
 
-  constructor(name: string, author: string, version: string, filesNormal: GameSkinFiles, fileHitsounds: IGameSkinHitsounds, filesHigh: Nullable<GameSkinFiles> = null) {
+  constructor(name: string, author: string, version: string, elements: IGameSkinElement[], filesNormal: GameSkinFiles, fileHitsounds: IGameSkinHitsounds, filesHigh: Nullable<GameSkinFiles> = null) {
     this.name = name;
     this.author = author;
     this.version = version;
+    this.elements = elements;
     this.normal = filesNormal;
     this.hitsounds = fileHitsounds;
     this.high = filesHigh;
@@ -224,6 +226,7 @@ export class GameSkins extends Map<string, GameSkin> {
           skinMeta.name,
           skinMeta.author,
           skinMeta.version,
+          skinMeta.elements,
           skinClassLow,
           fileHitsounds,
           skinClassHigh

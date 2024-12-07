@@ -70,7 +70,7 @@ export class GameScore {
   combo: number = 0;
   maxCombo: number = 0;
   accurate: number = 0;
-  accurateText: string = '0.00%';
+  private scoredNotes: number = 0;
 
   constructor(chart: GameChart, skinTextures: GameSkinFiles, skinHitsounds: IGameSkinHitsounds, containers: { game: Container, ui: Container }) {
     this.chart = chart;
@@ -113,8 +113,9 @@ export class GameScore {
   }
 
   updateScore(type: EGameScoreJudgeType) {
-    const { isAutoPlay, judgeCount, scorePerCombo, scorePerNote, scorePerNoteGood, notesCount, ui } = this;
+    const { isAutoPlay, judgeCount, scorePerCombo, scorePerNote, scorePerNoteGood, ui } = this;
 
+    this.scoredNotes++;
     if (isAutoPlay) judgeCount[3] += 1;
     else judgeCount[type] += 1;
 
@@ -130,9 +131,7 @@ export class GameScore {
       (this.maxCombo * scorePerCombo) +
       (scorePerNote * judgeCount[3] + scorePerNoteGood * judgeCount[2])
     );
-
-    this.accurate = (judgeCount[3] + judgeCount[2] * 0.65) / notesCount;
-    this.accurateText = `${this.accurate * 100}`;
+    this.accurate = (judgeCount[3] + judgeCount[2] * 0.65) / this.scoredNotes;
 
     ui.updateUI(this.score, this.combo, this.accurate);
   }

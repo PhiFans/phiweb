@@ -15,7 +15,7 @@ const isInArea = (
 };
 
 export function onScoreTick(this: GameScore, currentTime: number) {
-  const { notes, inputs, judges, judgeRange, isAutoPlay, size, hitParticles } = this;
+  const { notes, inputs, judges, judgeRange, isAutoPlay, size, effects } = this;
   const { list: inputList } = inputs;
 
   judges.length = 0;
@@ -103,7 +103,7 @@ export function onScoreTick(this: GameScore, currentTime: number) {
           sprite!.removeFromParent();
           score.isScoreAnimated = true;
 
-          this.playHitEffects(realLinePosX, realLinePosY, score.score, currentTime, true, type);
+          effects.playEffects(realLinePosX, realLinePosY, score.score, currentTime, true, type);
         } else {
           sprite!.tint = 0x6C4343;
           score.animationTime = currentTime;
@@ -119,7 +119,7 @@ export function onScoreTick(this: GameScore, currentTime: number) {
         // Calculate score & play effects later
         sprite!.removeFromParent();
         score.isScoreAnimated = true;
-        this.playHitEffects(realLinePosX, realLinePosY, score.score, currentTime, true, type);
+        effects.playEffects(realLinePosX, realLinePosY, score.score, currentTime, true, type);
         this.updateScore(score.score);
       } else for (let i = 0; i < judges.length; i++) {
         const { type, x, y } = judges[i];
@@ -160,7 +160,7 @@ export function onScoreTick(this: GameScore, currentTime: number) {
         if (timeBetweenReal <= judgeRange.perfect) score.score = EGameScoreJudgeType.PERFECT;
         else EGameScoreJudgeType.GOOD;
 
-        this.playHitEffects(realLinePosX, realLinePosY, score.score, currentTime, true, type);
+        effects.playEffects(realLinePosX, realLinePosY, score.score, currentTime, true, type);
 
         score.isScored = true;
         score.timeBetween = timeBetween;
@@ -184,7 +184,7 @@ export function onScoreTick(this: GameScore, currentTime: number) {
         // Calculate score & play effects later
         sprite!.removeFromParent();
         score.isScoreAnimated = true;
-        this.playHitEffects(realLinePosX, realLinePosY, score.score, currentTime, true, type);
+        effects.playEffects(realLinePosX, realLinePosY, score.score, currentTime, true, type);
         this.updateScore(score.score);
       } else for (let i = 0; i < judges.length; i++) {
         const { type, x, y, input } = judges[i];
@@ -204,7 +204,8 @@ export function onScoreTick(this: GameScore, currentTime: number) {
   }
 
   const { hitParticleScale } = size;
-  for (const particle of hitParticles) {
+  const { particles } = effects;
+  for (const particle of particles) {
     const { time, particleLength, sprites, distance, cosr, sinr, x, y } = particle;
     const progress = (currentTime - time) / 500;
     if (progress >= 1) {
@@ -224,9 +225,9 @@ export function onScoreTick(this: GameScore, currentTime: number) {
     }
   }
 
-  for (let i = 0; i < hitParticles.length; i++) {
-    if (hitParticles[i].isDestroyed) {
-      hitParticles.splice(i, 1);
+  for (let i = 0; i < particles.length; i++) {
+    if (particles[i].isDestroyed) {
+      particles.splice(i, 1);
       i--;
     }
   }

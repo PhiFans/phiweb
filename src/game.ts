@@ -51,19 +51,20 @@ export class Game {
       return;
     }
 
+    currentSkin.create(options.useHighQualitySkin)
+    const skinTextures = currentSkin[currentSkin.high && options.useHighQualitySkin ? 'high' : 'normal']!;
+    const skinHitsounds = currentSkin.hitsounds;
+
     this.chart = new GameChart(
       this,
       chartData,
       audio,
       (void 0),
+      skinTextures,
+      skinHitsounds
     );
     this.chart.audio.setChannel(this.audio.channels.music);
 
-    currentSkin.create(options.useHighQualitySkin)
-    const skinTextures = currentSkin[currentSkin.high && options.useHighQualitySkin ? 'high' : 'normal']!;
-    const skinHitsounds = currentSkin.hitsounds;
-
-    this.chart.createSprites(this.renderer.containers.game, skinTextures, skinHitsounds);
     this.renderer.containers.game.sortChildren();
 
     this.chart.reszie(this.renderer.size);

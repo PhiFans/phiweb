@@ -19,20 +19,18 @@ export class GameChart {
 
   readonly onChartTick: (currentTime: number, container: Container) => void;
 
-  constructor(game: Game, data: GameChartData, audio: GameAudioClip, background: unknown) {
+  constructor(game: Game, data: GameChartData, audio: GameAudioClip, background: unknown, skinTextures: GameSkinFiles, skinHitsounds: IGameSkinHitsounds) {
     this.game = game;
     this.data = data;
     this.audio = audio;
-    this.score = new GameScore(this);
     this.background = background;
+
+    this.score = new GameScore(this, skinTextures, skinHitsounds, game.renderer.containers);
+
+    this.data.createSprites(game.renderer.containers.game, this.game, skinTextures);
 
     this.onChartTick = onChartTick.bind(this);
     this.onTick = this.onTick.bind(this);
-  }
-
-  createSprites(container: Container, skinFiles: GameSkinFiles, skinHitSounds: IGameSkinHitsounds) {
-    this.data.createSprites(container, this.game, skinFiles);
-    this.score.createSprites(container, skinFiles, skinHitSounds);
   }
 
   reszie(sizer: IGameRendererSize) {

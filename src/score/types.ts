@@ -1,6 +1,6 @@
 import { Nullable } from '@/utils/types';
 
-export enum EGameChartScoreJudgeType {
+export enum EGameScoreJudgeType {
   PERFECT = 3,
   GOOD = 2,
   BAD = 1,
@@ -8,7 +8,7 @@ export enum EGameChartScoreJudgeType {
   UNSCORED = -1,
 }
 
-export enum EGameChartScoreResultType {
+export enum EGameScoreResultType {
   PHI = 6,
   V = 5,
   S = 4,
@@ -18,7 +18,7 @@ export enum EGameChartScoreResultType {
   FALSE = 0,
 }
 
-export interface IGameChartScoreNote {
+export interface IGameScoreNote {
   /**
    * Wether the score has been calculated.
    */
@@ -30,7 +30,7 @@ export interface IGameChartScoreNote {
   /**
    * The score of the note.
    */
-  score: EGameChartScoreJudgeType,
+  score: EGameScoreJudgeType,
   /**
    * Time between the hit time and note time, only useful for tap/hold.
    */

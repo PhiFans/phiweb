@@ -45,5 +45,5 @@ export const createAnimatedSkin = (elements: IGameSkinElementFiles[], type: TGam
     result.push((await window.createImageBitmap((await file.async('blob')))));
   }
 
-  return res(new GameSkinFileTextureAnimated(result, element.fps));
+  return res(new GameSkinFileTextureAnimated(result, element.speed));
 });

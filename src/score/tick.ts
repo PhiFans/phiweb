@@ -1,6 +1,6 @@
-import { GameChartScore } from '.';
+import { GameScore } from '.';
 import { GameChartScoreJudge } from './judge';
-import { EGameChartScoreJudgeType } from './types';
+import { EGameScoreJudgeType } from './types';
 
 const isInArea = (
   pointX: number,
@@ -14,7 +14,7 @@ const isInArea = (
   return Math.abs((pointX - noteX) * cosr + (pointY - noteY) * sinr) <= width;
 };
 
-export function onScoreTick(this: GameChartScore, currentTime: number) {
+export function onScoreTick(this: GameScore, currentTime: number) {
   const { notes, inputs, judges, judgeRange, isAutoPlay, size, hitParticles } = this;
   const { list: inputList } = inputs;
 
@@ -47,7 +47,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
 
     // Handle hold animation
     if (type === 3 && currentTime >= holdEndTime!) {
-      if (score.score !== EGameChartScoreJudgeType.MISS) this.updateScore(score.score);
+      if (score.score !== EGameScoreJudgeType.MISS) this.updateScore(score.score);
       sprite!.removeFromParent();
       score.isScoreAnimated = true;
       continue;
@@ -59,7 +59,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
       // Handle miss
       if (timeBetween <= -judgeRange.bad) {
         score.isScored = true;
-        score.score = EGameChartScoreJudgeType.MISS;
+        score.score = EGameScoreJudgeType.MISS;
         score.timeBetween = NaN;
 
         this.updateScore(score.score);
@@ -95,11 +95,11 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         score.isScored = true;
         score.timeBetween = timeBetween;
 
-        if (timeBetweenReal <= judgeRange.perfect) score.score = EGameChartScoreJudgeType.PERFECT;
-        else if (timeBetweenReal <= judgeRange.good) score.score = EGameChartScoreJudgeType.GOOD;
-        else score.score = EGameChartScoreJudgeType.BAD;
+        if (timeBetweenReal <= judgeRange.perfect) score.score = EGameScoreJudgeType.PERFECT;
+        else if (timeBetweenReal <= judgeRange.good) score.score = EGameScoreJudgeType.GOOD;
+        else score.score = EGameScoreJudgeType.BAD;
 
-        if (score.score !== EGameChartScoreJudgeType.BAD) {
+        if (score.score !== EGameScoreJudgeType.BAD) {
           sprite!.removeFromParent();
           score.isScoreAnimated = true;
 
@@ -115,7 +115,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         break;
       }
     } else if (type === 2) { // Handle Drag
-      if (score.isScored && score.score !== EGameChartScoreJudgeType.MISS && timeBetween <= 0) {
+      if (score.isScored && score.score !== EGameScoreJudgeType.MISS && timeBetween <= 0) {
         // Calculate score & play effects later
         sprite!.removeFromParent();
         score.isScoreAnimated = true;
@@ -127,7 +127,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         if (type !== 3) continue;
         if (!isInArea(x, y, realPosX, realPosY, judgeline.cosr, judgeline.sinr, noteWidth)) continue;
 
-        score.score = EGameChartScoreJudgeType.PERFECT;
+        score.score = EGameScoreJudgeType.PERFECT;
         score.isScored = true;
         score.timeBetween = NaN;
 
@@ -135,7 +135,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
       }
     } else if (type === 3) { // Handle Hold
       // Skip if hold is missed
-      if (score.score === EGameChartScoreJudgeType.MISS) continue;
+      if (score.score === EGameScoreJudgeType.MISS) continue;
 
       if (score.isScored) {
         if (score.isHolding) {
@@ -157,8 +157,8 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         if (type !== 1) continue;
         if (!isInArea(x, y, realPosX, realPosY, judgeline.cosr, judgeline.sinr, noteWidth)) continue;
 
-        if (timeBetweenReal <= judgeRange.perfect) score.score = EGameChartScoreJudgeType.PERFECT;
-        else EGameChartScoreJudgeType.GOOD;
+        if (timeBetweenReal <= judgeRange.perfect) score.score = EGameScoreJudgeType.PERFECT;
+        else EGameScoreJudgeType.GOOD;
 
         this.playHitEffects(realLinePosX, realLinePosY, score.score, currentTime, true, type);
 
@@ -172,7 +172,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
       }
 
       if (score.isScored && !score.isHolding) {
-        score.score = EGameChartScoreJudgeType.MISS;
+        score.score = EGameScoreJudgeType.MISS;
         score.timeBetween = NaN;
         score.isHolding = false;
 
@@ -180,7 +180,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         this.updateScore(score.score);
       }
     } else if (type === 4) { // Handle Flick
-      if (score.isScored && score.score !== EGameChartScoreJudgeType.MISS && timeBetween <= 0) {
+      if (score.isScored && score.score !== EGameScoreJudgeType.MISS && timeBetween <= 0) {
         // Calculate score & play effects later
         sprite!.removeFromParent();
         score.isScoreAnimated = true;
@@ -192,7 +192,7 @@ export function onScoreTick(this: GameChartScore, currentTime: number) {
         if (type !== 2) continue;
         if (!isInArea(x, y, realPosX, realPosY, judgeline.cosr, judgeline.sinr, noteWidth)) continue;
 
-        score.score = EGameChartScoreJudgeType.PERFECT;
+        score.score = EGameScoreJudgeType.PERFECT;
         score.isScored = true;
         score.timeBetween = NaN;
 

@@ -1,7 +1,7 @@
 import { Container, Ticker } from 'pixi.js';
 import { GameChartData } from './data';
 import { GameAudioClip } from '@/audio/clip';
-import { GameChartScore } from './score';
+import { GameScore } from '../score';
 import { onChartTick } from './tick';
 import { Game } from '@/game';
 import { IGameRendererSize } from '@/renderer';
@@ -12,7 +12,7 @@ export class GameChart {
   readonly game: Game;
   readonly data: GameChartData;
   readonly audio: GameAudioClip;
-  readonly score: GameChartScore;
+  readonly score: GameScore;
   // TODO: Maybe `PIXI.Sprite`
   readonly background: unknown;
   readonly ticker: Ticker = new Ticker();
@@ -23,7 +23,7 @@ export class GameChart {
     this.game = game;
     this.data = data;
     this.audio = audio;
-    this.score = new GameChartScore(this);
+    this.score = new GameScore(this);
     this.background = background;
 
     this.onChartTick = onChartTick.bind(this);

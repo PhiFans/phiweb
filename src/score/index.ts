@@ -1,8 +1,8 @@
-import { GameChart } from '..';
+import { GameChart } from '../chart';
 import { onScoreTick } from './tick';
 import { GameAudioChannel } from '@/audio/channel';
-import { EGameChartNoteType, GameChartNote } from '../note';
-import { EGameChartScoreJudgeType } from './types';
+import { EGameChartNoteType, GameChartNote } from '../chart/note';
+import { EGameScoreJudgeType } from './types';
 import { GameChartScoreInputs } from './inputs';
 import { GameChartScoreJudge } from './judge';
 import { IGameRendererSize } from '@/renderer';
@@ -57,7 +57,7 @@ class GameScoreHitParticle {
   isDestroyed = false;
 
   // TODO: Use `ParticleContainer` and `Particle`
-  constructor(type: EGameChartScoreJudgeType, time: number, x: number, y: number, texture: Texture, container: Container) {
+  constructor(type: EGameScoreJudgeType, time: number, x: number, y: number, texture: Texture, container: Container) {
     this.time = time;
     this.x = x;
     this.y = y;
@@ -90,7 +90,7 @@ class GameScoreHitParticle {
   }
 }
 
-export class GameChartScore {
+export class GameScore {
   readonly chart: GameChart;
   readonly notes: GameChartNote[];
   readonly size: IGameRendererSize;
@@ -171,13 +171,13 @@ export class GameChartScore {
     container.addChild(this.hitParticleContainer);
   }
 
-  updateScore(type: EGameChartScoreJudgeType) {
+  updateScore(type: EGameScoreJudgeType) {
     const { isAutoPlay, judgeCount, scorePerCombo, scorePerNote, scorePerNoteGood, notesCount } = this;
 
     if (isAutoPlay) judgeCount[3] += 1;
     else judgeCount[type] += 1;
 
-    if (type >= EGameChartScoreJudgeType.GOOD) {
+    if (type >= EGameScoreJudgeType.GOOD) {
       this.combo += 1;
       if (this.maxCombo < this.combo) this.maxCombo = this.combo;
     } else {
@@ -194,11 +194,11 @@ export class GameChartScore {
     this.accurateText = `${this.accurate * 100}`;
   }
 
-  playHitEffects(x: number, y: number, judgeType: EGameChartScoreJudgeType, currentTime: number, playHitsound: boolean = true, noteType: EGameChartNoteType = 1) {
+  playHitEffects(x: number, y: number, judgeType: EGameScoreJudgeType, currentTime: number, playHitsound: boolean = true, noteType: EGameChartNoteType = 1) {
     const { size, audioChannel, skinHitEffects, skinHitParticle, skinHitsounds, hitEffectContainer, hitParticleContainer, hitParticles } = this;
     const { playlist } = audioChannel;
 
-    if (judgeType >= EGameChartScoreJudgeType.GOOD) {
+    if (judgeType >= EGameScoreJudgeType.GOOD) {
       const { speed, textures } = skinHitEffects;
       const animation = new AnimatedSprite(textures!, true);
 

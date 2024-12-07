@@ -53,6 +53,8 @@ export class GameChart {
 
       note.sprite!.scale.set(sizer.noteScale);
     }
+
+    this.score.resize(sizer);
   }
 
   start() {

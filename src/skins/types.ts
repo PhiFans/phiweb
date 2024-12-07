@@ -15,19 +15,29 @@ export interface IGameSkinElementBase {
   type: TGameSkinElementType,
   enabled: boolean,
   align: 'left' | 'center' | 'right',
-  anchor: IGameSkinElementCoordinate,
   position: IGameSkinElementCoordinate,
   scale: number,
 }
 
 export interface IGameSkinElementTexture extends IGameSkinElementBase {
-  type: 'score' | 'accurate' | 'combo' | 'combo-text' | 'image',
+  type: 'combo-text' | 'image',
   path: string,
+  anchor: IGameSkinElementCoordinate,
+}
+
+export interface IGameSkinElementTextureNumber extends IGameSkinElementBase {
+  type: 'score' | 'accurate' | 'combo',
+  path: string,
+  stickTo: {
+    x: 'left' | 'center' | 'right',
+    y: 'top' | 'center' | 'bottom',
+  },
 }
 
 export interface IGameSkinElementTextureAnimated extends IGameSkinElementBase {
   type: 'hit-effect' | 'image',
   path: string,
+  anchor: IGameSkinElementCoordinate,
   speed: number,
 }
 
@@ -37,7 +47,7 @@ export interface IGameSkinElementText extends IGameSkinElementBase {
   size: number,
 }
 
-export type IGameSkinElement = IGameSkinElementTexture | IGameSkinElementTextureAnimated | IGameSkinElementText;
+export type IGameSkinElement = IGameSkinElementTexture | IGameSkinElementTextureNumber | IGameSkinElementTextureAnimated | IGameSkinElementText;
 
 export interface IGameSkinElementCoordinate {
   x: number,

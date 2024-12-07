@@ -9,6 +9,7 @@ import { Container } from 'pixi.js';
 import { GameSkinFiles } from '@/skins/file';
 import { GameScoreEffects } from './effects';
 import { IGameRendererSize } from '@/renderer';
+import { GameScoreUI } from './ui';
 
 interface IGameScoreJudgeRange {
   readonly perfect: number,
@@ -52,6 +53,7 @@ export class GameScore {
   readonly notesCount: number;
 
   readonly size: IGameRendererSize;
+  readonly ui: GameScoreUI;
   readonly effects: GameScoreEffects;
   readonly inputs: GameChartScoreInputs;
   readonly judges: GameChartScoreJudge[] = [];
@@ -75,16 +77,19 @@ export class GameScore {
     this.notes = this.chart.data.notes;
     this.notesCount = this.notes.length; // TODO: Fake notes
 
-    this.size = this.chart.game.renderer.size;
+    const { game } = this.chart;
+    const { renderer, skins, audio } = game;
+    this.size = renderer.size;
+    this.ui = new GameScoreUI(skins.currentSkin!.elements, skinTextures, containers.ui, this.size);
     this.effects = new GameScoreEffects(
       skinTextures,
       skinHitsounds,
       containers.game,
-      this.chart.game.audio.channels.effect,
+      audio.channels.effect,
       this.size
     );
 
-    const { options } = this.chart.game;
+    const { options } = game;
     if (options.challengeMode) {
       this.judgeRange = ScoreJudgeRanges.challenge;
       this.scorePerCombo = 1000000 / this.notesCount;
@@ -99,10 +104,16 @@ export class GameScore {
 
     this.inputs = new GameChartScoreInputs(this.chart.game);
     this.onScoreTick = onScoreTick.bind(this);
+
+    this.ui.updateUI(this.score, this.combo, this.accurate);
+  }
+
+  resize(size: IGameRendererSize) {
+    this.ui.resize(size);
   }
 
   updateScore(type: EGameScoreJudgeType) {
-    const { isAutoPlay, judgeCount, scorePerCombo, scorePerNote, scorePerNoteGood, notesCount } = this;
+    const { isAutoPlay, judgeCount, scorePerCombo, scorePerNote, scorePerNoteGood, notesCount, ui } = this;
 
     if (isAutoPlay) judgeCount[3] += 1;
     else judgeCount[type] += 1;
@@ -122,5 +133,7 @@ export class GameScore {
 
     this.accurate = (judgeCount[3] + judgeCount[2] * 0.65) / notesCount;
     this.accurateText = `${this.accurate * 100}`;
+
+    ui.updateUI(this.score, this.combo, this.accurate);
   }
 }

@@ -33,6 +33,7 @@ export interface IGameRendererSize {
   hitParticleScale: number,
 
   lineScale: number,
+  heightPercent: number,
 }
 
 export class GameRenderer {
@@ -61,6 +62,7 @@ export class GameRenderer {
     hitParticleScale: 0,
 
     lineScale: 0,
+    heightPercent: 1,
   };
 
   readonly _stageRectangle = new Rectangle(0, 0, 0, 0);
@@ -126,24 +128,27 @@ export class GameRenderer {
   resize(width: number, height: number, resolution: number = window.devicePixelRatio) {
     this.renderer.resize(width, height, resolution);
 
-    this.size.width = width;
-    this.size.height = height;
+    const { size } = this;
 
-    this.size.widthHalf = this.size.width / 2;
-    this.size.heightHalf = this.size.height / 2;
+    size.width = width;
+    size.height = height;
 
-    this.size.widthHalfBorder = this.size.widthHalf * 1.2;
-    this.size.heightHalfBorder = this.size.heightHalf * 1.2;
+    size.widthHalf = size.width / 2;
+    size.heightHalf = size.height / 2;
 
-    this.size.widthPercent = this.size.width * (9 / 160);
+    size.widthHalfBorder = size.widthHalf * 1.2;
+    size.heightHalfBorder = size.heightHalf * 1.2;
 
-    this.size.noteScale = this.size.width / 8080 * (this.game.options.useHighQualitySkin ? 1 : 2); // TODO: Settings
-    this.size.noteWidth = this.size.width * 0.117775;
-    this.size.noteSpeed = this.size.height * 0.6;
+    size.widthPercent = size.width * (9 / 160);
 
-    this.size.hitParticleScale = this.size.noteScale * 6;
+    size.noteScale = size.width / 8080 * (this.game.options.useHighQualitySkin ? 1 : 2); // TODO: Settings
+    size.noteWidth = size.width * 0.117775;
+    size.noteSpeed = size.height * 0.6;
 
-    this.size.lineScale = this.size.width > this.size.height * 0.75 ? this.size.height / 18.75 : this.size.width / 14.0625;
+    size.hitParticleScale = size.noteScale * 6;
+
+    size.lineScale = size.width > size.height * 0.75 ? size.height / 18.75 : size.width / 14.0625;
+    size.heightPercent = size.height / 1080;
 
     // this._stageRectangle.width = width * resolution;
     // this._stageRectangle.height = height * resolution;

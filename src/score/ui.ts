@@ -1,64 +1,95 @@
 import { IGameRendererSize } from '@/renderer';
 import { GameSkinFiles } from '@/skins/file';
-import { IGameSkinElement, IGameSkinElementTextureNumber } from '@/skins/types';
+import { IGameSkinElement, IGameSkinElementCoordinate, TGameSkinElementType } from '@/skins/types';
 import { GameUITexturedNumber } from '@/ui/textured-number';
 import { parseDoublePrecist } from '@/utils/math';
-import { Container } from 'pixi.js';
+import { Container, Sprite } from 'pixi.js';
 
-interface IGameScoreUIElements {
-  readonly score: IGameSkinElementTextureNumber,
-  readonly combo: IGameSkinElementTextureNumber,
-  readonly accurate: IGameSkinElementTextureNumber,
+interface IGameScoreUIElement {
+  type: TGameSkinElementType,
+  stickTo: {
+    x: 'left' | 'center' | 'right',
+    y: 'top' | 'center' | 'bottom',
+  },
+  position: IGameSkinElementCoordinate,
+  scale: number,
+  sprite: GameUITexturedNumber /** | Sprite */,
 }
 
-interface IGameScoreUISprites {
-  readonly score: GameUITexturedNumber,
-  readonly combo: GameUITexturedNumber,
-  readonly accurate: GameUITexturedNumber,
-}
+const getElementProps = (element: IGameSkinElement) => ({
+  type: element.type,
+  stickTo: element.stickTo,
+  position: element.position,
+  scale: element.scale,
+});
 
 const accurateToText = (number: number) => `${parseDoublePrecist(number * 100, 2)}%`;
 
 export class GameScoreUI {
   readonly container = new Container();
-  readonly elements: IGameScoreUIElements;
-  readonly sprites: IGameScoreUISprites;
+  readonly elements: IGameScoreUIElement[] = [];
 
   constructor(elements: IGameSkinElement[], skinFiles: GameSkinFiles, container: Container, size: IGameRendererSize) {
-    this.elements = {
-      score: elements.find(e => e.type === 'score')! as IGameSkinElementTextureNumber,
-      combo: elements.find(e => e.type === 'combo')! as IGameSkinElementTextureNumber,
-      accurate: elements.find(e => e.type === 'accurate')! as IGameSkinElementTextureNumber,
-    };
+    this.elements = [ ...elements ].filter(e => e.enabled).map<IGameScoreUIElement | undefined>((e) => {
+      switch (e.type) {
+        case 'score':
+        case 'combo':
+        case 'accurate': {
+          return {
+            ...getElementProps(e),
+            sprite: new GameUITexturedNumber(skinFiles.numbers[e.type], e, e.type === 'score' ? 7 : 0),
+          }
+        };
+        default: {
+          console.warn(`No such element type: ${e.type}, skipping...`);
+          return (void 0);
+        }
+      }
+    }).filter((e) => (e !== (void 0)));
 
-    this.sprites = {
-      score: new GameUITexturedNumber(skinFiles.numbers.score, this.elements.score, size, 7),
-      combo: new GameUITexturedNumber(skinFiles.numbers.combo, this.elements.combo, size),
-      accurate: new GameUITexturedNumber(skinFiles.numbers.accurate, this.elements.accurate, size),
-    };
-
-    this.container.addChild(
-      this.sprites.score.view,
-      this.sprites.combo.view,
-      this.sprites.accurate.view
-    );
+    for (const e of this.elements) this.container.addChild(e.sprite);
     container.addChild(this.container);
     this.resize(size);
   }
 
   resize(size: IGameRendererSize) {
-    const { sprites } = this;
+    const { elements } = this;
+    const { heightPercent, width, widthHalf, height, heightHalf } = size;
 
-    sprites.score.resize(size);
-    sprites.combo.resize(size);
-    sprites.accurate.resize(size);
+    for (const e of elements) {
+      const { stickTo, position, scale, sprite } = e;
+      const posX = (
+        stickTo.x === 'left' ? position.x * heightPercent :
+        stickTo.x === 'center' ? widthHalf + position.x * heightPercent :
+        width - position.x * heightPercent
+      );
+      const posY = (
+        stickTo.y === 'top' ? position.y * heightPercent :
+        stickTo.y === 'center' ? heightHalf + position.y * heightPercent :
+        height - position.y * heightPercent
+      );
+
+      sprite.scale.set(heightPercent * scale);
+      sprite.position.set(posX, posY);
+    }
   }
 
   updateUI(score: number, combo: number, accurate: number) {
-    const { sprites } = this;
+    const { elements } = this;
+    const accurateText = accurateToText(accurate);
 
-    sprites.score.number = score;
-    sprites.combo.number = combo;
-    sprites.accurate.number = accurateToText(accurate);
+    for (const e of elements) {
+      switch (e.type) {
+        case 'score':
+          e.sprite.number = score;
+          break;
+        case 'combo':
+          e.sprite.number = combo;
+          break;
+        case 'accurate':
+          e.sprite.number = accurateText;
+          break;
+      }
+    }
   }
 }

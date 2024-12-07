@@ -15,6 +15,10 @@ export interface IGameSkinElementBase {
   type: TGameSkinElementType,
   enabled: boolean,
   align: 'left' | 'center' | 'right',
+  stickTo: {
+    x: 'left' | 'center' | 'right',
+    y: 'top' | 'center' | 'bottom',
+  },
   position: IGameSkinElementCoordinate,
   scale: number,
 }
@@ -28,10 +32,6 @@ export interface IGameSkinElementTexture extends IGameSkinElementBase {
 export interface IGameSkinElementTextureNumber extends IGameSkinElementBase {
   type: 'score' | 'accurate' | 'combo',
   path: string,
-  stickTo: {
-    x: 'left' | 'center' | 'right',
-    y: 'top' | 'center' | 'bottom',
-  },
 }
 
 export interface IGameSkinElementTextureAnimated extends IGameSkinElementBase {

@@ -10,6 +10,7 @@ import { GameSkinFiles } from '@/skins/file';
 import { GameScoreEffects } from './effects';
 import { IGameRendererSize } from '@/renderer';
 import { GameScoreUI } from './ui';
+import { GameSkin } from '@/skins';
 
 interface IGameScoreJudgeRange {
   readonly perfect: number,
@@ -72,18 +73,17 @@ export class GameScore {
   accurate: number = 0;
   private scoredNotes: number = 0;
 
-  constructor(chart: GameChart, skinTextures: GameSkinFiles, skinHitsounds: IGameSkinHitsounds, containers: { game: Container, ui: Container }) {
+  constructor(chart: GameChart, skin: GameSkin, containers: { game: Container, ui: Container }) {
     this.chart = chart;
     this.notes = this.chart.data.notes;
     this.notesCount = this.notes.length; // TODO: Fake notes
 
     const { game } = this.chart;
-    const { renderer, skins, audio } = game;
+    const { renderer, audio } = game;
     this.size = renderer.size;
-    this.ui = new GameScoreUI(skins.currentSkin!.elements, skinTextures, containers.ui, this.size);
+    this.ui = new GameScoreUI(skin, containers.ui, this.size);
     this.effects = new GameScoreEffects(
-      skinTextures,
-      skinHitsounds,
+      skin,
       containers.game,
       audio.channels.effect,
       this.size

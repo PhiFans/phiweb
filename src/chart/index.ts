@@ -24,8 +24,7 @@ export class GameChart {
     this.background = background;
 
     const { renderer, skins } = this.game;
-
-    this.score = new GameScore(this, skinTextures, skinHitsounds, game.renderer.containers);
+    this.score = new GameScore(this, skins.currentSkin!, renderer.containers);
 
     this.data.createSprites(renderer.containers.game, this.game, skins.currentSkin!);
 

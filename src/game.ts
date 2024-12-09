@@ -43,35 +43,30 @@ export class Game {
       .catch((e) => rej(e));
   });}
 
-  startChart(chartData: GameChartData, audio: GameAudioClip) {
+  startChart(chartData: GameChartData, audio: GameAudioClip) {return new Promise(async (res) => {
     const { options, skins } = this;
     const { currentSkin } = skins;
     if (!currentSkin) {
       console.error('No skin loaded');
       return;
     }
-
-    currentSkin.create(options.useHighQualitySkin)
-    const skinTextures = currentSkin[currentSkin.high && options.useHighQualitySkin ? 'high' : 'normal']!;
-    const skinHitsounds = currentSkin.hitsounds;
+    await currentSkin.create(options.useHighQualitySkin);
 
     this.chart = new GameChart(
       this,
       chartData,
       audio,
-      (void 0),
-      skinTextures,
-      skinHitsounds
+      (void 0)
     );
     this.chart.audio.setChannel(this.audio.channels.music);
 
     this.renderer.containers.game.sortChildren();
-
     this.chart.reszie(this.renderer.size);
     this.chart.start();
 
+    res(this.chart);
     console.log(this);
-  }
+  })}
 
   get resolution() {
     return this.videoOptions.resolution || window.devicePixelRatio;

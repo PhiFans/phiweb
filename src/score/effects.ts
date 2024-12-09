@@ -1,11 +1,10 @@
 import { Sprite, Container, Texture, Rectangle, AnimatedSprite } from 'pixi.js';
-import { GameSkinFileTexture, GameSkinFileTextureAnimated } from '@/skins/file/texture';
-import { GameSkinFiles } from '@/skins/file';
 import { GameAudioChannel } from '@/audio/channel';
 import { EGameScoreJudgeType } from './types';
-import { IGameSkinHitsounds } from '@/skins/file/types';
 import { EGameChartNoteType } from '@/chart/note';
 import { IGameRendererSize } from '@/renderer';
+import { GameSkin } from '@/skins';
+import { TGameSkinElementFiledBaseArray, TGameSkinHitsounds } from '@/skins/types';
 
 class GameScoreEffectHitParticle {
   readonly particleLength = 3;
@@ -58,15 +57,17 @@ export class GameScoreEffects {
   readonly audioChannel: GameAudioChannel;
   readonly size: IGameRendererSize;
   readonly skin: {
-    hitEffects: GameSkinFileTextureAnimated,
-    hitParticle: GameSkinFileTexture,
-    sounds: IGameSkinHitsounds,
+    hitEffect: TGameSkinElementFiledBaseArray,
+    sounds: TGameSkinHitsounds,
+  };
+  readonly skinTextures: {
+    hitEffects: Texture[],
+    hitParticle: Texture,
   };
   readonly particles: GameScoreEffectHitParticle[] = [];
 
   constructor(
-    skinFiles: GameSkinFiles,
-    skinFilesSound: IGameSkinHitsounds,
+    { elements, hitsounds }: GameSkin,
     container: Container,
     audioChannel: GameAudioChannel,
     size: IGameRendererSize
@@ -75,9 +76,18 @@ export class GameScoreEffects {
     this.audioChannel = audioChannel;
     this.size = size;
     this.skin = {
-      hitEffects: skinFiles.hitEffects,
-      hitParticle: skinFiles.hitParticle,
-      sounds: skinFilesSound
+      hitEffect: elements.find((e) => e.type === 'hit-effect')!,
+      sounds: hitsounds,
+    };
+
+    const hitEffectTextures = this.skin.hitEffect.texture!;
+    const hitEffects: Texture[] = [];
+    for (const id in hitEffectTextures) {
+      if (!isNaN(parseInt(id))) hitEffects[parseInt(id)] = hitEffectTextures[id];
+    }
+    this.skinTextures = {
+      hitEffects: hitEffects,
+      hitParticle: hitEffectTextures['particle'],
     };
 
     this.container.label = 'Hit effects container';
@@ -97,19 +107,20 @@ export class GameScoreEffects {
     playHitsound = true,
     noteType: EGameChartNoteType = 1
   ) {
-    const { size, audioChannel, skin, container, particles } = this;
-    const { hitEffects, hitParticle, sounds } = skin;
+    const { size, audioChannel, skin, skinTextures, container, particles } = this;
+    const { sounds } = skin;
+    const { hitEffects, hitParticle } = skinTextures;
     const { playlist } = audioChannel;
 
     if (judgeType >= EGameScoreJudgeType.GOOD) {
-      const { speed, textures } = hitEffects;
-      const animation = new AnimatedSprite(textures!, true);
+      // const { speed } = hitEffect;
+      const animation = new AnimatedSprite(hitEffects, true);
 
       animation.position.set(x, y);
       animation.anchor.set(0.5);
       animation.scale.set(size.noteScale * 5.6)
       animation.tint = judgeType === 3 ? 0xFFECA0 : 0xB4E1FF;
-      animation.animationSpeed = speed;
+      animation.animationSpeed = 1 /** speed */;
       animation.loop = false;
 
       animation.onFrameChange = () => {
@@ -125,12 +136,12 @@ export class GameScoreEffects {
       container.addChild(animation);
       animation.play();
 
-      particles[particles.length] = new GameScoreEffectHitParticle(judgeType, currentTime, x, y, hitParticle.texture!, container);
+      particles[particles.length] = new GameScoreEffectHitParticle(judgeType, currentTime, x, y, hitParticle, container);
     }
 
     if (!playHitsound) return;
-    if (noteType === 1 || noteType === 3) playlist[playlist.length] = sounds.tap.clip!;
-    if (noteType === 2) playlist[playlist.length] = sounds.drag.clip!;
-    if (noteType === 4) playlist[playlist.length] = sounds.flick.clip!;
+    if (noteType === 1 || noteType === 3) playlist[playlist.length] = sounds.tap;
+    if (noteType === 2) playlist[playlist.length] = sounds.drag;
+    if (noteType === 4) playlist[playlist.length] = sounds.flick;
   }
 }

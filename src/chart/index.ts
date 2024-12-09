@@ -5,8 +5,6 @@ import { GameScore } from '../score';
 import { onChartTick } from './tick';
 import { Game } from '@/game';
 import { IGameRendererSize } from '@/renderer';
-import { GameSkinFiles } from '@/skins/file';
-import { IGameSkinHitsounds } from '@/skins/file/types';
 
 export class GameChart {
   readonly game: Game;
@@ -19,15 +17,17 @@ export class GameChart {
 
   readonly onChartTick: (currentTime: number, container: Container) => void;
 
-  constructor(game: Game, data: GameChartData, audio: GameAudioClip, background: unknown, skinTextures: GameSkinFiles, skinHitsounds: IGameSkinHitsounds) {
+  constructor(game: Game, data: GameChartData, audio: GameAudioClip, background: unknown) {
     this.game = game;
     this.data = data;
     this.audio = audio;
     this.background = background;
 
+    const { renderer, skins } = this.game;
+
     this.score = new GameScore(this, skinTextures, skinHitsounds, game.renderer.containers);
 
-    this.data.createSprites(game.renderer.containers.game, this.game, skinTextures);
+    this.data.createSprites(renderer.containers.game, this.game, skins.currentSkin!);
 
     this.onChartTick = onChartTick.bind(this);
     this.onTick = this.onTick.bind(this);

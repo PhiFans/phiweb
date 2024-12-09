@@ -4,6 +4,7 @@ import { GameChartJudgeLine } from './judgeline';
 import { Game } from '@/game';
 import { IGameScoreNote, EGameScoreJudgeType } from '@/score/types';
 import { GameSkinFiles } from '@/skins/file';
+import { GameSkin } from '@/skins';
 
 export enum EGameChartNoteType {
   TAP = 1,
@@ -33,6 +34,12 @@ export interface IGameChartNote {
   holdLength: Nullable<number>;
   posX: number;
 }
+
+const getNoteSkinTexture = (skin: GameSkin, type: string, useHighQuality = true, useHighlight = true) => {
+  const { playfields } = skin;
+  const targetTextures = playfields.filter((e) => e.type === 'note' && e.id === type);
+  return targetTextures.find((e) => e.isHighQuality === useHighQuality && e.isHighlight === useHighlight)!.texture!;
+};
 
 export class GameChartNote {
   readonly judgeline: GameChartJudgeLine;
@@ -118,24 +125,23 @@ export class GameChartNote {
     this.holdFloorPosition = this.type === EGameChartNoteType.HOLD ? this.floorPosition + this.holdLength! : null;
   }
 
-  createSprite(game: Game, skinFiles: GameSkinFiles, zIndex: number = 24) {
-    if (!skinFiles) throw new Error('No skin set, please set a skin');
+  createSprite(game: Game, skin: GameSkin, zIndex: number = 24) {
+    if (!skin) throw new Error('No skin set, please set a skin');
 
-    if (this.type === EGameChartNoteType.HOLD) this.createSpriteHold(game, skinFiles);
-    else this.createSpriteNonHold(game, skinFiles);
+    if (this.type === EGameChartNoteType.HOLD) this.createSpriteHold(game, skin);
+    else this.createSpriteNonHold(game, skin);
 
     this.sprite!.zIndex = zIndex;
     this.sprite!.label = 'Note';
   }
 
-  private createSpriteNonHold(game: Game, skinFiles: GameSkinFiles) {
+  private createSpriteNonHold(game: Game, skin: GameSkin) {
     const getSpriteTexture = () => {
-      const { useHighlight } = game.options;
-      const highlight = useHighlight && this.isSameTime ? 'highlight' : 'normal';
+      const { useHighlight, useHighQualitySkin } = game.options;
 
-      if (this.type === EGameChartNoteType.TAP) return skinFiles.notes.tap[highlight].texture!;
-      if (this.type === EGameChartNoteType.DRAG) return skinFiles.notes.drag[highlight].texture!;
-      if (this.type === EGameChartNoteType.FLICK) return skinFiles.notes.flick[highlight].texture!;
+      if (this.type === EGameChartNoteType.TAP) return getNoteSkinTexture(skin, 'tap', useHighlight, useHighQualitySkin);
+      if (this.type === EGameChartNoteType.DRAG) return getNoteSkinTexture(skin, 'drag', useHighlight, useHighQualitySkin);
+      if (this.type === EGameChartNoteType.FLICK) return getNoteSkinTexture(skin, 'flick', useHighlight, useHighQualitySkin);
     };
 
     const sprite = new Sprite(getSpriteTexture());
@@ -144,14 +150,13 @@ export class GameChartNote {
     this.sprite = sprite;
   }
 
-  private createSpriteHold(game: Game, skinFiles: GameSkinFiles) {
-    const { useHighlight } = game.options;
-    const highlight = useHighlight && this.isSameTime ? 'highlight' : 'normal';
+  private createSpriteHold(game: Game, skin: GameSkin) {
+    const { useHighlight, useHighQualitySkin } = game.options;
 
     const baseContainer = new Container();
-    const spriteHead = new Sprite(skinFiles.notes.hold.head[highlight].texture!);
-    const spriteBody = new Sprite(skinFiles.notes.hold.body[highlight].texture!);
-    const spriteEnd = new Sprite(skinFiles.notes.hold.end.texture!);
+    const spriteHead = new Sprite(getNoteSkinTexture(skin, 'hold-head', useHighlight, useHighQualitySkin));
+    const spriteBody = new Sprite(getNoteSkinTexture(skin, 'hold-body', useHighlight, useHighQualitySkin));
+    const spriteEnd = new Sprite(getNoteSkinTexture(skin, 'hold-end', false, useHighQualitySkin));
 
     spriteHead.anchor.set(0.5, 0);
     spriteBody.anchor.set(0.5, 1);

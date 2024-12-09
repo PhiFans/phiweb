@@ -5,7 +5,7 @@ import { Nullable } from '@/utils/types';
 import { IChartOfficial } from './converter/official/types';
 import { Container, Rectangle } from 'pixi.js';
 import { Game } from '@/game';
-import { GameSkinFiles } from '@/skins/file';
+import { GameSkin } from '@/skins';
 
 const ParseJSON = (string: string): Nullable<unknown> => {
   try {
@@ -40,7 +40,7 @@ export class GameChartData {
     });
   });}
 
-  createSprites(container: Container, game: Game, skinFiles: GameSkinFiles) {
+  createSprites(container: Container, game: Game, skin: GameSkin) {
     if (!this.container) this.container = new Container();
 
     this.container.label = 'Chart sprites container';
@@ -58,7 +58,7 @@ export class GameChartData {
     for (let i = 0; i < this.notes.length; i++) {
       const note = this.notes[i];
       const zIndex = note.type !== 3 ? lineLength + 1 + i : ((i - 10) > 0 ? i - 10 : 0);
-      this.notes[i].createSprite(game, skinFiles, zIndex);
+      this.notes[i].createSprite(game, skin, zIndex);
     }
 
     container.addChild(this.container);

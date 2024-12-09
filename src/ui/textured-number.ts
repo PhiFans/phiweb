@@ -1,6 +1,6 @@
 import { Graphics, Texture } from 'pixi.js';
-import { GameSkinFileTexture } from '@/skins/file/texture';
-import { IGameSkinElementTextureNumber } from '@/skins/types';
+import { TGameSkinElementNumber } from '@/skins/types';
+import { TGameSkinElementFiledBaseArray } from '@/skins/types';
 
 const calculateTextureLength = (textures: Texture[]) => {
   let result = 0;
@@ -9,26 +9,31 @@ const calculateTextureLength = (textures: Texture[]) => {
 };
 
 export class GameUITexturedNumber extends Graphics {
-  private readonly textures: Record<string, GameSkinFileTexture> = {};
-  readonly info: IGameSkinElementTextureNumber;
+  private readonly textures: Record<string, Texture> = {};
+  readonly info: TGameSkinElementNumber;
 
   private _numberText: string = '';
   private _numberDigits: number = 0;
   private _numberDigitsMin: number = 0;
 
   // TODO: Skin meta
-  constructor(textures: GameSkinFileTexture[], info: IGameSkinElementTextureNumber, minDigits: number = 0, label: string = '') {
+  constructor(element: TGameSkinElementFiledBaseArray, minDigits: number = 0, label: string = '') {
+    if (element.type === 'combo-text' || element.type === 'hit-effect' || element.type === 'animation') throw new Error(`Unsupported type: ${element.type}`);
     super();
 
-    for (let i = 0; i < textures.length; i++) {
-      const texture = textures[i];
-      if (!texture.texture) throw new Error('Number texture not created, please create it first!');
+    const { texture: textures } = element;
+    const textureNames = Object.keys(textures!);
+    for (let i = 0; i < textureNames.length; i++) {
+      const textureName = textureNames[i];
+      const texture = textures![textureName];
+      if (!texture) throw new Error('Number texture not created, please create it first!');
 
-      if (i === 10) this.textures['.'] = texture;
-      else if (i === 11) this.textures['%'] = texture;
-      else this.textures[`${i}`] = texture;
+      if (textureName === 'dot') this.textures['.'] = texture;
+      else if (textureName === 'percent') this.textures['%'] = texture;
+      else this.textures[`${textureName}`] = texture;
     }
-    this.info = info;
+
+    this.info = { ...element };
     this._numberDigitsMin = minDigits;
     this.label = label;
   }
@@ -39,12 +44,12 @@ export class GameUITexturedNumber extends Graphics {
 
     for (let i = 0; i < _numberDigits; i++) {
       const number = _numberText[i];
-      result.push(textures[number].texture!);
+      result.push(textures[number]);
     }
 
     if (_numberDigitsMin !== 0) {
       while (result.length < _numberDigitsMin) {
-        result.unshift(textures['0'].texture!);
+        result.unshift(textures['0']);
       }
     }
 

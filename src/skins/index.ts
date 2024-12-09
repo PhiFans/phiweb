@@ -38,33 +38,25 @@ const getFileByPath = (fileList: JSZipFilesMap, path: string, highQuality = fals
   else res(new File([ await file.async('blob') ], path));
 });
 
-const getFilesByPath = (fileList: JSZipFilesMap, path: string, highQuality = false): Promise<File[]> => new Promise(async (res) => {
+const getFilesByPath = (fileList: JSZipFilesMap, path: string, highQuality = false): Promise<Record<string, File>> => new Promise(async (res) => {
   const RegFile = new RegExp(`^${path.replace(/\//, '\\/')}-([\\da-zA-Z]+)(@2x)?$`);
-  const RegFileHigh = new RegExp(`^${path.replace(/\//, '\\/')}-([\\da-zA-Z]+)@2x$`);
-
-  const SortFn = (a: File, b: File) => {
-    const aNum = parseInt(RegFile.exec(a.name)![1]);
-    const bNum = parseInt(RegFile.exec(b.name)![1]);
-
-    if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum;
-    else if (isNaN(aNum)) return 1;
-    else return -1;
-  };
 
   const fileNames = fileList.keys();
-  const result: Array<File> = [];
-  const resultHigh: Array<File> = [];
+  const result: Record<string, File> = {};
+  const resultHigh: Record<string, File> = {};
 
   for (const filename of fileNames) {
     if (!RegFile.test(filename)) continue;
 
     const file = fileList.get(filename)!;
-    if (RegFileHigh.test(filename)) resultHigh.push(new File([ await file.async('blob') ], filename));
-    else if (RegFile.test(filename)) result.push(new File([ await file.async('blob') ], filename));
+    const regResult = RegFile.exec(filename)!;
+
+    if (regResult[2] === '@2x') resultHigh[regResult[1]] = new File([ await file.async('blob') ], filename);
+    else result[regResult[1]] = new File([ await file.async('blob') ], filename);
   }
 
-  if (resultHigh.length > 0 && highQuality) res(resultHigh.sort(SortFn));
-  else res(result.sort(SortFn));
+  if (Object.keys(resultHigh).length > 0 && highQuality) res(resultHigh);
+  else res(result);
 });
 
 // TODO: Need a better way to save it
@@ -174,19 +166,26 @@ export class GameSkin {
         });
       } else {
         promise = new Promise((res, rej) => {
-          const promises: Promise<Texture>[] = [ ...(element as TGameSkinElementFiledBaseArray).file[qualityName] ].map((file) => {
-            return new Promise((res, rej) => {
+          const { file: _files } = (element as TGameSkinElementFiledBaseArray);
+          const files = _files[qualityName];
+          const subPromises: Promise<[ string, Texture ]>[] = [];
+
+          for (const name in files) {
+            const file = files[name];
+            subPromises.push(new Promise((res, rej) => {
               window.createImageBitmap(file)
                 .then((bitmap) => {
                   const result = Texture.from(bitmap);
                   result.label = `${name}: ${file.name}`,
-                  res(result);
+                  res([ name, result ]);
                 })
                 .catch(e => rej(e));
-            });
-          });
+            }));
+          }
 
-          Promise.all<Promise<Texture>[]>(promises).then((result) => {
+          Promise.all<Promise<[ string, Texture ]>[]>(subPromises).then((_result) => {
+            const result: Record<string, Texture> = {};
+            for (const _subresult of _result) result[_subresult[0]] = _subresult[1];
             (element as TGameSkinElementFiledBaseArray).texture = result;
             res(result);
           }).catch(e => rej(e));

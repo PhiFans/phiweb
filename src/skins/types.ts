@@ -98,14 +98,14 @@ export type TGameSkinFile = {
 };
 
 export type TGameSkinFileArray = {
-  normal: File[],
-  high: File[],
+  normal: Record<string, File>,
+  high: Record<string, File>,
 };
 
 export type TGameSkinElementFiledBaseArray = TGameSkinElement & {
   type: 'score' | 'combo' | 'accurate' | 'combo-text' | 'hit-effect' | 'animation',
   file: TGameSkinFileArray,
-  texture?: Texture[],
+  texture?: Record<string, Texture>,
 };
 
 export type TGameSkinElementFiledBase = TGameSkinElement & {

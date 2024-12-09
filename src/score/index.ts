@@ -77,9 +77,9 @@ export class GameScore {
     this.notesCount = this.notes.length; // TODO: Fake notes
 
     const { game } = this.chart;
-    const { renderer, audio } = game;
+    const { renderer, audio, options } = game;
     this.size = renderer.size;
-    this.ui = new GameScoreUI(skin, containers.ui, this.size);
+    this.ui = new GameScoreUI(skin, containers.ui, this.size, options);
     this.effects = new GameScoreEffects(
       skin,
       containers.game,
@@ -87,7 +87,6 @@ export class GameScore {
       this.size
     );
 
-    const { options } = game;
     if (options.challengeMode) {
       this.judgeRange = ScoreJudgeRanges.challenge;
       this.scorePerCombo = 1000000 / this.notesCount;

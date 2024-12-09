@@ -1,16 +1,12 @@
-import JSZip, { file } from 'jszip';
+import JSZip from 'jszip';
 import { Game } from '@/game';
-import { GameSkinFiles } from './file';
-import { GameSkinFileTexture } from './file/texture';
-import { createAnimatedSkin, createNoteSkin, createNumbersSkin } from './file/utils';
-import { Nullable } from '@/utils/types';
-import { IGameSkinFileNotes, IGameSkinFileNumbers, IGameSkinHitsounds } from './file/types';
-import { IGameSkinElement, IGameSkinElementTexture, IGameSkinMeta, TGameSkinElementComboText, TGameSkinElementHitEffect, TGameSkinElementNumber, TGameSkinElementText, TGameSkinElementTexture } from './types';
-import { JSZipFiles, JSZipFilesMap, IGameSkinElementFiles } from './file/types';
-import { ReadFileAsAudioBuffer } from '@/utils/file';
-import { GameSkinFileSound } from './file/sound';
+import { IGameSkinMeta } from './types';
+import { JSZipFiles, JSZipFilesMap } from './file/types';
 import { TGameSkinElement } from './types';
+import { GameAudioClip } from '@/audio/clip';
+import { Texture } from 'pixi.js';
 
+// TODO: Move all types to `./types`
 type TGameSkinFile = {
   normal: File,
   high: File,
@@ -24,24 +20,47 @@ type TGameSkinFileArray = {
 type TGameSkinElementFiledBaseArray = TGameSkinElement & {
   type: 'score' | 'combo' | 'accurate' | 'combo-text' | 'hit-effect' | 'animation',
   file: TGameSkinFileArray,
+  texture?: Texture[],
 };
 
 type TGameSkinElementFiledBase = TGameSkinElement & {
   type: 'image',
   file: TGameSkinFile,
+  texture?: Texture,
 };
 
 type TGameSkinElementFiledBaseNever = TGameSkinElement & {
   type: 'song-name' | 'song-level' | 'song-artist' | 'text',
-  file: undefined,
 };
 
 type TGameSkinElementFiled = TGameSkinElementFiledBase | TGameSkinElementFiledBaseArray | TGameSkinElementFiledBaseNever;
 
+type TGameSkinSoundType = 'hitsound';
+type TGameSkinSoundIDHitsound = 'tap' | 'drag' | 'flick';
+
+type TGameSkinSoundBase = {
+  type: TGameSkinSoundType,
+  id: string,
+  file: File,
+  clip?: GameAudioClip,
+};
+
+type TGameSkinSoundHitsound = TGameSkinSoundBase & {
+  type: 'hitsound',
+  id: TGameSkinSoundIDHitsound,
+};
+
+type TGameSkinSound = TGameSkinSoundHitsound;
+
+type TGameSkinHitsounds = {
+  tap: GameAudioClip,
+  drag: GameAudioClip,
+  flick: GameAudioClip,
+};
+
 type SkinInput = File | Blob | string;
 
 const RegFileExt = /\.([a-zA-Z\d]+)$/;
-const RegFileQualityHigh = /@2x$/;
 
 const getFileListFromZip = (files: JSZipFiles): JSZipFilesMap => {
   const result: [ string, JSZip.JSZipObject ][] = [];
@@ -52,104 +71,6 @@ const getFileListFromZip = (files: JSZipFiles): JSZipFilesMap => {
   }
   return new Map(result);
 };
-
-const getFileListByPath = (fileList: JSZipFilesMap, _pathStart: string): JSZipFilesMap => {
-  const pathStart = _pathStart.replace(/\//, '\\/');
-  const RegPath = new RegExp(`^${pathStart}-(\\d|dot|percent)$`);
-  const result: [ string, JSZip.JSZipObject ][] = [];
-
-  fileList.forEach((value, filename) => {
-    if (!RegPath.test(filename)) return;
-    const textId = RegPath.exec(filename)![1];
-    result.push([ textId, value ]);
-  });
-
-  return new Map(result);
-};
-
-const getFilesAnimated = (fileList: JSZipFilesMap, _pathStart: string): JSZipFilesMap => {
-  const pathStart = _pathStart.replace(/\//, '\\/');
-  const RegPath = new RegExp(`^${pathStart}-(\\d+)$`);
-  const result: [ string, JSZip.JSZipObject ][] = [];
-
-  fileList.forEach((value, filename) => {
-    if (!RegPath.test(filename)) return;
-    const textId = RegPath.exec(filename)![1];
-    result.push([ textId, value ]);
-  });
-
-  result.sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
-  return new Map(result);
-};
-
-const getFilesByQuality = (fileList: JSZipFilesMap, high = false): Nullable<JSZipFilesMap> => {
-  const result: [ string, JSZip.JSZipObject ][] = [];
-  fileList.forEach((value, filename) => {
-    const isHighQuality = RegFileQualityHigh.test(filename);
-    const realFileName = filename.replace('@2x', '');
-
-    if (isHighQuality && high) result.push([ realFileName, value ]);
-    else if (!isHighQuality && !high) result.push([ realFileName, value ]);
-  });
-
-  if (result.length <= 0) return null;
-  else return new Map(result);
-};
-
-const createSkinElements = (elements: IGameSkinElement[], fileList: JSZipFilesMap) => {
-  const result: IGameSkinElementFiles[] = [];
-
-  for (const element of elements) {
-    switch (element.type) {
-      case 'score':
-      case 'accurate':
-      case 'combo': {
-        const fileListNumber = getFileListByPath(fileList, element.path);
-        result.push({
-          ...element,
-          files: fileListNumber,
-        });
-        break;
-      }
-      case 'hit-effect': {
-        const fileListAnimated = getFilesAnimated(fileList, element.path);
-        result.push({
-          ...element,
-          files: fileListAnimated,
-        })
-        break;
-      }
-    }
-  }
-
-  return result;
-};
-
-// XXX: This might need move to `utils`
-const createSkinFileClass = (fileList: JSZipFilesMap, elements: IGameSkinElementFiles[]): Promise<GameSkinFiles> => new Promise(async (res) => {
-  const noteClass: IGameSkinFileNotes = {
-    tap: (await createNoteSkin(fileList, 'note-tap')),
-    drag: (await createNoteSkin(fileList, 'note-drag')),
-    hold: {
-      head: (await createNoteSkin(fileList, 'note-hold-head')),
-      body: (await createNoteSkin(fileList, 'note-hold-body')),
-      end: new GameSkinFileTexture((await window.createImageBitmap((await fileList.get('note-hold-end')!.async('blob'))))),
-    },
-    flick: (await createNoteSkin(fileList, 'note-flick')),
-  };
-
-  const numbersClass: IGameSkinFileNumbers = {
-    score: (await createNumbersSkin(elements, 'score')),
-    accurate: (await createNumbersSkin(elements, 'accurate', true, true)),
-    combo: (await createNumbersSkin(elements, 'combo')),
-  };
-
-  const hitEffectElement = elements.find(e => e.type === 'hit-effect')! as IGameSkinElementTexture;
-  const hitEffectsClass = await createAnimatedSkin(elements, 'hit-effect');
-  const hitParticleFile = new GameSkinFileTexture((await window.createImageBitmap((await fileList.get(`${hitEffectElement.path}-particle`)!.async('blob')))));
-
-  return res(new GameSkinFiles(noteClass, numbersClass, hitEffectsClass, hitParticleFile));
-});
 
 const getFileByPath = (fileList: JSZipFilesMap, path: string, highQuality = false): Promise<File> => new Promise(async (res) => {
   const file = fileList.get(path)!;
@@ -188,20 +109,59 @@ const getFilesByPath = (fileList: JSZipFilesMap, path: string, highQuality = fal
   else res(result.sort(SortFn));
 });
 
-export class GameSkinNew {
+const getSoundsFromList = (fileList: JSZipFilesMap): Promise<TGameSkinSound[]> => new Promise(async (res) => {
+  const RegHitsound = /^hitsound-(tap|drag|flick)$/;
+
+  const fileNames = fileList.keys();
+  const result: TGameSkinSound[] = [];
+
+  for (const filename of fileNames) {
+    const file = fileList.get(filename)!;
+
+    if (RegHitsound.test(filename)) {
+      const id = RegHitsound.exec(filename)![1] as TGameSkinSoundIDHitsound;
+
+      result.push({
+        type: 'hitsound', id,
+        file: new File([ await file.async('blob') ], filename),
+      });
+    }
+  }
+
+  return res(result);
+});
+
+export class GameSkin {
   readonly name: string;
   readonly author: string;
   readonly version: string;
   readonly elements: TGameSkinElementFiled[];
+  readonly sounds: TGameSkinSound[];
 
-  constructor(name: string, author: string, version: string, elements: TGameSkinElementFiled[]) {
+  constructor(name: string, author: string, version: string, elements: TGameSkinElementFiled[], sounds: TGameSkinSound[]) {
     this.name = name;
     this.author = author;
     this.version = version;
     this.elements = [ ...elements ];
+    this.sounds = sounds;
   }
 
-  static from(name: string, author: string, version: string, elements: TGameSkinElement[], fileList: JSZipFilesMap) {return new Promise(async (res, rej) => {
+  getHitsounds(): TGameSkinHitsounds {
+    const { sounds } = this;
+    return {
+      tap: sounds.find((e) => e.type === 'hitsound' && e.id === 'tap')!.clip!,
+      drag: sounds.find((e) => e.type === 'hitsound' && e.id === 'drag')!.clip!,
+      flick: sounds.find((e) => e.type === 'hitsound' && e.id === 'flick')!.clip!,
+    }
+  }
+
+  static from(
+    name: string,
+    author: string,
+    version: string,
+    elements: TGameSkinElement[],
+    fileList: JSZipFilesMap
+  ): Promise<GameSkin> {return new Promise(async (res) => {
     const newElements: TGameSkinElementFiled[] = [];
 
     for (const e of [ ...elements ]) {
@@ -225,7 +185,7 @@ export class GameSkinNew {
         case 'song-level':
         case 'song-artist':
         case 'text': {
-          newElements.push({ ...e, file: undefined });
+          newElements.push({ ...e });
           break;
         }
         case 'image': {
@@ -244,52 +204,8 @@ export class GameSkinNew {
       }
     }
 
-    return res(new GameSkinNew(name, author, version, newElements));
+    return res(new GameSkin(name, author, version, newElements, await getSoundsFromList(fileList)));
   })}
-}
-
-export class GameSkin {
-  readonly name: string;
-  readonly author: string;
-  readonly version: string;
-  readonly elements: IGameSkinElement[];
-  readonly normal: GameSkinFiles;
-  readonly hitsounds: IGameSkinHitsounds;
-  readonly high: Nullable<GameSkinFiles> = null;
-
-  constructor(name: string, author: string, version: string, elements: IGameSkinElement[], filesNormal: GameSkinFiles, fileHitsounds: IGameSkinHitsounds, filesHigh: Nullable<GameSkinFiles> = null) {
-    this.name = name;
-    this.author = author;
-    this.version = version;
-    this.elements = elements;
-    this.normal = filesNormal;
-    this.hitsounds = fileHitsounds;
-    this.high = filesHigh;
-  }
-
-  create(useHighQualitySkin = false) {
-    this.createHitsounds();
-    if (this.high && useHighQualitySkin) this.high.create();
-    else this.normal.create();
-  }
-
-  destroy() {
-    this.destroyHitsounds();
-    this.normal.destroy();
-    if (this.high) this.high.destroy();
-  }
-
-  private createHitsounds() {
-    this.hitsounds.tap.create();
-    this.hitsounds.drag.create();
-    this.hitsounds.flick.create();
-  }
-
-  private destroyHitsounds() {
-    this.hitsounds.tap.destroy();
-    this.hitsounds.drag.destroy();
-    this.hitsounds.flick.destroy();
-  }
 }
 
 export class GameSkins extends Map<string, GameSkin> {
@@ -326,47 +242,15 @@ export class GameSkins extends Map<string, GameSkin> {
       .then(async (result) => {
         const { files } = result;
         const skinMeta = await this.parseSkinMeta(files['skin.json']); // TODO: Skin meta
-
         const fileList = getFileListFromZip(files);
-        const fileListLow = getFilesByQuality(fileList, false)!;
-        const fileListHigh = getFilesByQuality(fileList, true);
+        const resultSkin = await GameSkin.from(skinMeta.name, skinMeta.author, skinMeta.version, skinMeta.elements, fileList);
 
-        // const skinElementsLow = createSkinElements(skinMeta.elements, fileListLow);
-        // const skinClassLow = await createSkinFileClass(fileListLow, skinElementsLow);
+        this.set(skinMeta.name, resultSkin);
+        res(resultSkin);
+        this.setSkin(skinMeta.name);
 
-        // let skinClassHigh: Nullable<GameSkinFiles> = null;
-        // if (fileListHigh) {
-        //   const skinElementHigh = createSkinElements(skinMeta.elements, fileListHigh);
-        //   skinClassHigh = await createSkinFileClass(fileListHigh, skinElementHigh);
-        // }
-
-        // const fileHitsounds: IGameSkinHitsounds = {
-        //   tap: new GameSkinFileSound((await ReadFileAsAudioBuffer((await fileList.get('hitsound-tap')!.async('blob'))))),
-        //   drag: new GameSkinFileSound((await ReadFileAsAudioBuffer((await fileList.get('hitsound-drag')!.async('blob'))))),
-        //   flick: new GameSkinFileSound((await ReadFileAsAudioBuffer((await fileList.get('hitsound-flick')!.async('blob')))))
-        // };
-
-        // // TODO: Skin meta
-        // const skinResult = new GameSkin(
-        //   skinMeta.name,
-        //   skinMeta.author,
-        //   skinMeta.version,
-        //   skinMeta.elements,
-        //   skinClassLow,
-        //   fileHitsounds,
-        //   skinClassHigh
-        // );
-        // this.set(skinMeta.name, skinResult);
-        // res(skinResult);
-        // this.setSkin(skinMeta.name);
-
-        // console.log(skinMeta);
-        // console.log(this);
-
+        console.log(resultSkin);
         console.log(fileList);
-        console.log(await getFilesByPath(fileList, 'number', true));
-        console.log(await getFilesByPath(fileList, 'hit-effect', false));
-        console.log(await GameSkinNew.from(skinMeta.name, skinMeta.author, skinMeta.version, skinMeta.elements, fileList));
       })
       .catch((e) => {
         rej('Read skin file error, this may not a valid skin file.');

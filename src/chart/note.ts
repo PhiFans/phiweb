@@ -3,7 +3,6 @@ import { Nullable } from '@/utils/types';
 import { GameChartJudgeLine } from './judgeline';
 import { Game } from '@/game';
 import { IGameScoreNote, EGameScoreJudgeType } from '@/score/types';
-import { GameSkinFiles } from '@/skins/file';
 import { GameSkin } from '@/skins';
 
 export enum EGameChartNoteType {

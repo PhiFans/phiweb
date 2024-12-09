@@ -137,10 +137,11 @@ export class GameChartNote {
   private createSpriteNonHold(game: Game, skin: GameSkin) {
     const getSpriteTexture = () => {
       const { useHighlight, useHighQualitySkin } = game.options;
+      const { isSameTime } = this;
 
-      if (this.type === EGameChartNoteType.TAP) return getNoteSkinTexture(skin, 'tap', useHighlight, useHighQualitySkin);
-      if (this.type === EGameChartNoteType.DRAG) return getNoteSkinTexture(skin, 'drag', useHighlight, useHighQualitySkin);
-      if (this.type === EGameChartNoteType.FLICK) return getNoteSkinTexture(skin, 'flick', useHighlight, useHighQualitySkin);
+      if (this.type === EGameChartNoteType.TAP) return getNoteSkinTexture(skin, 'tap', useHighQualitySkin, useHighlight && isSameTime);
+      if (this.type === EGameChartNoteType.DRAG) return getNoteSkinTexture(skin, 'drag', useHighQualitySkin, useHighlight && isSameTime);
+      if (this.type === EGameChartNoteType.FLICK) return getNoteSkinTexture(skin, 'flick', useHighQualitySkin, useHighlight && isSameTime);
     };
 
     const sprite = new Sprite(getSpriteTexture());
@@ -151,11 +152,12 @@ export class GameChartNote {
 
   private createSpriteHold(game: Game, skin: GameSkin) {
     const { useHighlight, useHighQualitySkin } = game.options;
+    const { isSameTime } = this;
 
     const baseContainer = new Container();
-    const spriteHead = new Sprite(getNoteSkinTexture(skin, 'hold-head', useHighlight, useHighQualitySkin));
-    const spriteBody = new Sprite(getNoteSkinTexture(skin, 'hold-body', useHighlight, useHighQualitySkin));
-    const spriteEnd = new Sprite(getNoteSkinTexture(skin, 'hold-end', false, useHighQualitySkin));
+    const spriteHead = new Sprite(getNoteSkinTexture(skin, 'hold-head', useHighQualitySkin, useHighlight && isSameTime));
+    const spriteBody = new Sprite(getNoteSkinTexture(skin, 'hold-body', useHighQualitySkin, useHighlight && isSameTime));
+    const spriteEnd = new Sprite(getNoteSkinTexture(skin, 'hold-end', useHighQualitySkin, false));
 
     spriteHead.anchor.set(0.5, 0);
     spriteBody.anchor.set(0.5, 1);

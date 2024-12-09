@@ -147,11 +147,18 @@ const getPlayfieldsFromList = (fileList: JSZipFilesMap): Promise<TGameSkinPlayfi
       const id = testResult[1] as TGameSkinPlayfieldIDNote;
       const isHighlight = testResult[3] === '-highlight';
       const isHighQuality = testResult[4] === '@2x';
+      const resultFile = new File([ await file.async('blob') ], filename);
 
       result.push({
         type: 'note', id,
-        file: new File([ await file.async('blob') ], filename),
+        file: resultFile,
         isHighlight, isHighQuality,
+      });
+
+      if (id === 'hold-end') result.push({
+        type: 'note', id,
+        file: resultFile,
+        isHighlight: true, isHighQuality,
       });
     }
   }

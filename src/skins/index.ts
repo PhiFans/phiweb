@@ -5,6 +5,8 @@ import { JSZipFiles, JSZipFilesMap } from './file/types';
 import { TGameSkinElement } from './types';
 import { GameAudioClip } from '@/audio/clip';
 import { Texture } from 'pixi.js';
+import { ReadFileAsAudioBuffer } from '@/utils/file';
+import { GameAudio } from '@/audio';
 
 // TODO: Move all types to `./types`
 type TGameSkinFile = {
@@ -146,7 +148,81 @@ export class GameSkin {
     this.sounds = sounds;
   }
 
-  getHitsounds(): TGameSkinHitsounds {
+  create(useHighQuality = true) {return new Promise(async (res) => {
+    const qualityName = useHighQuality ? 'high' : 'normal';
+    const { elements, sounds, name } = this;
+
+    const promiseElements: Promise<unknown>[] = [];
+    const promiseSounds: Promise<unknown>[] = [];
+
+    // Create texture(s) for elements
+    for (const element of elements) {
+      if (
+        element.type === 'song-name' ||
+        element.type === 'song-level' ||
+        element.type === 'song-artist' ||
+        element.type === 'text'
+      ) continue;
+
+      let promise: Promise<unknown>;
+      if (element.type === 'image') {
+        promise = new Promise((res, rej) => {
+          const file = element.file[qualityName];
+          window.createImageBitmap(file)
+            .then((bitmap) => {
+              const result = Texture.from(bitmap);
+              result.label = `${name}: ${file.name}`,
+              element.texture = result;
+              res(result);
+            })
+            .catch(e => rej(e));
+        });
+      } else {
+        promise = new Promise((res, rej) => {
+          const promises: Promise<Texture>[] = [ ...(element as TGameSkinElementFiledBaseArray).file[qualityName] ].map((file) => {
+            return new Promise((res, rej) => {
+              window.createImageBitmap(file)
+                .then((bitmap) => {
+                  const result = Texture.from(bitmap);
+                  result.label = `${name}: ${file.name}`,
+                  res(result);
+                })
+                .catch(e => rej(e));
+            });
+          });
+
+          Promise.all<Promise<Texture>[]>(promises).then((result) => {
+            (element as TGameSkinElementFiledBaseArray).texture = result;
+            res(result);
+          }).catch(e => rej(e));
+        });
+      }
+
+      if (promise) promiseElements.push(promise);
+    }
+
+    // Create audio clip for sounds
+    for (const sound of sounds) {
+      const { file } = sound;
+
+      promiseSounds.push(new Promise((res, rej) => {
+        ReadFileAsAudioBuffer(file)
+          .then((buffer) => {
+            const result = GameAudio.from(buffer);
+            sound.clip = result;
+            res(result);
+          })
+          .catch(e => rej(e));
+      }));
+    }
+
+    await Promise.all(promiseElements);
+    await Promise.all(promiseSounds);
+
+    res(this);
+  })}
+
+  get hitsounds(): TGameSkinHitsounds {
     const { sounds } = this;
     return {
       tap: sounds.find((e) => e.type === 'hitsound' && e.id === 'tap')!.clip!,

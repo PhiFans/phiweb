@@ -1,6 +1,6 @@
 import JSZip from 'jszip';
 import { Game } from '@/game';
-import { JSZipFiles, JSZipFilesMap } from './file/types';
+import { JSZipFiles, JSZipFilesMap } from './types';
 import { Texture } from 'pixi.js';
 import { ReadFileAsAudioBuffer } from '@/utils/file';
 import { GameAudio } from '@/audio';

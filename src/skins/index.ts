@@ -37,6 +37,25 @@ type TGameSkinElementFiledBaseNever = TGameSkinElement & {
 
 type TGameSkinElementFiled = TGameSkinElementFiledBase | TGameSkinElementFiledBaseArray | TGameSkinElementFiledBaseNever;
 
+type TGameSkinPlayfieldType = 'note';
+type TGameSkinPlayfieldIDNote = 'tap' | 'drag' | 'hold-head' | 'hold-body' | 'hold-end' | 'flick';
+
+type TGameSkinPlayfieldBase = {
+  type: TGameSkinPlayfieldType,
+  id: string,
+  isHighQuality: boolean,
+  file: File,
+  texture?: Texture,
+};
+
+type TGameSkinPlayfieldNote = TGameSkinPlayfieldBase & {
+  type: 'note',
+  id: TGameSkinPlayfieldIDNote,
+  isHighlight: boolean,
+};
+
+type TGameSkinPlayfield = TGameSkinPlayfieldNote;
+
 type TGameSkinSoundType = 'hitsound';
 type TGameSkinSoundIDHitsound = 'tap' | 'drag' | 'flick';
 
@@ -111,6 +130,35 @@ const getFilesByPath = (fileList: JSZipFilesMap, path: string, highQuality = fal
   else res(result.sort(SortFn));
 });
 
+// TODO: Need a better way to save it
+const getPlayfieldsFromList = (fileList: JSZipFilesMap): Promise<TGameSkinPlayfield[]> => new Promise(async (res) => {
+  const RegPlayfieldTest = /^(note)-/;
+  const RegPlayfieldNote = /^note-(tap|drag|hold-(head|body|end)|flick)(-highlight)?(@2x)?$/;
+
+  const fileNames = fileList.keys();
+  const result: TGameSkinPlayfield[] = [];
+
+  for (const filename of fileNames) {
+    if (!RegPlayfieldTest.test(filename)) continue;
+    const file = fileList.get(filename)!;
+
+    if (RegPlayfieldNote.test(filename)) {
+      const testResult = RegPlayfieldNote.exec(filename)!;
+      const id = testResult[1] as TGameSkinPlayfieldIDNote;
+      const isHighlight = testResult[3] === '-highlight';
+      const isHighQuality = testResult[4] === '@2x';
+
+      result.push({
+        type: 'note', id,
+        file: new File([ await file.async('blob') ], filename),
+        isHighlight, isHighQuality,
+      });
+    }
+  }
+
+  res(result);
+});
+
 const getSoundsFromList = (fileList: JSZipFilesMap): Promise<TGameSkinSound[]> => new Promise(async (res) => {
   const RegHitsound = /^hitsound-(tap|drag|flick)$/;
 
@@ -138,21 +186,24 @@ export class GameSkin {
   readonly author: string;
   readonly version: string;
   readonly elements: TGameSkinElementFiled[];
+  readonly playfields: TGameSkinPlayfield[];
   readonly sounds: TGameSkinSound[];
 
-  constructor(name: string, author: string, version: string, elements: TGameSkinElementFiled[], sounds: TGameSkinSound[]) {
+  constructor(name: string, author: string, version: string, elements: TGameSkinElementFiled[], playfields: TGameSkinPlayfield[], sounds: TGameSkinSound[]) {
     this.name = name;
     this.author = author;
     this.version = version;
     this.elements = [ ...elements ];
+    this.playfields = playfields;
     this.sounds = sounds;
   }
 
   create(useHighQuality = true) {return new Promise(async (res) => {
     const qualityName = useHighQuality ? 'high' : 'normal';
-    const { elements, sounds, name } = this;
+    const { elements, playfields, sounds, name } = this;
 
     const promiseElements: Promise<unknown>[] = [];
+    const promisePlayfields: Promise<unknown>[] = [];
     const promiseSounds: Promise<unknown>[] = [];
 
     // Create texture(s) for elements
@@ -201,6 +252,19 @@ export class GameSkin {
       if (promise) promiseElements.push(promise);
     }
 
+    for (const playfield of playfields) {
+      promisePlayfields.push(new Promise((res, rej) => {
+        window.createImageBitmap(playfield.file)
+          .then((bitmap) => {
+            const result = Texture.from(bitmap);
+            result.label = `${name}: ${playfield.file.name}`;
+            playfield.texture = result;
+            res(result);
+          })
+          .catch(e => rej(e));
+      }));
+    }
+
     // Create audio clip for sounds
     for (const sound of sounds) {
       const { file } = sound;
@@ -217,6 +281,7 @@ export class GameSkin {
     }
 
     await Promise.all(promiseElements);
+    await Promise.all(promisePlayfields);
     await Promise.all(promiseSounds);
 
     res(this);
@@ -280,7 +345,14 @@ export class GameSkin {
       }
     }
 
-    return res(new GameSkin(name, author, version, newElements, await getSoundsFromList(fileList)));
+    return res(new GameSkin(
+      name,
+      author,
+      version,
+      newElements,
+      await getPlayfieldsFromList(fileList),
+      await getSoundsFromList(fileList)
+    ));
   })}
 }
 

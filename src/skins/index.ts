@@ -1,83 +1,20 @@
 import JSZip from 'jszip';
 import { Game } from '@/game';
-import { IGameSkinMeta } from './types';
 import { JSZipFiles, JSZipFilesMap } from './file/types';
-import { TGameSkinElement } from './types';
-import { GameAudioClip } from '@/audio/clip';
 import { Texture } from 'pixi.js';
 import { ReadFileAsAudioBuffer } from '@/utils/file';
 import { GameAudio } from '@/audio';
-
-// TODO: Move all types to `./types`
-type TGameSkinFile = {
-  normal: File,
-  high: File,
-};
-
-type TGameSkinFileArray = {
-  normal: File[],
-  high: File[],
-};
-
-type TGameSkinElementFiledBaseArray = TGameSkinElement & {
-  type: 'score' | 'combo' | 'accurate' | 'combo-text' | 'hit-effect' | 'animation',
-  file: TGameSkinFileArray,
-  texture?: Texture[],
-};
-
-type TGameSkinElementFiledBase = TGameSkinElement & {
-  type: 'image',
-  file: TGameSkinFile,
-  texture?: Texture,
-};
-
-type TGameSkinElementFiledBaseNever = TGameSkinElement & {
-  type: 'song-name' | 'song-level' | 'song-artist' | 'text',
-};
-
-type TGameSkinElementFiled = TGameSkinElementFiledBase | TGameSkinElementFiledBaseArray | TGameSkinElementFiledBaseNever;
-
-type TGameSkinPlayfieldType = 'note';
-type TGameSkinPlayfieldIDNote = 'tap' | 'drag' | 'hold-head' | 'hold-body' | 'hold-end' | 'flick';
-
-type TGameSkinPlayfieldBase = {
-  type: TGameSkinPlayfieldType,
-  id: string,
-  isHighQuality: boolean,
-  file: File,
-  texture?: Texture,
-};
-
-type TGameSkinPlayfieldNote = TGameSkinPlayfieldBase & {
-  type: 'note',
-  id: TGameSkinPlayfieldIDNote,
-  isHighlight: boolean,
-};
-
-type TGameSkinPlayfield = TGameSkinPlayfieldNote;
-
-type TGameSkinSoundType = 'hitsound';
-type TGameSkinSoundIDHitsound = 'tap' | 'drag' | 'flick';
-
-type TGameSkinSoundBase = {
-  type: TGameSkinSoundType,
-  id: string,
-  file: File,
-  clip?: GameAudioClip,
-};
-
-type TGameSkinSoundHitsound = TGameSkinSoundBase & {
-  type: 'hitsound',
-  id: TGameSkinSoundIDHitsound,
-};
-
-type TGameSkinSound = TGameSkinSoundHitsound;
-
-type TGameSkinHitsounds = {
-  tap: GameAudioClip,
-  drag: GameAudioClip,
-  flick: GameAudioClip,
-};
+import {
+  IGameSkinMeta,
+  TGameSkinElement,
+  TGameSkinPlayfield,
+  TGameSkinPlayfieldIDNote,
+  TGameSkinSound,
+  TGameSkinSoundIDHitsound,
+  TGameSkinElementFiled,
+  TGameSkinElementFiledBaseArray,
+  TGameSkinHitsounds
+} from './types';
 
 type SkinInput = File | Blob | string;
 

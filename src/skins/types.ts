@@ -1,3 +1,5 @@
+import { Texture } from 'pixi.js';
+import { GameAudioClip } from '@/audio/clip';
 
 export interface IGameSkinMeta {
   name: string,
@@ -89,3 +91,73 @@ export interface IGameSkinElementCoordinate {
   x: number,
   y: number,
 }
+
+export type TGameSkinFile = {
+  normal: File,
+  high: File,
+};
+
+export type TGameSkinFileArray = {
+  normal: File[],
+  high: File[],
+};
+
+export type TGameSkinElementFiledBaseArray = TGameSkinElement & {
+  type: 'score' | 'combo' | 'accurate' | 'combo-text' | 'hit-effect' | 'animation',
+  file: TGameSkinFileArray,
+  texture?: Texture[],
+};
+
+export type TGameSkinElementFiledBase = TGameSkinElement & {
+  type: 'image',
+  file: TGameSkinFile,
+  texture?: Texture,
+};
+
+export type TGameSkinElementFiledBaseNever = TGameSkinElement & {
+  type: 'song-name' | 'song-level' | 'song-artist' | 'text',
+};
+
+export type TGameSkinElementFiled = TGameSkinElementFiledBase | TGameSkinElementFiledBaseArray | TGameSkinElementFiledBaseNever;
+
+export type TGameSkinPlayfieldType = 'note';
+export type TGameSkinPlayfieldIDNote = 'tap' | 'drag' | 'hold-head' | 'hold-body' | 'hold-end' | 'flick';
+
+export type TGameSkinPlayfieldBase = {
+  type: TGameSkinPlayfieldType,
+  id: string,
+  isHighQuality: boolean,
+  file: File,
+  texture?: Texture,
+};
+
+export type TGameSkinPlayfieldNote = TGameSkinPlayfieldBase & {
+  type: 'note',
+  id: TGameSkinPlayfieldIDNote,
+  isHighlight: boolean,
+};
+
+export type TGameSkinPlayfield = TGameSkinPlayfieldNote;
+
+export type TGameSkinSoundType = 'hitsound';
+export type TGameSkinSoundIDHitsound = 'tap' | 'drag' | 'flick';
+
+export type TGameSkinSoundBase = {
+  type: TGameSkinSoundType,
+  id: string,
+  file: File,
+  clip?: GameAudioClip,
+};
+
+export type TGameSkinSoundHitsound = TGameSkinSoundBase & {
+  type: 'hitsound',
+  id: TGameSkinSoundIDHitsound,
+};
+
+export type TGameSkinSound = TGameSkinSoundHitsound;
+
+export type TGameSkinHitsounds = {
+  tap: GameAudioClip,
+  drag: GameAudioClip,
+  flick: GameAudioClip,
+};

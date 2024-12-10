@@ -158,15 +158,26 @@ export class GameScoreUI {
     const accurateText = accurateToText(accurate);
 
     for (const e of elements) {
-      switch (e.type) {
+      const { type, sprite } = e;
+      switch (type) {
         case 'score':
-          e.sprite.number = score;
+          sprite.number = score;
           break;
         case 'combo':
-          e.sprite.number = combo;
+          sprite.number = combo;
+          if (e.autoHide) {
+            if (combo > 2 && !sprite.visible) sprite.visible = true;
+            else if (combo <= 2 &&sprite.visible) sprite.visible = false;
+          }
           break;
         case 'accurate':
-          e.sprite.number = accurateText;
+          sprite.number = accurateText;
+          break;
+        case 'combo-text':
+          if (e.autoHide) {
+            if (combo > 2 && !sprite.visible) sprite.visible = true;
+            else if (combo <= 2 && sprite.visible) sprite.visible = false;
+          }
           break;
       }
     }

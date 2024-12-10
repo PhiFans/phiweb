@@ -54,7 +54,12 @@ export type TGameSkinElementAligned = TGameSkinElementBase & {
 };
 
 export type TGameSkinElementNumber = TGameSkinElementPathed & TGameSkinElementAligned & {
-  type: 'score' | 'combo' | 'accurate',
+  type: 'score' | 'accurate',
+};
+
+export type TGameSkinElementNumberCombo = TGameSkinElementPathed & TGameSkinElementAligned & {
+  type: 'combo',
+  autoHide: boolean,
 };
 
 export type TGameSkinElementText = TGameSkinElementAligned & TGameSkinElementAnchored & {
@@ -81,6 +86,7 @@ export type TGameSkinElementAnimation = TGameSkinElementPathed & TGameSkinElemen
 
 export type TGameSkinElementComboText = TGameSkinElementPathed & TGameSkinElementAnchored & {
   type: 'combo-text',
+  autoHide: boolean,
 };
 
 export type TGameSkinElementHitEffect = {
@@ -93,6 +99,7 @@ export type TGameSkinElementHitEffect = {
 
 export type TGameSkinElement = (
   TGameSkinElementNumber |
+  TGameSkinElementNumberCombo |
   TGameSkinElementText |
   TGameSkinElementTexture |
   TGameSkinElementTextCustom |

@@ -12,8 +12,14 @@ export interface IGameSkinMeta {
   name: string,
   author: string,
   version: string,
+  fontFamilies: TGameSkinFontFamily[],
   elements: TGameSkinElement[]
 }
+
+export type TGameSkinFontFamily = {
+  name: string,
+  path: string,
+};
 
 export type TGameSkinElementTypeTexture = 'score' | 'accurate' | 'combo' | 'image';
 export type TGameSkinElementTypeText = 'song-name' | 'song-level' | 'song-artist' | 'text';

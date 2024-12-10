@@ -59,6 +59,16 @@ const getFilesByPath = (fileList: JSZipFilesMap, path: string, highQuality = fal
   else res(result);
 });
 
+const createFontFamily = (name: string, file: Blob) => {
+  const dom = document.createElement('style');
+  dom.innerHTML = `@font-family {
+  font-family: "${name}";
+  src: url(${URL.createObjectURL(file)});
+}`
+  document.head.appendChild(dom);
+  return dom;
+};
+
 // TODO: Need a better way to save it
 const getPlayfieldsFromList = (fileList: JSZipFilesMap): Promise<TGameSkinPlayfield[]> => new Promise(async (res) => {
   const RegPlayfieldTest = /^(note)-/;
@@ -335,6 +345,19 @@ export class GameSkins extends Map<string, GameSkin> {
         const skinMeta = await this.parseSkinMeta(files['skin.json']); // TODO: Skin meta
         const fileList = getFileListFromZip(files);
         const resultSkin = await GameSkin.from(skinMeta.name, skinMeta.author, skinMeta.version, skinMeta.elements, fileList);
+
+        for (const font of skinMeta.fontFamilies) {
+          const fontFile = fileList.get(font.path);
+          if (!fontFile) {
+            console.warn(`Font path: ${font.path} not found, skipping...`);
+            continue;
+          }
+
+          // TODO: For some reason `fontfaceobserver` is broken, wait for another implement for loading the font.
+          const fontBlob = await fontFile.async('blob');
+          createFontFamily(font.name, fontBlob);
+          await (new Promise((res) => setTimeout(() => res(void 0), 200)));
+        }
 
         this.set(skinMeta.name, resultSkin);
         res(resultSkin);

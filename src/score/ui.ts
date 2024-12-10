@@ -102,6 +102,22 @@ export class GameScoreUI {
             result.sprite.anchor.set(e.anchor.x, e.anchor.y);
             return result;
           }
+          case 'text': {
+            const result: TGameScoreUIElement = {
+              ...e,
+              sprite: new Text({
+                text: e.text,
+                style: {
+                  fontFamily: e.fontFamily,
+                  fontSize: e.size,
+                  align: e.align,
+                  fill: 0xFFFFFF,
+                },
+              }),
+            };
+            result.sprite.anchor.set(e.anchor.x, e.anchor.y);
+            return result;
+          }
           default: {
             console.warn(`No such element type: ${e.type}, skipping...`);
             return (void 0);

@@ -39,6 +39,7 @@ export type TGameSkinElementBase = {
   },
   position: TGameSkinElementCoordinate,
   scale: number,
+  alpha: number,
 };
 
 export type TGameSkinElementPathed = TGameSkinElementBase & {

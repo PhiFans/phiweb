@@ -1,6 +1,6 @@
 import { IGameRendererSize } from '@/renderer';
 import { GameSkin } from '@/skins';
-import { TGameSkinElement, TGameSkinElementTypeText } from '@/skins/types';
+import { TGameSkinElement, TGameSkinElementAnchored, TGameSkinElementTypeText } from '@/skins/types';
 import { GameUITexturedNumber } from '@/ui/textured-number';
 import { parseDoublePrecist } from '@/utils/math';
 import { Container, Sprite, Text } from 'pixi.js';
@@ -37,92 +37,64 @@ export class GameScoreUI {
       .filter(e => e.type !== 'hit-effect')
       .filter(e => e.enabled)
       .map<TGameScoreUIElement | undefined>((e) => {
+        if (e.type === 'animation') return void 0; // TODO: We will work on that later.
+        const result: Partial<TGameScoreUIElement> & Omit<TGameScoreUIElement, 'sprite'> = { ...e };
+
         switch (e.type) {
           case 'score':
           case 'combo':
           case 'accurate': {
-            return {
-              ...e,
-              sprite: new GameUITexturedNumber(e, e.type === 'score' ? 7 : 0),
-            }
+            result.sprite = new GameUITexturedNumber(e, e.type === 'score' ? 7 : 0);
+            break;
           };
           case 'combo-text': {
-            const result: TGameScoreUIElement = {
-              ...e,
-              sprite: new Sprite(options.autoPlay ? e.texture!['autoplay'] : e.texture!['normal']),
-            };
-            result.sprite.anchor.set(e.anchor.x, e.anchor.y);
-            return result;
+            result.sprite = new Sprite(options.autoPlay ? e.texture!['autoplay'] : e.texture!['normal']);
+            break;
           }
-          case 'song-name': { // TODO: Song info
-            const result: TGameScoreUIElement = {
-              ...e,
-              sprite: new Text({
-                text: 'Song name',
-                style: {
-                  fontFamily: e.fontFamily,
-                  fontSize: e.size,
-                  align: e.align,
-                  fill: 0xFFFFFF,
-                },
-              }),
-            };
-            result.sprite.anchor.set(e.anchor.x, e.anchor.y);
-            return result;
-          }
-          case 'song-level': { // TODO: Song info
-            const result: TGameScoreUIElement = {
-              ...e,
-              sprite: new Text({
-                text: 'IN Lv.?',
-                style: {
-                  fontFamily: e.fontFamily,
-                  fontSize: e.size,
-                  align: e.align,
-                  fill: 0xFFFFFF,
-                },
-              }),
-            };
-            result.sprite.anchor.set(e.anchor.x, e.anchor.y);
-            return result;
-          }
-          case 'song-artist': { // TODO: Song info
-            const result: TGameScoreUIElement = {
-              ...e,
-              sprite: new Text({
-                text: 'Song artist',
-                style: {
-                  fontFamily: e.fontFamily,
-                  fontSize: e.size,
-                  align: e.align,
-                  fill: 0xFFFFFF,
-                },
-              }),
-            };
-            result.sprite.anchor.set(e.anchor.x, e.anchor.y);
-            return result;
+          case 'song-name': // TODO: Song info
+          case 'song-level':
+          case 'song-artist': {
+            result.sprite = new Text({
+              text: (
+                e.type === 'song-name' ? 'Song name' :
+                e.type === 'song-artist' ? 'Song artist' :
+                'IN Lv.?'
+              ),
+              style: {
+                fontFamily: e.fontFamily,
+                fontSize: e.size,
+                align: e.align,
+                fill: 0xFFFFFF,
+              },
+            });
+            break;
           }
           case 'text': {
-            const result: TGameScoreUIElement = {
-              ...e,
-              sprite: new Text({
-                text: e.text,
-                style: {
-                  fontFamily: e.fontFamily,
-                  fontSize: e.size,
-                  align: e.align,
-                  fill: 0xFFFFFF,
-                },
-              }),
-            };
-            result.sprite.anchor.set(e.anchor.x, e.anchor.y);
-            return result;
-          }
-          default: {
-            console.warn(`No such element type: ${e.type}, skipping...`);
-            return (void 0);
+            result.sprite = new Text({
+              text: e.text,
+              style: {
+                fontFamily: e.fontFamily,
+                fontSize: e.size,
+                align: e.align,
+                fill: 0xFFFFFF,
+              },
+            });
+            break;
           }
         }
+
+        if (!result.sprite) {
+          console.warn(`No such element type: ${e.type}, skipping...`);
+          return (void 0);
+        }
+
+        if (e.alpha) result.sprite.alpha = e.alpha;
+        if ((e as TGameSkinElementAnchored).anchor && (result.sprite as Sprite | Text).anchor) {
+          const { anchor } = (e as TGameSkinElementAnchored);
+          (result.sprite as Sprite | Text).anchor.set(anchor.x, anchor.y);
+        }
+
+        return result as TGameScoreUIElement;
       })
       .filter((e) => (e !== (void 0)));
 

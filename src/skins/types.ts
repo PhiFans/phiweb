@@ -57,7 +57,7 @@ export type TGameSkinElementNumber = TGameSkinElementPathed & TGameSkinElementAl
   type: 'score' | 'combo' | 'accurate',
 };
 
-export type TGameSkinElementText = TGameSkinElementAligned & {
+export type TGameSkinElementText = TGameSkinElementAligned & TGameSkinElementAnchored & {
   type: 'song-name' | 'song-level' | 'song-artist',
   fontFamily: string,
   size: number,
@@ -67,10 +67,11 @@ export type TGameSkinElementTexture = TGameSkinElementPathed & TGameSkinElementA
   type: 'image',
 };
 
-export type TGameSkinElementTextCustom = TGameSkinElementAligned & {
+export type TGameSkinElementTextCustom = TGameSkinElementAligned & TGameSkinElementAnchored & {
   type: 'text',
   fontFamily: string,
   text: string,
+  size: number,
 };
 
 export type TGameSkinElementAnimation = TGameSkinElementPathed & TGameSkinElementAnchored & {

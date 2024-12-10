@@ -47,10 +47,60 @@ export class GameScoreUI {
             }
           };
           case 'combo-text': {
-            return {
+            const result: TGameScoreUIElement = {
               ...e,
               sprite: new Sprite(options.autoPlay ? e.texture!['autoplay'] : e.texture!['normal']),
-            }
+            };
+            result.sprite.anchor.set(e.anchor.x, e.anchor.y);
+            return result;
+          }
+          case 'song-name': { // TODO: Song info
+            const result: TGameScoreUIElement = {
+              ...e,
+              sprite: new Text({
+                text: 'Song name',
+                style: {
+                  fontFamily: e.fontFamily,
+                  fontSize: e.size,
+                  align: e.align,
+                  fill: 0xFFFFFF,
+                },
+              }),
+            };
+            result.sprite.anchor.set(e.anchor.x, e.anchor.y);
+            return result;
+          }
+          case 'song-level': { // TODO: Song info
+            const result: TGameScoreUIElement = {
+              ...e,
+              sprite: new Text({
+                text: 'IN Lv.?',
+                style: {
+                  fontFamily: e.fontFamily,
+                  fontSize: e.size,
+                  align: e.align,
+                  fill: 0xFFFFFF,
+                },
+              }),
+            };
+            result.sprite.anchor.set(e.anchor.x, e.anchor.y);
+            return result;
+          }
+          case 'song-artist': { // TODO: Song info
+            const result: TGameScoreUIElement = {
+              ...e,
+              sprite: new Text({
+                text: 'Song artist',
+                style: {
+                  fontFamily: e.fontFamily,
+                  fontSize: e.size,
+                  align: e.align,
+                  fill: 0xFFFFFF,
+                },
+              }),
+            };
+            result.sprite.anchor.set(e.anchor.x, e.anchor.y);
+            return result;
           }
           default: {
             console.warn(`No such element type: ${e.type}, skipping...`);
@@ -84,9 +134,6 @@ export class GameScoreUI {
 
       sprite.scale.set(heightPercent * (scale || 1));
       sprite.position.set(posX, posY);
-      if (
-        e.type === 'combo-text'
-      ) (sprite as Sprite).anchor.set(e.anchor.x, e.anchor.y);
     }
   }
 

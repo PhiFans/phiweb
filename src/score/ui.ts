@@ -88,6 +88,8 @@ export class GameScoreUI {
           return (void 0);
         }
 
+        // TODO: Pause button
+        result.sprite.interactive = result.sprite.interactiveChildren = false;
         if (e.alpha) result.sprite.alpha = e.alpha;
         if ((e as TGameSkinElementAnchored).anchor && (result.sprite as Sprite | Text).anchor) {
           const { anchor } = (e as TGameSkinElementAnchored);

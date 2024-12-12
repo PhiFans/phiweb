@@ -9,13 +9,11 @@ export type TPhiEditNoteBase = {
   scaleX: number,
   isAbove: boolean,
   isFake: boolean,
-  startTime?: number,
 };
 
 export type TPhiEditNoteHold = TPhiEditNoteBase & {
   type: EGameChartNoteType.HOLD,
   endBeat: number,
-  endTime?: number,
 };
 
 export type TPhiEditLine = {
@@ -32,19 +30,16 @@ export type TPhiEditLineEvent = {
   start: number,
   end: number,
   easing: number,
-  startTime?: number,
-  endTime?: number,
 };
 
 export type TPhiEditLineEventSingle = {
   startBeat: number,
   endBeat: number,
   value: number,
-  startTime?: number,
-  endTime?: number,
 }
 
 export type TPhiEditBPM = TPhiEditLineEventSingle & {
+  startTime?: number,
   beatTime?: number,
 };
 

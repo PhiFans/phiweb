@@ -105,7 +105,6 @@ const parseBPM = (BPMs: TPhiEditBPM[]) => {
 
     bpmChangedTime += currentBeatRealTime * (bpm.startBeat - bpmChangedBeat);
     bpm.startTime = bpmChangedTime;
-    bpm.endTime = nextBPM ? currentBeatRealTime * (bpm.endBeat - bpmChangedBeat) : Infinity;
     bpm.beatTime = 60000 / bpm.value;
 
     bpmChangedBeat += (bpm.startBeat - bpmChangedBeat);

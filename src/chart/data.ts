@@ -6,6 +6,7 @@ import { IChartOfficial } from './converter/official/types';
 import { Container, Rectangle } from 'pixi.js';
 import { Game } from '@/game';
 import { GameSkin } from '@/skins';
+import { ConvertFromPhiEdit } from './converter/phiedit';
 
 const ParseJSON = (string: string): Nullable<unknown> => {
   try {
@@ -35,6 +36,9 @@ export class GameChartData {
       // Parse official chart
       if (!rawJson) throw new Error('Not a JSON chart file!');
       res(ConvertFromOfficial(rawJson as IChartOfficial));
+    }).catch(() => {
+      // Parse PhiEdit chart
+      res(ConvertFromPhiEdit(rawData));
     }).catch(() => {
       rej('Unsupported chart format');
     });

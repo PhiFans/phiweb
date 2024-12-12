@@ -6,9 +6,10 @@ import {
   arrangeEvents,
   parseFirstLayerEvents,
   calcLineFloorPosition,
-  convertEventsToClasses
+  convertEventsToClasses,
+  getFloorPositionByTime
 } from '@/utils/chart';
-import { EGameChartNoteType } from '@/chart/note';
+import { EGameChartNoteType, GameChartNote, IGameChartNote } from '@/chart/note';
 import { IGameChartEvent } from '@/chart/event';
 import { IGameChartEventLayer } from '@/chart/eventlayer';
 import {
@@ -17,7 +18,8 @@ import {
   IPhiEditCommandBase,
   TPhiEditLine,
   TPhiEditLineEvent,
-  TPhiEditLineEventSingle
+  TPhiEditLineEventSingle,
+  TPhiEditNoteHold
 } from './types';
 
 type TPhiEditLineEventSimple = { startBeat: number, endBeat: number };
@@ -230,6 +232,7 @@ export const ConvertFromPhiEdit = (_chartRaw: string) => {
   const bpmList: TPhiEditBPM[] = [];
   const noteList: TPhiEditNote[] = [];
   const lineList: Record<string, TPhiEditLine> = {};
+  const noteListNew: IGameChartNote[] = [];
   const lineListNew: Record<string, GameChartJudgeLine> = {};
 
   for (const command of chartRawArr) {
@@ -255,7 +258,7 @@ export const ConvertFromPhiEdit = (_chartRaw: string) => {
           ),
           lineID: parseNumber(commandArr[1], -1),
           startBeat: parseNumber(commandArr[2], 0),
-          positionX: parseNumber(commandArr[3], 0),
+          positionX: parseNumber(parseFloat(commandArr[3]) * 9 / 1024, 0),
           speed: 1,
           scaleX: 1,
           isAbove: commandArr[4] == '1',
@@ -269,7 +272,7 @@ export const ConvertFromPhiEdit = (_chartRaw: string) => {
           lineID: parseNumber(commandArr[1], -1),
           startBeat: parseNumber(commandArr[2], 0),
           endBeat: parseNumber(commandArr[3], 0),
-          positionX: parseNumber(commandArr[4], 0),
+          positionX: parseNumber(parseFloat(commandArr[4]) * 9 / 1024, 0),
           speed: 1,
           scaleX: 1,
           isAbove: commandArr[5] == '1',
@@ -375,7 +378,6 @@ export const ConvertFromPhiEdit = (_chartRaw: string) => {
   }
   parseBPM(bpmList);
 
-  console.log({ ...lineList });
   for (const lineID in lineList) {
     const newLine = new GameChartJudgeLine();
     const _newEvents: IGameChartEventLayer = {
@@ -445,10 +447,52 @@ export const ConvertFromPhiEdit = (_chartRaw: string) => {
     lineListNew[lineID] = newLine;
   }
 
-  console.log(bpmList);
-  console.log(noteList);
-  console.log(lineList);
+  noteList.sort((a, b) => a.startBeat - b.startBeat);
+  for (const oldNote of noteList) {
+    const line = lineListNew[oldNote.lineID];
+    if (!line) {
+      console.warn(`Line ID: ${oldNote.lineID} not found, skipping...`);
+      continue;
+    }
 
-  console.log(result);
+    const noteTime = calculateRealTime(bpmList, oldNote.startBeat);
+    const holdTimeLength = oldNote.type === 3 ? calculateRealTime(bpmList, (oldNote as TPhiEditNoteHold).endBeat) - noteTime : null;
+
+    noteListNew.push({
+      judgeline: line,
+      type: oldNote.type,
+      time: noteTime,
+      speed: oldNote.speed,
+      posX: oldNote.positionX,
+      floorPosition: 0,
+      isAbove: oldNote.isAbove,
+      isFake: oldNote.isFake,
+      isSameTime: false,
+      holdTime: holdTimeLength,
+      holdLength: null,
+    });
+  }
+
+  const sameTimeNote: Record<string, number> = {};
+  for (const note of noteListNew) sameTimeNote[`${note.time}`] = sameTimeNote[`${note.time}`] ? 2 : 1;
+  for (const oldNote of noteListNew) {
+    const floorPosition = getFloorPositionByTime(oldNote.judgeline, oldNote.time);
+    const holdLength = oldNote.type === 3 ? getFloorPositionByTime(oldNote.judgeline, (oldNote.time + oldNote.holdTime!)) - floorPosition : null;
+
+    result.notes.push(new GameChartNote(
+      oldNote.judgeline,
+      oldNote.type,
+      oldNote.isAbove,
+      oldNote.time,
+      oldNote.speed,
+      oldNote.posX,
+      sameTimeNote[`${oldNote.time}`] === 2,
+      floorPosition,
+      oldNote.isFake,
+      oldNote.holdTime,
+      holdLength
+    ));
+  }
+
   return result;
 };

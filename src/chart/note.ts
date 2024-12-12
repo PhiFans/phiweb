@@ -32,6 +32,7 @@ export interface IGameChartNote {
    */
   holdLength: Nullable<number>;
   posX: number;
+  isFake?: boolean,
 }
 
 const getNoteSkinTexture = (skin: GameSkin, type: string, useHighQuality = true, useHighlight = true) => {

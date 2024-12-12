@@ -165,7 +165,7 @@ export const ConvertFromPhiEdit = (_chartRaw: string) => {
           startBeat: parseNumber(commandArr[2], 0),
           endBeat: parseNumber(commandArr[3], 0),
           start: NaN,
-          end: parseNumber(commandArr[4], 0, 2),
+          end: parseNumber(parseInt(commandArr[4]) / 255, 0, 4),
           easing: 1,
         });
         break;
@@ -174,8 +174,8 @@ export const ConvertFromPhiEdit = (_chartRaw: string) => {
         pushEventToLine(lineList, commandArr[1], 'alpha', {
           startBeat: parseNumber(commandArr[2], 0),
           endBeat: NaN,
-          start: parseNumber(commandArr[3], 0, 2),
-          end: parseNumber(commandArr[3], 0, 2),
+          start: parseNumber(parseInt(commandArr[3]) / 255, 0, 4),
+          end: parseNumber(parseInt(commandArr[3]) / 255, 0, 4),
           easing: 1,
         });
         break;

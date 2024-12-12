@@ -1,6 +1,7 @@
 import { Container } from 'pixi.js';
 import { GameChart } from '.';
 import { GameChartEvent } from './event';
+import { EGameChartNoteType } from './note';
 
 interface IAreaPoint extends Array<number> {
   /** Start X */
@@ -104,12 +105,22 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
       isAbove,
       holdLength,
       holdFloorPosition,
-      isOfficial
+      isOfficial,
+      isFake
     } = note;
     const floorPositionDiff = (floorPosition - judgeline.floorPosition) * (type === 3 ? 1 : speed);
     const sprite = note.sprite!;
 
-    // TODO: Fake note support
+    if (
+      isFake &&
+      (
+        (type !== EGameChartNoteType.HOLD && currentTime >= time) ||
+        currentTime >= holdEndTime!
+      )
+    ) {
+      if (sprite.parent) sprite.removeFromParent();
+      continue;
+    }
     if (score.isScored && (score.isScoreAnimated || score.animationTime !== null)) continue;
     // TODO: Made as an option
     if (floorPositionDiff * 0.6 > 2 || (floorPositionDiff < 0 && time > currentTime)) {

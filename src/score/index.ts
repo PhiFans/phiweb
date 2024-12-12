@@ -74,7 +74,7 @@ export class GameScore {
   constructor(chart: GameChart, skin: GameSkin, containers: { game: Container, ui: Container }) {
     this.chart = chart;
     this.notes = this.chart.data.notes;
-    this.notesCount = this.notes.length; // TODO: Fake notes
+    this.notesCount = this.chart.data.notesTotalReal;
 
     const { game } = this.chart;
     const { renderer, audio, options } = game;

@@ -67,4 +67,12 @@ export class GameChartData {
 
     container.addChild(this.container);
   }
+
+  get notesTotal() {
+    return this.notes.length;
+  }
+
+  get notesTotalReal() {
+    return this.notes.filter(e => !e.isFake).length;
+  }
 }

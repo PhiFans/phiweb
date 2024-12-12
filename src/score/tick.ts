@@ -27,7 +27,8 @@ export function onScoreTick(this: GameScore, currentTime: number) {
 
   const { noteWidth } = size;
   for (const note of notes) {
-    const { time, score, type, holdEndTime, realPosX, realPosY, realLinePosX, realLinePosY, judgeline, sprite } = note;
+    const { time, score, type, holdEndTime, realPosX, realPosY, realLinePosX, realLinePosY, judgeline, sprite, isFake } = note;
+    if (isFake) continue;
     if (score.isScored && score.isScoreAnimated) continue;
 
     const timeBetween = time - currentTime,

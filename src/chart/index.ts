@@ -44,8 +44,8 @@ export class GameChart {
 
     for (const note of data.notes) {
       if (note.type === 3) {
-        // TODO: Support of the non-official hold rendering
-        const holdLength = ((note.holdTime! / 1000) * note.speed) * sizer.noteSpeed / sizer.noteScale;
+        const { isOfficial } = note;
+        const holdLength = (isOfficial ? note.holdTime! / 1000 * note.speed : note.holdLength!) * sizer.noteSpeed / sizer.noteScale;
         note.sprite!.children[1].height = holdLength;
         note.sprite!.children[2].position.y = -holdLength
       }

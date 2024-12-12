@@ -68,6 +68,11 @@ export class GameChartNote {
    */
   readonly holdFloorPosition: Nullable<number>;
   readonly posX: number;
+  readonly isFake: boolean;
+  /**
+   * Wether this note comes from official chart, used for hold length calculation.
+   */
+  readonly isOfficial: boolean;
 
   /** The real note position when on line. Only be used & calculaed when ticking */
   realLinePosX: number = 0;
@@ -107,8 +112,10 @@ export class GameChartNote {
     posX: number,
     isSameTime: boolean,
     floorPosition: number,
+    isFake: boolean = false,
     holdTime: Nullable<number>,
-    holdLength: Nullable<number>
+    holdLength: Nullable<number>,
+    isOfficial: boolean = false
   ) {
     this.judgeline = judgeline;
     this.type = type;
@@ -117,11 +124,13 @@ export class GameChartNote {
     this.holdTime = holdTime;
     this.speed = speed;
     this.posX = posX;
+    this.isFake = isFake;
     this.isSameTime = isSameTime;
     this.floorPosition = floorPosition;
     this.holdEndTime = this.type === EGameChartNoteType.HOLD ? this.time + this.holdTime! : null;
     this.holdLength = holdLength;
     this.holdFloorPosition = this.type === EGameChartNoteType.HOLD ? this.floorPosition + this.holdLength! : null;
+    this.isOfficial = isOfficial;
   }
 
   createSprite(game: Game, skin: GameSkin, zIndex: number = 24) {

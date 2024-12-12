@@ -92,10 +92,24 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
   const { size } = renderer;
   const { widthHalfBorder, heightHalfBorder } = size;
   for (const note of data.notes) {
-    const { score, judgeline, type, time, holdEndTime, posX: notePosX, floorPosition, speed, isAbove, holdLength } = note;
+    const {
+      score,
+      judgeline,
+      type,
+      time,
+      holdEndTime,
+      posX: notePosX,
+      floorPosition,
+      speed,
+      isAbove,
+      holdLength,
+      holdFloorPosition,
+      isOfficial
+    } = note;
     const floorPositionDiff = (floorPosition - judgeline.floorPosition) * (type === 3 ? 1 : speed);
     const sprite = note.sprite!;
 
+    // TODO: Fake note support
     if (score.isScored && (score.isScoreAnimated || score.animationTime !== null)) continue;
     // TODO: Made as an option
     if (floorPositionDiff * 0.6 > 2 || (floorPositionDiff < 0 && time > currentTime)) {
@@ -117,8 +131,9 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
     if (type === 3) {
       let realHoldLength = holdLength! * size.noteSpeed / size.noteScale;
       if (time <= currentTime) {
-        // TODO: Support of the non-official hold rendering
-        realHoldLength = ((holdEndTime! - currentTime) / 1000) * speed * size.noteSpeed / size.noteScale;
+        realHoldLength = (
+          isOfficial ? (holdEndTime! - currentTime) / 1000 * speed : (holdFloorPosition! - judgeline.floorPosition)
+        ) * size.noteSpeed / size.noteScale;
 
         const [ spriteHead, spriteBody, spriteEnd ] = sprite.children;
 

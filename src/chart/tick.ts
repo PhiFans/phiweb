@@ -108,7 +108,7 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
       isOfficial,
       isFake
     } = note;
-    const floorPositionDiff = (floorPosition - judgeline.floorPosition) * (type === 3 ? 1 : speed);
+    const floorPositionDiff = (floorPosition - judgeline.floorPosition) * (type === 3 && isOfficial ? 1 : speed);
     const sprite = note.sprite!;
 
     if (
@@ -143,8 +143,8 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
       let realHoldLength = holdLength! * size.noteSpeed / size.noteScale;
       if (time <= currentTime) {
         realHoldLength = (
-          isOfficial ? (holdEndTime! - currentTime) / 1000 * speed : (holdFloorPosition! - judgeline.floorPosition)
-        ) * size.noteSpeed / size.noteScale;
+          isOfficial ? (holdEndTime! - currentTime) / 1000 : (holdFloorPosition! - judgeline.floorPosition)
+        ) * speed * size.noteSpeed / size.noteScale;
 
         const [ spriteHead, spriteBody, spriteEnd ] = sprite.children;
 

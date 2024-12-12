@@ -1,6 +1,10 @@
 import { Graphics, Texture } from 'pixi.js';
-import { TGameSkinElementNumber } from '@/skins/types';
-import { TGameSkinElementFiledBaseArray } from '@/skins/types';
+import { TGameSkinElementNumber, TGameSkinElementNumberCombo, TGameSkinFileArray } from '@/skins/types';
+
+type TGameUITexturedNumberElement = (TGameSkinElementNumber | TGameSkinElementNumberCombo) & {
+  file: TGameSkinFileArray,
+  texture?: Record<string, Texture>,
+}
 
 const calculateTextureLength = (textures: Texture[]) => {
   let result = 0;
@@ -10,15 +14,14 @@ const calculateTextureLength = (textures: Texture[]) => {
 
 export class GameUITexturedNumber extends Graphics {
   private readonly textures: Record<string, Texture> = {};
-  readonly info: TGameSkinElementNumber;
+  readonly info: TGameUITexturedNumberElement;
 
   private _numberText: string = '';
   private _numberDigits: number = 0;
   private _numberDigitsMin: number = 0;
 
   // TODO: Skin meta
-  constructor(element: TGameSkinElementFiledBaseArray, minDigits: number = 0, label: string = '') {
-    if (element.type === 'combo-text' || element.type === 'hit-effect' || element.type === 'animation') throw new Error(`Unsupported type: ${element.type}`);
+  constructor(element: TGameUITexturedNumberElement, minDigits: number = 0, label: string = '') {
     super();
 
     const { texture: textures } = element;

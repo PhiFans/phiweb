@@ -1,11 +1,5 @@
 import { EGameChartNoteType } from "@/chart/note";
 
-export type TPhiEditBPM = {
-  startBeat: number,
-  bpm: number,
-  startTime?: number,
-};
-
 export type TPhiEditNoteBase = {
   type: EGameChartNoteType,
   lineID: number,
@@ -49,6 +43,10 @@ export type TPhiEditLineEventSingle = {
   startTime?: number,
   endTime?: number,
 }
+
+export type TPhiEditBPM = TPhiEditLineEventSingle & {
+  beatTime?: number,
+};
 
 export type TPhiEditNote = TPhiEditNoteBase | TPhiEditNoteHold;
 

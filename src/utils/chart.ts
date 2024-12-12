@@ -1,8 +1,8 @@
 import { GameChartJudgeLine } from '@/chart/judgeline';
-import { GameChartEventSingle } from '@/chart/event';
+import { GameChartEvent, GameChartEventSingle } from '@/chart/event';
 import { parseDoublePrecist } from './math';
 import { IGameChartEvent, IGameChartEventSingle } from '@/chart/event';
-import { IGameChartEventLayer } from '@/chart/eventlayer';
+import { GameChartEventLayer, IGameChartEventLayer } from '@/chart/eventlayer';
 import { Nullable } from './types';
 
 export const SortFn = (a: IGameChartEvent, b: IGameChartEvent) => a.startTime - b.startTime;
@@ -166,6 +166,46 @@ export const parseFirstLayerEvents = (events: IGameChartEventLayer) => {
   events.alpha = parseFirstLayerEvent<IGameChartEvent>(events.alpha);
 
   return events;
+};
+
+export const convertEventsToClasses = (events: IGameChartEventLayer) => {
+  const result = new GameChartEventLayer();
+
+  events.speed.forEach((e) => result.speed.push(new GameChartEventSingle(
+    e.startTime,
+    e.endTime,
+    e.value
+  )));
+
+  events.moveX.forEach((e) => result.moveX.push(new GameChartEvent(
+    e.startTime,
+    e.endTime,
+    e.start,
+    e.end
+  )));
+
+  events.moveY.forEach((e) => result.moveY.push(new GameChartEvent(
+    e.startTime,
+    e.endTime,
+    e.start,
+    e.end
+  )));
+
+  events.rotate.forEach((e) => result.rotate.push(new GameChartEvent(
+    e.startTime,
+    e.endTime,
+    e.start,
+    e.end
+  )));
+
+  events.alpha.forEach((e) => result.alpha.push(new GameChartEvent(
+    e.startTime,
+    e.endTime,
+    e.start,
+    e.end
+  )));
+
+  return result;
 };
 
 export const calcLineFloorPosition = (judgeline: GameChartJudgeLine) => {

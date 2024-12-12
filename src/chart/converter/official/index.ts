@@ -1,10 +1,9 @@
 import { GameChartData } from '@/chart/data';
 import { GameChartJudgeLine } from '@/chart/judgeline';
-import { sortEvents, arrangeEvents, parseFirstLayerEvents, calcLineFloorPosition, getFloorPositionByTime } from '@/utils/chart';
+import { sortEvents, arrangeEvents, parseFirstLayerEvents, calcLineFloorPosition, getFloorPositionByTime, convertEventsToClasses } from '@/utils/chart';
 import { parseDoublePrecist } from '@/utils/math';
 import { IChartOfficial } from './types';
-import { GameChartEvent, GameChartEventSingle } from '@/chart/event';
-import { GameChartEventLayer, IGameChartEventLayer } from '@/chart/eventlayer';
+import { IGameChartEventLayer } from '@/chart/eventlayer';
 import { EGameChartNoteType, GameChartNote, IGameChartNote } from '@/chart/note';
 
 const calcRealTime = (time: number, bpm: number) => Math.floor(time / bpm * 1875);
@@ -62,46 +61,6 @@ const ConvertOfficialChartVersion = (chart: IChartOfficial) => {
   }
   return result;
 };
-
-const convertEventsToClasses = (events: IGameChartEventLayer) => {
-  const result = new GameChartEventLayer();
-
-  events.speed.forEach((e) => result.speed.push(new GameChartEventSingle(
-    e.startTime,
-    e.endTime,
-    e.value
-  )));
-
-  events.moveX.forEach((e) => result.moveX.push(new GameChartEvent(
-    e.startTime,
-    e.endTime,
-    e.start,
-    e.end
-  )));
-
-  events.moveY.forEach((e) => result.moveY.push(new GameChartEvent(
-    e.startTime,
-    e.endTime,
-    e.start,
-    e.end
-  )));
-
-  events.rotate.forEach((e) => result.rotate.push(new GameChartEvent(
-    e.startTime,
-    e.endTime,
-    e.start,
-    e.end
-  )));
-
-  events.alpha.forEach((e) => result.alpha.push(new GameChartEvent(
-    e.startTime,
-    e.endTime,
-    e.start,
-    e.end
-  )));
-
-  return result;
-}
 
 export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
   const chartRaw = ConvertOfficialChartVersion(_chartRaw);

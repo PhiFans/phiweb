@@ -146,12 +146,12 @@ const parseNullEventTime = (events: TPhiEditLineEventSimple[]) => {
 };
 
 const parseNullEvent = (events: TPhiEditLineEvent[]) => {
-  for (let i = 1; i < events.length; i++) {
+  for (let i = 0; i < events.length; i++) {
     const lastEvent = events[i - 1];
     const event = events[i];
 
     if (!isNaN(event.start)) continue;
-    event.start = lastEvent.end;
+    event.start = lastEvent ? lastEvent.end : 0;
   }
 
   return events;
@@ -375,6 +375,7 @@ export const ConvertFromPhiEdit = (_chartRaw: string) => {
   }
   parseBPM(bpmList);
 
+  console.log({ ...lineList });
   for (const lineID in lineList) {
     const newLine = new GameChartJudgeLine();
     const _newEvents: IGameChartEventLayer = {
@@ -435,7 +436,7 @@ export const ConvertFromPhiEdit = (_chartRaw: string) => {
     });
 
     sortLineEvents(_newEvents);
-    arrangeEvents(_newEvents); // TODO: Need fix this
+    arrangeEvents(_newEvents);
     parseFirstLayerEvents(_newEvents);
     newLine.eventLayers.push(convertEventsToClasses(_newEvents));
     calcLineFloorPosition(newLine);

@@ -153,9 +153,30 @@ export const arrangeEvents = (events: IGameChartEventLayer) => {
 };
 
 export const parseFirstLayerEvents = (events: IGameChartEventLayer) => {
-  const parseFirstLayerEvent = <T extends { startTime: number, endTime: number }>(events: T[]) => {
-    events[0].startTime = -Infinity;
-    events[events.length - 1].endTime = Infinity;
+  const parseFirstLayerEvent = <T extends (IGameChartEvent | IGameChartEventSingle)>(events: T[]) => {
+    const startEvent = events[0] as IGameChartEvent;
+    const endEvent = events[events.length - 1] as IGameChartEvent;
+
+    if (!isNaN(startEvent.start)) {
+      if (startEvent.start === startEvent.end) events[0].startTime = -Infinity;
+      else (events as IGameChartEvent[]).unshift({
+        startTime: -Infinity,
+        endTime: startEvent.startTime,
+        start: startEvent.start,
+        end: startEvent.start
+      });
+      if (endEvent.start === endEvent.end) events[events.length - 1].endTime = Infinity;
+      else (events as IGameChartEvent[]).push({
+        startTime: endEvent.endTime,
+        endTime: Infinity,
+        start: endEvent.end,
+        end: endEvent.end
+      });
+    } else {
+      events[0].startTime = -Infinity;
+      events[events.length - 1].endTime = Infinity;
+    }
+
     return events;
   };
 

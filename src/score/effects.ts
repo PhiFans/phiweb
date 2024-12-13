@@ -108,6 +108,7 @@ export class GameScoreEffects {
     noteType: EGameChartNoteType = 1
   ) {
     const { size, audioChannel, skin, skinTextures, container, particles } = this;
+    const { widthOffset, noteScale } = size;
     const { sounds } = skin;
     const { hitEffects, hitParticle } = skinTextures;
     const { playlist } = audioChannel;
@@ -116,9 +117,9 @@ export class GameScoreEffects {
       // const { speed } = hitEffect;
       const animation = new AnimatedSprite(hitEffects, true);
 
-      animation.position.set(x, y);
+      animation.position.set(widthOffset + x, y);
       animation.anchor.set(0.5);
-      animation.scale.set(size.noteScale * 5.6)
+      animation.scale.set(noteScale * 5.6);
       animation.tint = judgeType === 3 ? 0xFFECA0 : 0xB4E1FF;
       animation.animationSpeed = 1 /** speed */;
       animation.loop = false;

@@ -41,7 +41,7 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
   const { data, game } = this;
 
   const { renderer } = game;
-  const { widthHalf, heightHalf } = renderer.size;
+  const { widthHalf, widthOffset, heightHalf } = renderer.size;
 
   for (const line of data.lines) {
     const { eventLayers } = line;
@@ -83,9 +83,11 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
     line.radian = line.angle * (Math.PI / 180);
     line.cosr = Math.cos(line.radian);
     line.sinr = Math.sin(line.radian);
+    line.realPosX = line.posX * widthHalf;
+    line.realPosY = line.posY * heightHalf;
 
-    sprite.position.x = line.realPosX = line.posX * widthHalf;
-    sprite.position.y = line.realPosY = line.posY * heightHalf;
+    sprite.position.x = widthOffset + line.realPosX;
+    sprite.position.y = line.realPosY;
     sprite.angle = line.angle;
     sprite.alpha = line.alpha;
   }
@@ -170,7 +172,7 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
       continue;
     }
 
-    sprite.position.set(note.realPosX, note.realPosY);
+    sprite.position.set(widthOffset + note.realPosX, note.realPosY);
     sprite.angle = judgeline.angle + (isAbove ? 0 : 180);
     if (!sprite.parent) container.addChild(sprite);
   }

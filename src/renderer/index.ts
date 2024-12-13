@@ -20,6 +20,12 @@ export interface IGameRendererSize {
   height: number,
   widthHalf: number,
   heightHalf: number,
+  /** The real width of the screen */
+  widthReal: number,
+  /** The real half width of the screen */
+  widthRealHalf: number,
+  /** `widthRealHalf - widthHalf` */
+  widthOffset: number,
   widthPercent: number,
   /** Used for culling notes */
   widthHalfBorder: number,
@@ -51,6 +57,9 @@ export class GameRenderer {
     height: 0,
     widthHalf: 0,
     heightHalf: 0,
+    widthReal: 0,
+    widthRealHalf: 0,
+    widthOffset: 0,
     widthPercent: 0,
     widthHalfBorder: 0,
     heightHalfBorder: 0,
@@ -130,11 +139,16 @@ export class GameRenderer {
 
     const { size } = this;
 
-    size.width = width;
+    size.widthReal = width;
     size.height = height;
 
-    size.widthHalf = size.width / 2;
+    size.widthRealHalf = size.widthReal / 2;
     size.heightHalf = size.height / 2;
+
+    // TODO: Made as an option?
+    size.width = size.height / 9 * 16 >= size.widthReal ? size.widthReal : size.height / 9 * 16;
+    size.widthHalf = size.width / 2;
+    size.widthOffset = size.widthRealHalf - size.widthHalf;
 
     size.widthHalfBorder = size.widthHalf * 1.2;
     size.heightHalfBorder = size.heightHalf * 1.2;

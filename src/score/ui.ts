@@ -107,11 +107,11 @@ export class GameScoreUI {
 
   resize(size: IGameRendererSize) {
     const { elements } = this;
-    const { heightPercent, width, widthHalf, height, heightHalf } = size;
+    const { heightPercent, width, widthHalf, widthOffset, height, heightHalf } = size;
 
     for (const e of elements) {
       const { stickTo, position, scale, sprite } = e;
-      const posX = (
+      const posX = widthOffset + (
         stickTo.x === 'left' ? position.x * heightPercent :
         stickTo.x === 'center' ? widthHalf + position.x * heightPercent :
         width - position.x * heightPercent

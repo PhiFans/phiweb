@@ -1,5 +1,5 @@
 import { Game } from '@/game';
-import { autoDetectRenderer, isWebGPUSupported, Container, Ticker, Rectangle } from 'pixi.js';
+import { autoDetectRenderer, isWebGPUSupported, Container, Ticker, Rectangle, Graphics } from 'pixi.js';
 import type { Renderer, AutoDetectOptions } from 'pixi.js';
 
 const DefaultRendererOptions: Partial<AutoDetectOptions> = {
@@ -14,6 +14,12 @@ const DefaultRendererOptions: Partial<AutoDetectOptions> = {
 };
 export let isWebGPUAvailable: boolean = false;
 isWebGPUSupported().then((result) => isWebGPUAvailable = result);
+
+const CreateContainerMask = (x: number, y: number, width: number, height: number) => {
+  return new Graphics()
+    .rect(x, y, width, height)
+    .fill(0xFFFFFF);
+};
 
 export interface IGameRendererSize {
   width: number,
@@ -137,7 +143,7 @@ export class GameRenderer {
   resize(width: number, height: number, resolution: number = window.devicePixelRatio) {
     this.renderer.resize(width, height, resolution);
 
-    const { size } = this;
+    const { size, containers } = this;
 
     size.widthReal = width;
     size.height = height;
@@ -178,7 +184,9 @@ export class GameRenderer {
     // this.containers.game.boundsArea = this._stageRectangleGame;
     // this.containers.game.cullArea = this._stageRectangleGame;
 
-    this.containers.game.position.set(this.size.widthHalf, this.size.heightHalf);
+    containers.game.position.set(this.size.widthHalf, this.size.heightHalf);
+    if (size.widthOffset <= 0) containers.game.mask = null;
+    else containers.game.mask = CreateContainerMask(size.widthOffset, 0, size.width, size.height);
   }
 
   get canvas() {

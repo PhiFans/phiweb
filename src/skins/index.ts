@@ -2,7 +2,7 @@ import JSZip from 'jszip';
 import { Game } from '@/game';
 import { JSZipFiles, JSZipFilesMap } from './types';
 import { Texture } from 'pixi.js';
-import { ReadFileAsAudioBuffer } from '@/utils/file';
+import { ReadFileAsAudioBuffer, generateImageBitmap } from '@/utils/file';
 import { GameAudio } from '@/audio';
 import {
   IGameSkinMeta,
@@ -165,7 +165,7 @@ export class GameSkin {
       if (element.type === 'image') {
         promise = new Promise((res, rej) => {
           const file = element.file[qualityName];
-          window.createImageBitmap(file)
+          generateImageBitmap(file, useHighQuality ? 1 : 2)
             .then((bitmap) => {
               const result = Texture.from(bitmap);
               result.label = `${name}: ${file.name}`,
@@ -183,7 +183,7 @@ export class GameSkin {
           for (const name in files) {
             const file = files[name];
             subPromises.push(new Promise((res, rej) => {
-              window.createImageBitmap(file)
+              generateImageBitmap(file, useHighQuality ? 1 : 2)
                 .then((bitmap) => {
                   const result = Texture.from(bitmap);
                   result.label = `${name}: ${file.name}`,
@@ -207,7 +207,7 @@ export class GameSkin {
 
     for (const playfield of playfields) {
       promisePlayfields.push(new Promise((res, rej) => {
-        window.createImageBitmap(playfield.file)
+        generateImageBitmap(playfield.file, useHighQuality ? 1 : 2)
           .then((bitmap) => {
             const result = Texture.from(bitmap);
             result.label = `${name}: ${playfield.file.name}`;

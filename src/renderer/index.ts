@@ -161,7 +161,7 @@ export class GameRenderer {
 
     size.widthPercent = size.width * (9 / 160);
 
-    size.noteScale = size.width / 8080 * (this.game.options.useHighQualitySkin ? 1 : 2); // TODO: Settings
+    size.noteScale = size.width / 8080; // TODO: Settings
     size.noteWidth = size.width * 0.117775;
     size.noteSpeed = size.height * 0.6;
 

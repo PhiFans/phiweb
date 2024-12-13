@@ -57,6 +57,24 @@ export const ReadFileAsAudioBuffer = (file: File | Blob): Promise<AudioBuffer> =
   }
 });
 
+export const generateImageBitmap = (file: Blob, scale?: number): Promise<ImageBitmap> => new Promise(async (res, rej) => {
+  try {
+    const orig = await window.createImageBitmap(file);
+    if (!scale || scale === 1) return res(orig);
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d')!;
+
+    canvas.width = orig.width * scale;
+    canvas.height = orig.height * scale;
+
+    ctx.drawImage(orig, 0, 0, canvas.width, canvas.height);
+    return res(await window.createImageBitmap(canvas));
+  } catch (e) {
+    rej(e);
+  }
+});
+
 export const decodeFile = (file: File): Promise<IFile | File[]> => new Promise((res, rej) => {
   (new Promise(() => {
     throw new Error('Promise chain!');

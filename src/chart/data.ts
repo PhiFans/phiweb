@@ -24,7 +24,7 @@ export class GameChartData {
   container?: Container;
 
   constructor(offset: number) {
-    this.offset = Math.round(offset);
+    this.offset = Math.floor(offset);
   }
 
   static from(rawData: string): Promise<GameChartData> {return new Promise((res, rej) => {

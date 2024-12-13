@@ -105,11 +105,11 @@ const parseBPM = (BPMs: TPhiEditBPM[]) => {
 
     bpm.endBeat = nextBPM ? nextBPM.startBeat : Infinity;
 
-    bpmChangedTime = parseDoublePrecist(bpmChangedTime + currentBeatRealTime * (bpm.startBeat - bpmChangedBeat));
+    bpmChangedTime = parseDoublePrecist(bpmChangedTime + currentBeatRealTime * (bpm.startBeat - bpmChangedBeat), 6, false);
     bpm.startTime = bpmChangedTime;
-    bpm.beatTime = Math.round(60000 / bpm.value);
+    bpm.beatTime = parseDoublePrecist(60000 / bpm.value, 6, false);
 
-    bpmChangedBeat = parseDoublePrecist(bpmChangedBeat + (bpm.startBeat - bpmChangedBeat));
+    bpmChangedBeat = parseDoublePrecist(bpmChangedBeat + (bpm.startBeat - bpmChangedBeat), 6, false);
     currentBeatRealTime = bpm.beatTime;
   }
 
@@ -123,7 +123,7 @@ const calculateRealTime = (BPMs: TPhiEditBPM[], beat: number) => {
     if (bpm.endBeat <= beat) continue;
     if (bpm.startBeat > beat) break;
 
-    return Math.round(bpm.startTime! + ((beat - bpm.startBeat) * bpm.beatTime!));
+    return Math.floor(bpm.startTime! + ((beat - bpm.startBeat) * bpm.beatTime!));
   }
 
   throw new Error(`Cannot found BPM for beat ${beat}`);
@@ -477,7 +477,7 @@ export const ConvertFromPhiEdit = (_chartRaw: string) => {
   for (const note of noteListNew) sameTimeNote[`${note.time}`] = sameTimeNote[`${note.time}`] ? 2 : 1;
   for (const oldNote of noteListNew) {
     const floorPosition = getFloorPositionByTime(oldNote.judgeline, oldNote.time);
-    const holdLength = oldNote.type === 3 ? getFloorPositionByTime(oldNote.judgeline, (oldNote.time + oldNote.holdTime!)) - floorPosition : null;
+    const holdLength = oldNote.type === 3 ? parseDoublePrecist(getFloorPositionByTime(oldNote.judgeline, (oldNote.time + oldNote.holdTime!)) - floorPosition, 3, false) : null;
 
     result.notes.push(new GameChartNote(
       oldNote.judgeline,

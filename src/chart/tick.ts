@@ -59,15 +59,31 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
     line.alpha = 0;
 
     for (const layer of eventLayers) {
-      layer._posX = valueCalculator(layer.moveX, currentTime, layer._posX);
-      layer._posY = valueCalculator(layer.moveY, currentTime, layer._posY);
-      layer._angle = valueCalculator(layer.rotate, currentTime, layer._angle);
-      layer._alpha = valueCalculator(layer.alpha, currentTime, layer._alpha);
+      const {
+        moveX,
+        moveY,
+        rotate,
+        alpha,
+        speed,
 
-      for (const event of layer.speed) {
+        _posX,
+        _posY,
+        _angle,
+        _alpha
+      } = layer;
+
+      layer._posX = valueCalculator(moveX, currentTime, _posX);
+      layer._posY = valueCalculator(moveY, currentTime, _posY);
+      layer._angle = valueCalculator(rotate, currentTime, _angle);
+      layer._alpha = valueCalculator(alpha, currentTime, _alpha);
+
+      for (let i = speed.lastIndex, l = speed.length; i < l; i++) {
+        const event = speed[i];
+
         if (event.endTime <= currentTime) continue;
         if (event.startTime > currentTime) break;
 
+        speed.lastIndex = i;
         layer._speed = event.value;
       }
 

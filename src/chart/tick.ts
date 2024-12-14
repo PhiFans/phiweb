@@ -1,6 +1,7 @@
 import { Container } from 'pixi.js';
 import { GameChart } from '.';
 import { GameChartEvent } from './event';
+import { ArrayIndexed } from '@/utils/class';
 import { EGameChartNoteType } from './note';
 
 interface IAreaPoint extends Array<number> {
@@ -14,10 +15,14 @@ interface IAreaPoint extends Array<number> {
   3: number,
 }
 
-const valueCalculator = (events: GameChartEvent[], currentTime: number, defaultValue = 0) => {
-  for (const event of events) {
+const valueCalculator = (events: ArrayIndexed<GameChartEvent>, currentTime: number, defaultValue = 0) => {
+  const { lastIndex, length } = events;
+  for (let i = lastIndex, l = length; i < l; i++) {
+    const event = events[i];
     if (event.endTime <= currentTime) continue;
     if (event.startTime > currentTime) break;
+
+    events.lastIndex = i;
     if (event.start === event.end) return event.start;
 
     const timePercentEnd = (currentTime - event.startTime) / (event.endTime - event.startTime);

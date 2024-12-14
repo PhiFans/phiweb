@@ -34,6 +34,7 @@ export type TRPEChartLine = {
   Name: string,
   Texture: string,
   eventLayers: TRPEChartEventLayer[],
+  notes: TRPEChartNote[],
   father: number,
   isCover: number,
   bpmfactor: number,

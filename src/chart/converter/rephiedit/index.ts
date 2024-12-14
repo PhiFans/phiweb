@@ -3,10 +3,11 @@ import { GameChartData } from '@/chart/data';
 import { TRPEChart, TRPEChartBeat, TRPEChartBPM, TRPEChartEvent, TRPEChartEventBase } from './types';
 import { IGameChartEventLayer } from '@/chart/eventlayer';
 import { parseDoublePrecist } from '@/utils/math';
-import { arrangeEvents, calcLineFloorPosition, convertEventsToClasses, parseFirstLayerEvents, sortEvents as sortLineEvents } from '@/utils/chart';
-import { TChartBPM, TChartEventLayer, TChartLine } from '../types';
+import { arrangeEvents, calcLineFloorPosition, convertEventsToClasses, getFloorPositionByTime, parseFirstLayerEvents, sortEvents as sortLineEvents } from '@/utils/chart';
+import { TChartBPM } from '../types';
 import { IGameChartEvent, IGameChartEventSingle } from '@/chart/event';
 import { GameChartJudgeLine } from '@/chart/judgeline';
+import { EGameChartNoteType, GameChartNote, IGameChartNote } from '@/chart/note';
 
 type TimeExtra = { startBeat: number, endBeat: number };
 
@@ -202,6 +203,7 @@ export const ConvertFromRePhiEdit = (_chartRaw: TRPEChart) => {
   if (!_chartRaw.META.RPEVersion || isNaN(_chartRaw.META.RPEVersion)) throw new Error('Not a valid Re:PhiEdit chart');
   const result = new GameChartData(_chartRaw.META.offset);
   const bpmList: TChartBPM[] = parseBPM(_chartRaw.BPMList);
+  const noteList: IGameChartNote[] = [];
 
   // Parse lines
   _chartRaw.judgeLineList.forEach((oldLine) => {
@@ -210,6 +212,8 @@ export const ConvertFromRePhiEdit = (_chartRaw: TRPEChart) => {
 
     // Parse line events
     oldLine.eventLayers.forEach((oldLayer, layerIndex) => {
+      if (!oldLayer) return;
+
       const newEvents: IGameChartEventLayer = {
         speed: [],
         moveX: [],
@@ -270,9 +274,55 @@ export const ConvertFromRePhiEdit = (_chartRaw: TRPEChart) => {
 
     calcLineFloorPosition(newLine);
     result.lines.push(newLine);
+
+    // Parse notes
+    if (oldLine.notes) oldLine.notes.forEach((oldNote) => {
+      const realTime = calculateRealTime(bpmList, beatToNumber(oldNote.startTime));
+      const holdTime = oldNote.type === 2 ? Math.floor(calculateRealTime(bpmList, beatToNumber(oldNote.endTime)) - realTime) : null;
+
+      // TODO: xScale, yOffset, etc.
+      noteList.push({
+        judgeline: newLine,
+        type: (
+          oldNote.type === 1 ? EGameChartNoteType.TAP :
+          oldNote.type === 2 ? EGameChartNoteType.HOLD :
+          oldNote.type === 3 ? EGameChartNoteType.FLICK :
+          oldNote.type === 4 ? EGameChartNoteType.DRAG : EGameChartNoteType.TAP
+        ),
+        time: realTime,
+        holdTime: holdTime,
+        speed: oldNote.speed,
+        posX: parseDoublePrecist(oldNote.positionX / (675 * (9 / 80)), 6),
+        isAbove: oldNote.above === 1,
+        isFake: oldNote.isFake === 1,
+        isSameTime: false,
+        floorPosition: 0,
+        holdLength: null,
+      });
+    });
   });
 
-  console.log(_chartRaw);
-  console.log(result);
+  noteList.sort((a, b) => a.time - b.time);
+  const sameTimeNote: Record<string, number> = {};
+  for (const note of noteList) sameTimeNote[`${note.time}`] = sameTimeNote[`${note.time}`] ? 2 : 1;
+  for (const oldNote of noteList) {
+    const floorPosition = getFloorPositionByTime(oldNote.judgeline, oldNote.time);
+    const holdLength = oldNote.type === 3 ? parseDoublePrecist(getFloorPositionByTime(oldNote.judgeline, (oldNote.time + oldNote.holdTime!)) - floorPosition, 3, false) : null;
+
+    result.notes.push(new GameChartNote(
+      oldNote.judgeline,
+      oldNote.type,
+      oldNote.isAbove,
+      oldNote.time,
+      oldNote.speed,
+      oldNote.posX,
+      sameTimeNote[`${oldNote.time}`] === 2,
+      floorPosition,
+      oldNote.isFake,
+      oldNote.holdTime,
+      holdLength
+    ));
+  }
+
   return result;
 };

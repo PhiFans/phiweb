@@ -20,6 +20,7 @@
     "@pixi/layout": "^2.0.1",
     "@pixi/ui": "^2.1.5",
     "audio-decode": "^2.2.2",
+    "bezier-easing": "^2.1.0",
     "jszip": "^3.10.1",
     "pixi.js": "^8.5.2"
   }

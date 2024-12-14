@@ -105,11 +105,11 @@ const parseBPM = (BPMs: TPhiEditBPM[]) => {
 
     bpm.endBeat = nextBPM ? nextBPM.startBeat : Infinity;
 
-    bpmChangedTime = parseDoublePrecist(bpmChangedTime + currentBeatRealTime * (bpm.startBeat - bpmChangedBeat), 6, false);
+    bpmChangedTime = parseDoublePrecist(bpmChangedTime + currentBeatRealTime * (bpm.startBeat - bpmChangedBeat), 6, -1);
     bpm.startTime = bpmChangedTime;
-    bpm.beatTime = parseDoublePrecist(60000 / bpm.value, 6, false);
+    bpm.beatTime = parseDoublePrecist(60000 / bpm.value, 6, -1);
 
-    bpmChangedBeat = parseDoublePrecist(bpmChangedBeat + (bpm.startBeat - bpmChangedBeat), 6, false);
+    bpmChangedBeat = parseDoublePrecist(bpmChangedBeat + (bpm.startBeat - bpmChangedBeat), 6, -1);
     currentBeatRealTime = bpm.beatTime;
   }
 
@@ -477,7 +477,7 @@ export const ConvertFromPhiEdit = (_chartRaw: string) => {
   for (const note of noteListNew) sameTimeNote[`${note.time}`] = sameTimeNote[`${note.time}`] ? 2 : 1;
   for (const oldNote of noteListNew) {
     const floorPosition = getFloorPositionByTime(oldNote.judgeline, oldNote.time);
-    const holdLength = oldNote.type === 3 ? parseDoublePrecist(getFloorPositionByTime(oldNote.judgeline, (oldNote.time + oldNote.holdTime!)) - floorPosition, 3, false) : null;
+    const holdLength = oldNote.type === 3 ? parseDoublePrecist(getFloorPositionByTime(oldNote.judgeline, (oldNote.time + oldNote.holdTime!)) - floorPosition, 3, -1) : null;
 
     result.notes.push(new GameChartNote(
       oldNote.judgeline,

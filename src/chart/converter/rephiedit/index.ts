@@ -42,7 +42,7 @@ const Easings: ((x: number) => number)[] = [
   (x) => x < 0.5 ? (1 - Easings[25](1 - 2 * x)) / 2 : (1 + Easings[25](2 * x - 1)) / 2
 ];
 
-const beatToNumber = (beatArray: TRPEChartBeat) => parseDoublePrecist(beatArray[0] + (beatArray[1] / beatArray[2]), 6, false);
+const beatToNumber = (beatArray: TRPEChartBeat) => parseDoublePrecist(beatArray[0] + (beatArray[1] / beatArray[2]), 6, -1);
 const sortEvents = <T extends { startTime: TRPEChartBeat }>(events: T[]) => {
   return events.sort((a, b) => beatToNumber(a.startTime) - beatToNumber(b.startTime));
 }
@@ -62,9 +62,9 @@ const parseBPM = (oldBPMs: TRPEChartBPM[]) => {
     const startBeat = beatToNumber(oldBPM.startTime);
     const endBeat = nextOldBPM ? beatToNumber(nextOldBPM.startTime) : Infinity;
 
-    bpmChangedTime = parseDoublePrecist(bpmChangedTime + currentBeatRealTime * (startBeat - bpmChangedBeat), 6, false);
-    bpmChangedBeat = parseDoublePrecist(bpmChangedBeat + (startBeat - bpmChangedBeat), 6, false);
-    currentBeatRealTime = parseDoublePrecist(60000 / oldBPM.bpm, 6, false);
+    bpmChangedTime = parseDoublePrecist(bpmChangedTime + currentBeatRealTime * (startBeat - bpmChangedBeat), 6, -1);
+    bpmChangedBeat = parseDoublePrecist(bpmChangedBeat + (startBeat - bpmChangedBeat), 6, -1);
+    currentBeatRealTime = parseDoublePrecist(60000 / oldBPM.bpm, 6, -1);
 
     result.push({
       startBeat: startBeat,
@@ -157,8 +157,8 @@ const calculateSpeedEventEase = (eventOld: TRPEChartEventBase): IGameChartEventS
   const result: IGameChartEventSingle[] = [];
 
   for (let i = 0, timeCount = Math.ceil(beatBetween / 0.125); i < timeCount; i++) {
-    const currentBeat = parseDoublePrecist(startBeat + 0.125 * i, 6, false);
-    const nextBeat = (i + 1 < timeCount) ? parseDoublePrecist(startBeat + 0.125 * (i + 1), 6, false) : endBeat;
+    const currentBeat = parseDoublePrecist(startBeat + 0.125 * i, 6, -1);
+    const nextBeat = (i + 1 < timeCount) ? parseDoublePrecist(startBeat + 0.125 * (i + 1), 6, -1) : endBeat;
 
     result.push({
       startTime: currentBeat,
@@ -179,7 +179,7 @@ const calculateSpeedEventEase = (eventOld: TRPEChartEventBase): IGameChartEventS
 
   result.push({
     startTime: endBeat,
-    endTime: parseDoublePrecist(endBeat + 0.125, 6, false),
+    endTime: parseDoublePrecist(endBeat + 0.125, 6, -1),
     value: event.end,
   });
   return result;
@@ -307,7 +307,7 @@ export const ConvertFromRePhiEdit = (_chartRaw: TRPEChart) => {
   for (const note of noteList) sameTimeNote[`${note.time}`] = sameTimeNote[`${note.time}`] ? 2 : 1;
   for (const oldNote of noteList) {
     const floorPosition = getFloorPositionByTime(oldNote.judgeline, oldNote.time);
-    const holdLength = oldNote.type === 3 ? parseDoublePrecist(getFloorPositionByTime(oldNote.judgeline, (oldNote.time + oldNote.holdTime!)) - floorPosition, 3, false) : null;
+    const holdLength = oldNote.type === 3 ? parseDoublePrecist(getFloorPositionByTime(oldNote.judgeline, (oldNote.time + oldNote.holdTime!)) - floorPosition, 3, -1) : null;
 
     result.notes.push(new GameChartNote(
       oldNote.judgeline,

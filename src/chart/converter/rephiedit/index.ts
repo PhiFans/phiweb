@@ -225,8 +225,8 @@ export const ConvertFromRePhiEdit = (_chartRaw: TRPEChart) => {
       if (oldLayer.speedEvents) oldLayer.speedEvents.forEach((oldEvent) => {
         newEvents.speed.push(...calculateSpeedEventEase({
           ...oldEvent,
-          start: parseDoublePrecist(oldEvent.start / (0.6 / (120 / 900)), 6),
-          end: parseDoublePrecist(oldEvent.end / (0.6 / (120 / 900)), 6),
+          start: parseDoublePrecist(oldEvent.start / 4.5, 6),
+          end: parseDoublePrecist(oldEvent.end / 4.5, 6),
         }).map((e) => ({
           ...e,
           startTime: calculateRealTime(bpmList, e.startTime),

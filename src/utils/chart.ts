@@ -268,7 +268,7 @@ export const calcLineFloorPosition = (judgeline: GameChartJudgeLine) => {
     event.value = currentFloorPosition;
     event.endTime = eventNext ? eventNext.startTime : Infinity;
 
-    if (eventNext) currentFloorPosition = parseDoublePrecist(currentFloorPosition + ((eventNext.startTime - event.startTime) / 1000) * getLineSpeedValueByTime(judgeline, event.startTime), 3);
+    if (eventNext) currentFloorPosition = parseDoublePrecist(currentFloorPosition + ((eventNext.startTime - event.startTime) / 1000) * getLineSpeedValueByTime(judgeline, event.startTime), 3, false);
   }
 
   floorPositions.forEach((event) => judgeline.floorPositions.push(new GameChartEventSingle(

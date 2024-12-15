@@ -19,10 +19,12 @@ const valueCalculator = (events: ArrayIndexed<GameChartEvent>, currentTime: numb
   const { lastIndex, length } = events;
 
   if (length === 0) return defaultValue;
-  else if (lastIndex + 1 === length) return events[length - 1].end;
   else for (let i = lastIndex, l = length; i < l; i++) {
     const event = events[i];
-    if (event.endTime <= currentTime) continue;
+    if (event.endTime <= currentTime) {
+      if (i + 1 === length) return events[length - 1].end;
+      continue;
+    }
     if (event.startTime > currentTime) return i !== 0 ? events[i - 1].end : defaultValue;
 
     events.lastIndex = i;
@@ -81,11 +83,13 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
       layer._alpha = valueCalculator(alpha, currentTime, _alpha);
 
       if (speed.length !== 0) {
-        if (speed.lastIndex + 1 === speed.length) layer._speed = speed[speed.length - 1].value;
-        else for (let i = speed.lastIndex, l = speed.length; i < l; i++) {
+        for (let i = speed.lastIndex, l = speed.length; i < l; i++) {
           const event = speed[i];
 
-          if (event.endTime <= currentTime) continue;
+          if (event.endTime <= currentTime) {
+            if (i + 1 === speed.length) layer._speed = speed[i].value;
+            continue;
+          }
           if (event.startTime > currentTime) break;
 
           speed.lastIndex = i;

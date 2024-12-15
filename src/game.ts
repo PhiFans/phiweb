@@ -7,6 +7,7 @@ import { GameFiles } from './files';
 import { GameChart } from './chart';
 import { GameChartData } from './chart/data';
 import { GameAudioClip } from './audio/clip';
+import { EGameScoreJudgeType } from './score/types';
 
 export class Game {
   readonly renderer: GameRenderer = new GameRenderer(this);
@@ -67,6 +68,37 @@ export class Game {
     res(this.chart);
     console.log(this);
   })}
+
+  /**
+   * @param seconds Seek seconds
+   */
+  seekChart(seconds: number) {
+    if (!this.chart) return;
+    if (!this.options.autoPlay) return;
+
+    const seekTime = seconds * 1000;
+    const { data, audio, score } = this.chart;
+    const { lines, notes } = data;
+
+    audio.seek(seconds);
+    score.reset();
+
+    for (const line of lines) line.reset();
+    for (const note of notes) {
+      note.reset();
+      if (
+        note.time <= seekTime &&
+        (note.type !== 3 || note.holdEndTime! <= seekTime)
+      ) {
+        note.score.isScored = true;
+        note.score.isScoreAnimated = true;
+        note.score.score = EGameScoreJudgeType.PERFECT;
+        if (note.sprite!.parent) note.sprite!.removeFromParent();
+      }
+    }
+
+    this.chart.reszie(this.renderer.size);
+  }
 
   get resolution() {
     return this.videoOptions.resolution || window.devicePixelRatio;

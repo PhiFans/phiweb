@@ -144,6 +144,24 @@ export class GameChartNote {
     this.sprite!.label = 'Note';
   }
 
+  reset() {
+    this.realLinePosX = 0;
+    this.realLinePosY = 0;
+
+    this.realPosX = 0;
+    this.realPosY = 0;
+
+    this.realHoldEndPosX = 0;
+    this.realHoldEndPosY = 0;
+
+    this.score.isScored = false;
+    this.score.isScoreAnimated = false;
+    this.score.score = EGameScoreJudgeType.UNSCORED;
+    this.score.timeBetween = 0;
+    this.score.isHolding = false;
+    this.score.animationTime = null;
+  }
+
   private createSpriteNonHold(game: Game, skin: GameSkin) {
     const getSpriteTexture = () => {
       const { useHighlight, useHighQualitySkin } = game.options;

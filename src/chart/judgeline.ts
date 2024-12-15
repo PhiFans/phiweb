@@ -45,4 +45,23 @@ export class GameChartJudgeLine {
     this.sprite.label = 'JudgeLine';
     container.addChild(this.sprite);
   }
+
+  reset() {
+    for (const eventlayer of this.eventLayers) eventlayer.reset();
+    this.floorPositions.reset();
+
+    this.speed = 0;
+    this.posX = 0;
+    this.posY = 0;
+    this.angle = 0;
+    this.alpha = 0;
+    this.floorPosition = 0;
+
+    this.radian = 0;
+    this.cosr = 0;
+    this.sinr = 0;
+
+    this.realPosX = 0;
+    this.realPosY = 0;
+  }
 }

@@ -36,4 +36,12 @@ export class GameChartEventLayer {
   _posY: number = 0;
   _angle: number = 0;
   _alpha: number = 0;
+
+  reset() {
+    this.speed.reset();
+    this.moveX.reset();
+    this.moveY.reset();
+    this.rotate.reset();
+    this.alpha.reset();
+  }
 }

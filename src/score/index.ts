@@ -132,4 +132,22 @@ export class GameScore {
 
     ui.updateUI(this.score, this.combo, this.accurate);
   }
+
+  reset() {
+    this.scoredNotes = 0;
+
+    this.judgeCount[0] = 0;
+    this.judgeCount[1] = 0;
+    this.judgeCount[2] = 0;
+    this.judgeCount[3] = 0;
+
+    this.combo = 0;
+    this.maxCombo = 0;
+
+    this.score = 0;
+    this.accurate = 0;
+
+    this.ui.updateUI(0, 0, 1);
+    this.effects.reset();
+  }
 }

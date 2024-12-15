@@ -145,4 +145,12 @@ export class GameScoreEffects {
     if (noteType === 2) playlist[playlist.length] = sounds.drag;
     if (noteType === 4) playlist[playlist.length] = sounds.flick;
   }
+
+  reset() {
+    const { particles } = this;
+    while (particles.length > 0) {
+      particles[0].destroy();
+      particles.splice(0, 1);
+    }
+  }
 }

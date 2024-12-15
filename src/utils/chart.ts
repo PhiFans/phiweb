@@ -267,14 +267,22 @@ export const calcLineFloorPosition = (judgeline: GameChartJudgeLine) => {
 };
 
 export const getLineSpeedValueByTime = (judgeline: GameChartJudgeLine, time: number) => {
+  const { eventLayers } = judgeline;
   let result: Nullable<number> = null;
 
-  for (const eventLayer of judgeline.eventLayers) {
+  for (let i = 0, l = eventLayers.length; i < l; i++) {
+    const { speed } = eventLayers[i];
     let value: Nullable<number> = null;
 
-    for (const event of eventLayer.speed) {
+    for (let j = 0, k = speed.length; j < k; j++) {
+      const event = speed[j];
+
       if (event.endTime <= time) continue;
-      if (event.startTime > time) break;
+      if (event.startTime > time) {
+        value = j !== 0 ? speed[j - 1].value : i === 0 ? 1 : 0;
+        break;
+      }
+
       value = event.value;
     }
 

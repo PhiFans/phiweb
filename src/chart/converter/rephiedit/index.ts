@@ -207,8 +207,8 @@ export const ConvertFromRePhiEdit = (_chartRaw: TRPEChart) => {
 
   // Parse lines
   _chartRaw.judgeLineList.forEach((oldLine) => {
-    // TODO: Line textures, `isCover`, etc.
-    const newLine = new GameChartJudgeLine();
+    // TODO: Line textures, etc.
+    const newLine = new GameChartJudgeLine(oldLine.isCover === 1);
 
     // Parse line events
     oldLine.eventLayers.forEach((oldLayer, layerIndex) => {

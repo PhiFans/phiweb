@@ -6,6 +6,7 @@ import { GameChartEventLayer } from './eventlayer';
 export class GameChartJudgeLine {
   readonly eventLayers: Array<GameChartEventLayer> = new Array();
   readonly floorPositions: ArrayIndexed<GameChartEventSingle> = new ArrayIndexed();
+  readonly isCover: boolean = true;
 
   speed: number = 0;
   posX: number = 0;
@@ -22,6 +23,10 @@ export class GameChartJudgeLine {
   realPosY: number = 0;
 
   sprite?: Sprite;
+
+  constructor(isCover: boolean = true) {
+    this.isCover = isCover;
+  }
 
   createSprites(container: Container) {
     if (!this.sprite) this.sprite = new Sprite(Texture.WHITE); // TODO: Skin loader

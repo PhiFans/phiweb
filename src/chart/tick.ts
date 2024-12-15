@@ -160,7 +160,7 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
     }
     if (score.isScored && (score.isScoreAnimated || score.animationTime !== null)) continue;
     // TODO: Made as an option
-    if (floorPositionDiff * 0.6 > 2 || (floorPositionDiff < 0 && time > currentTime)) {
+    if (floorPositionDiff * 0.6 > 2 || (floorPositionDiff < 0 && time > currentTime && judgeline.isCover)) {
       if (sprite.parent) sprite.removeFromParent();
       continue;
     }

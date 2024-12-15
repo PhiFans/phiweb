@@ -75,14 +75,10 @@ export const arrangeSameVariationEvent = (events: IGameChartEvent[]) => {
       oldEvent.endTime = newEndTime;
     }
 
-    if (lastNewEvent.endTime < oldEvent.startTime) {
-      newEvents.push({
-        startTime: lastNewEvent.endTime,
-        endTime: oldEvent.startTime,
-        start: lastNewEvent.end,
-        end: lastNewEvent.end
-      }, oldEvent);
-    } else if (lastNewEvent.endTime == oldEvent.startTime) {
+    if (
+      lastNewEvent.endTime < oldEvent.startTime ||
+      lastNewEvent.endTime == oldEvent.startTime
+    ) {
       newEvents.push(oldEvent);
     } else if (lastNewEvent.endTime > oldEvent.startTime) {
       if (lastNewEvent.endTime < oldEvent.endTime) {
@@ -155,7 +151,6 @@ export const arrangeEvents = (events: IGameChartEventLayer) => {
 export const parseFirstLayerEvents = (events: IGameChartEventLayer) => {
   const parseFirstLayerEvent = <T extends (IGameChartEvent | IGameChartEventSingle)>(events: T[]) => {
     const startEvent = events[0] as IGameChartEvent;
-    const endEvent = events[events.length - 1] as IGameChartEvent;
 
     if (!isNaN(startEvent.start)) {
       if (startEvent.start === startEvent.end) events[0].startTime = -Infinity;
@@ -164,13 +159,6 @@ export const parseFirstLayerEvents = (events: IGameChartEventLayer) => {
         endTime: startEvent.startTime,
         start: startEvent.start,
         end: startEvent.start
-      });
-      if (endEvent.start === endEvent.end) events[events.length - 1].endTime = Infinity;
-      else (events as IGameChartEvent[]).push({
-        startTime: endEvent.endTime,
-        endTime: Infinity,
-        start: endEvent.end,
-        end: endEvent.end
       });
     } else {
       events[0].startTime = -Infinity;

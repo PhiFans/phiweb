@@ -54,7 +54,7 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
   const { widthHalf, widthOffset, heightHalf } = renderer.size;
 
   for (const line of data.lines) {
-    const { eventLayers } = line;
+    const { eventLayers, parent } = line;
     const sprite = line.sprite!;
 
     line.speed = 0;
@@ -120,6 +120,14 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
     line.sinr = Math.sin(line.radian);
     line.realPosX = line.posX * widthHalf;
     line.realPosY = line.posY * heightHalf;
+
+    if (parent !== null) {
+      const newX = (line.realPosX * parent.cosr + line.realPosY * parent.sinr) + parent.realPosX,
+            newY = (line.realPosY * parent.cosr - line.realPosX * parent.sinr) + parent.realPosY;
+
+      line.realPosX = newX;
+      line.realPosY = newY;
+    }
 
     sprite.position.x = widthOffset + line.realPosX;
     sprite.position.y = line.realPosY;

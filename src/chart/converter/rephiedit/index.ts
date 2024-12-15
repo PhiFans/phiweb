@@ -208,7 +208,10 @@ export const ConvertFromRePhiEdit = (_chartRaw: TRPEChart) => {
   // Parse lines
   _chartRaw.judgeLineList.forEach((oldLine) => {
     // TODO: Line textures, etc.
-    const newLine = new GameChartJudgeLine(oldLine.isCover === 1);
+    const newLine = new GameChartJudgeLine(
+      oldLine.isCover === 1,
+      oldLine.father !== -1 ? oldLine.father : null
+    );
 
     // Parse line events
     oldLine.eventLayers.forEach((oldLayer, layerIndex) => {
@@ -274,6 +277,17 @@ export const ConvertFromRePhiEdit = (_chartRaw: TRPEChart) => {
 
     calcLineFloorPosition(newLine);
     result.lines.push(newLine);
+
+    // Set parent line
+    for (const newLine of result.lines) {
+      if (newLine.parentID === null) continue;
+      const newParentLine = result.lines[newLine.parentID];
+      if (!newParentLine) {
+        console.warn(`Line ID: ${newLine.parentID} not found, skipping...`);
+        continue;
+      }
+      newLine.parent = newParentLine;
+    }
 
     // Parse notes
     if (oldLine.notes) oldLine.notes.forEach((oldNote) => {

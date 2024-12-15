@@ -2,11 +2,15 @@ import { Container, Sprite, Texture } from 'pixi.js';
 import { ArrayIndexed } from '@/utils/class';
 import { GameChartEventSingle } from './event';
 import { GameChartEventLayer } from './eventlayer';
+import { Nullable } from '@/utils/types';
 
 export class GameChartJudgeLine {
   readonly eventLayers: Array<GameChartEventLayer> = new Array();
   readonly floorPositions: ArrayIndexed<GameChartEventSingle> = new ArrayIndexed();
-  readonly isCover: boolean = true;
+  readonly isCover: boolean;
+  readonly parentID: Nullable<number>;
+
+  parent: Nullable<GameChartJudgeLine> = null;
 
   speed: number = 0;
   posX: number = 0;
@@ -24,8 +28,9 @@ export class GameChartJudgeLine {
 
   sprite?: Sprite;
 
-  constructor(isCover: boolean = true) {
+  constructor(isCover: boolean = true, parentID: Nullable<number> = null) {
     this.isCover = isCover;
+    this.parentID = parentID;
   }
 
   createSprites(container: Container) {

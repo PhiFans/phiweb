@@ -184,7 +184,7 @@ export class GameRenderer {
     // this.containers.game.boundsArea = this._stageRectangleGame;
     // this.containers.game.cullArea = this._stageRectangleGame;
 
-    containers.game.position.set(this.size.widthHalf, this.size.heightHalf);
+    containers.game.position.set(size.widthOffset + size.widthHalf, size.heightHalf);
     if (size.widthOffset <= 0) containers.game.mask = null;
     else containers.game.mask = CreateContainerMask(size.widthOffset, 0, size.width, size.height);
   }

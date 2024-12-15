@@ -51,7 +51,7 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
   const { data, game } = this;
 
   const { renderer } = game;
-  const { widthHalf, widthOffset, heightHalf } = renderer.size;
+  const { widthHalf, heightHalf } = renderer.size;
 
   for (const line of data.lines) {
     const { eventLayers, parent } = line;
@@ -129,7 +129,7 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
       line.realPosY = newY;
     }
 
-    sprite.position.x = widthOffset + line.realPosX;
+    sprite.position.x = line.realPosX;
     sprite.position.y = line.realPosY;
     sprite.angle = line.angle;
     sprite.alpha = line.alpha;
@@ -215,7 +215,7 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
       continue;
     }
 
-    sprite.position.set(widthOffset + note.realPosX, note.realPosY);
+    sprite.position.set(note.realPosX, note.realPosY);
     sprite.angle = judgeline.angle + (isAbove ? 0 : 180);
     if (!sprite.parent) container.addChild(sprite);
   }

@@ -204,7 +204,7 @@ export function onScoreTick(this: GameScore, currentTime: number) {
     }
   }
 
-  const { widthOffset, hitParticleScale } = size;
+  const { hitParticleScale } = size;
   const { particles } = effects;
   for (const particle of particles) {
     const { time, particleLength, sprites, distance, cosr, sinr, x, y } = particle;
@@ -222,7 +222,7 @@ export function onScoreTick(this: GameScore, currentTime: number) {
 
       sprite.alpha = 1 - progress;
       sprite.scale.set(scale);
-      sprite.position.set(widthOffset + _distance * cosr[i] + x, _distance * sinr[i] + y);
+      sprite.position.set(_distance * cosr[i] + x, _distance * sinr[i] + y);
     }
   }
 

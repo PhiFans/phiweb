@@ -52,6 +52,7 @@ export class Game {
       return;
     }
     await currentSkin.create(options.useHighQualitySkin);
+    this.stage.set(null);
 
     this.chart = new GameChart(
       this,

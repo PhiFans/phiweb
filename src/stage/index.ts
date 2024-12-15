@@ -2,6 +2,7 @@ import { Layout } from '@pixi/layout';
 import { Container } from 'pixi.js';
 import { GameStageTitle } from './title';
 import { Game } from '@/game';
+import { Nullable } from '@/utils/types';
 
 export abstract class GameStageBase {
   abstract readonly game: Game;
@@ -40,7 +41,12 @@ export class GameStage {
     }
   }
 
-  set(name: string) {
+  set(name: Nullable<string>) {
+    if (name === null) {
+      this.unsetAll();
+      return;
+    };
+
     if (!this.stages[name]) throw new Error(`No such stage: ${name}`);
     this.unsetAll();
 

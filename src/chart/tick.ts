@@ -100,10 +100,14 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
       line.alpha += layer._alpha;
     }
 
-    for (const event of line.floorPositions) {
+    const { floorPositions } = line;
+    for (let i = floorPositions.lastIndex, l = floorPositions.length; i < l; i++) {
+      const event = floorPositions[i];
+
       if (event.endTime <= currentTime) continue;
       if (event.startTime > currentTime) break;
 
+      floorPositions.lastIndex = i;
       line.floorPosition = (currentTime - event.startTime) / 1000 * line.speed + event.value;
     }
 

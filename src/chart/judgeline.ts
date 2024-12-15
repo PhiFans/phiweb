@@ -1,10 +1,11 @@
 import { Container, Sprite, Texture } from 'pixi.js';
+import { ArrayIndexed } from '@/utils/class';
 import { GameChartEventSingle } from './event';
 import { GameChartEventLayer } from './eventlayer';
 
 export class GameChartJudgeLine {
   readonly eventLayers: Array<GameChartEventLayer> = new Array();
-  readonly floorPositions: Array<GameChartEventSingle> = new Array();
+  readonly floorPositions: ArrayIndexed<GameChartEventSingle> = new ArrayIndexed();
 
   speed: number = 0;
   posX: number = 0;

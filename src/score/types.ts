@@ -24,6 +24,10 @@ export interface IGameScoreNote {
    */
   isScored: boolean,
   /**
+   * **[Hold only]** Wether the score has been calculated & updated.
+   */
+  isHoldScored: boolean,
+  /**
    * Wether the animation has been played.
    */
   isScoreAnimated: boolean,

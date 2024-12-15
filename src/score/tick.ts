@@ -35,8 +35,8 @@ export function onScoreTick(this: GameScore, currentTime: number) {
       timeBetweenReal = timeBetween > 0 ? timeBetween : -timeBetween;
 
     // Handle bad animation
-    if (score.animationTime !== null) {
-      const percent = (currentTime - score.animationTime) / 500;
+    if (score.score === EGameScoreJudgeType.BAD) {
+      const percent = (currentTime - score.animationTime!) / 500;
       sprite!.alpha = 1 - percent;
 
       if (percent >= 1) {
@@ -48,7 +48,6 @@ export function onScoreTick(this: GameScore, currentTime: number) {
 
     // Handle hold animation
     if (type === 3 && currentTime >= holdEndTime!) {
-      if (score.score !== EGameScoreJudgeType.MISS) this.updateScore(score.score);
       sprite!.removeFromParent();
       score.isScoreAnimated = true;
       continue;
@@ -140,6 +139,21 @@ export function onScoreTick(this: GameScore, currentTime: number) {
 
       if (score.isScored) {
         if (score.isHolding) {
+          // Holding animation
+          if ((currentTime - score.animationTime!) >= 200) { // TODO: Dynamic hold animation time
+            effects.playEffects(realLinePosX, realLinePosY, score.score, currentTime, false);
+            score.animationTime = currentTime;
+          }
+
+          if (currentTime + 200 >= holdEndTime!) {
+            // Hold judge has ended
+            if (!score.isHoldScored) {
+              this.updateScore(score.score);
+              score.isHoldScored = true;
+            }
+            continue;
+          }
+
           score.isHolding = false;
 
           for (let i = 0; i < judges.length; i++) {
@@ -165,6 +179,7 @@ export function onScoreTick(this: GameScore, currentTime: number) {
 
         score.isScored = true;
         score.timeBetween = timeBetween;
+        score.animationTime = time;
         score.isHolding = true;
 
         if (input) input.isTapped = true;
@@ -176,6 +191,7 @@ export function onScoreTick(this: GameScore, currentTime: number) {
         score.score = EGameScoreJudgeType.MISS;
         score.timeBetween = NaN;
         score.isHolding = false;
+        score.isHoldScored = true;
 
         sprite!.alpha = 0.5;
         this.updateScore(score.score);

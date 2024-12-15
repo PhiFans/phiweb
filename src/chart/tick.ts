@@ -3,6 +3,7 @@ import { GameChart } from '.';
 import { GameChartEvent } from './event';
 import { ArrayIndexed } from '@/utils/class';
 import { EGameChartNoteType } from './note';
+import { EGameScoreJudgeType } from '@/score/types';
 
 interface IAreaPoint extends Array<number> {
   /** Start X */
@@ -166,7 +167,7 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
       if (sprite.parent) sprite.removeFromParent();
       continue;
     }
-    if (score.isScored && (score.isScoreAnimated || score.animationTime !== null)) continue;
+    if (score.isScored && (score.isScoreAnimated || score.score === EGameScoreJudgeType.BAD)) continue;
     // TODO: Made as an option
     if (floorPositionDiff * 0.6 > 2 || (floorPositionDiff < 0 && time > currentTime && judgeline.isCover)) {
       if (sprite.parent) sprite.removeFromParent();

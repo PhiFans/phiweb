@@ -95,6 +95,7 @@ export class GameChartNote {
    */
   readonly score: IGameScoreNote = {
     isScored: false,
+    isHoldScored: false,
     isScoreAnimated: false,
     score: EGameScoreJudgeType.UNSCORED,
     timeBetween: 0,
@@ -155,6 +156,7 @@ export class GameChartNote {
     this.realHoldEndPosY = 0;
 
     this.score.isScored = false;
+    this.score.isHoldScored = false;
     this.score.isScoreAnimated = false;
     this.score.score = EGameScoreJudgeType.UNSCORED;
     this.score.timeBetween = 0;

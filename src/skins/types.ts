@@ -91,6 +91,7 @@ export type TGameSkinElementComboText = TGameSkinElementPathed & TGameSkinElemen
 };
 
 export type TGameSkinElementHitEffect = {
+  texture: any;
   type: 'hit-effect',
   path: string,
   anchor: TGameSkinElementCoordinate,
@@ -124,7 +125,7 @@ export type TGameSkinFileArray = {
   high: Record<string, File>,
 };
 
-export type TGameSkinElementFiledBaseArray = TGameSkinElement & {
+export type TGameSkinElementFiledArray = TGameSkinElement & {
   type: 'score' | 'combo' | 'accurate' | 'combo-text' | 'hit-effect' | 'animation',
   file: TGameSkinFileArray,
   texture?: Record<string, Texture>,
@@ -136,11 +137,16 @@ export type TGameSkinElementFiledBase = TGameSkinElement & {
   texture?: Texture,
 };
 
-export type TGameSkinElementFiledBaseNever = TGameSkinElement & {
+export type TGameSkinElementFiledNever = TGameSkinElement & {
   type: 'song-name' | 'song-level' | 'song-artist' | 'text',
 };
 
-export type TGameSkinElementFiled = TGameSkinElementFiledBase | TGameSkinElementFiledBaseArray | TGameSkinElementFiledBaseNever;
+export type TGameSkinElementFiledHitEffect = TGameSkinElementHitEffect & {
+  file: TGameSkinFileArray,
+  texture?: Record<string, Texture>,
+}
+
+export type TGameSkinElementFiled = TGameSkinElementFiledBase | TGameSkinElementFiledArray | TGameSkinElementFiledNever | TGameSkinElementFiledHitEffect;
 
 export type TGameSkinPlayfieldType = 'note';
 export type TGameSkinPlayfieldIDNote = 'tap' | 'drag' | 'hold-head' | 'hold-body' | 'hold-end' | 'flick';

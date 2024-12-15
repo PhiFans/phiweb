@@ -12,7 +12,7 @@ import {
   TGameSkinSound,
   TGameSkinSoundIDHitsound,
   TGameSkinElementFiled,
-  TGameSkinElementFiledBaseArray,
+  TGameSkinElementFiledArray,
   TGameSkinHitsounds
 } from './types';
 
@@ -176,7 +176,7 @@ export class GameSkin {
         });
       } else {
         promise = new Promise((res, rej) => {
-          const { file: _files } = (element as TGameSkinElementFiledBaseArray);
+          const { file: _files } = (element as TGameSkinElementFiledArray);
           const files = _files[qualityName];
           const subPromises: Promise<[ string, Texture ]>[] = [];
 
@@ -196,7 +196,7 @@ export class GameSkin {
           Promise.all<Promise<[ string, Texture ]>[]>(subPromises).then((_result) => {
             const result: Record<string, Texture> = {};
             for (const _subresult of _result) result[_subresult[0]] = _subresult[1];
-            (element as TGameSkinElementFiledBaseArray).texture = result;
+            (element as TGameSkinElementFiledArray).texture = result;
             res(result);
           }).catch(e => rej(e));
         });

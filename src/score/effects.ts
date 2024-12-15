@@ -4,7 +4,7 @@ import { EGameScoreJudgeType } from './types';
 import { EGameChartNoteType } from '@/chart/note';
 import { IGameRendererSize } from '@/renderer';
 import { GameSkin } from '@/skins';
-import { TGameSkinElementFiledBaseArray, TGameSkinHitsounds } from '@/skins/types';
+import { TGameSkinElementFiledHitEffect, TGameSkinHitsounds } from '@/skins/types';
 
 class GameScoreEffectHitParticle {
   readonly particleLength = 3;
@@ -57,7 +57,7 @@ export class GameScoreEffects {
   readonly audioChannel: GameAudioChannel;
   readonly size: IGameRendererSize;
   readonly skin: {
-    hitEffect: TGameSkinElementFiledBaseArray,
+    hitEffect: TGameSkinElementFiledHitEffect,
     sounds: TGameSkinHitsounds,
   };
   readonly skinTextures: {
@@ -109,19 +109,19 @@ export class GameScoreEffects {
   ) {
     const { size, audioChannel, skin, skinTextures, container, particles } = this;
     const { noteScale } = size;
-    const { sounds } = skin;
+    const { hitEffect, sounds } = skin;
     const { hitEffects, hitParticle } = skinTextures;
     const { playlist } = audioChannel;
 
     if (judgeType >= EGameScoreJudgeType.GOOD) {
-      // const { speed } = hitEffect;
+      const { speed, anchor } = hitEffect;
       const animation = new AnimatedSprite(hitEffects, true);
 
       animation.position.set(x, y);
-      animation.anchor.set(0.5);
+      animation.anchor.set(anchor.x, anchor.y);
       animation.scale.set(noteScale * 5.6);
       animation.tint = judgeType === 3 ? 0xFFECA0 : 0xB4E1FF;
-      animation.animationSpeed = 1 /** speed */;
+      animation.animationSpeed = speed;
       animation.loop = false;
 
       animation.onFrameChange = () => {

@@ -1,7 +1,7 @@
 import JSZip from 'jszip';
 import { Game } from '@/game';
-import { JSZipFiles, JSZipFilesMap } from './types';
-import { Texture } from 'pixi.js';
+import { JSZipFiles, JSZipFilesMap, TGameSkinElementCoordinate } from './types';
+import { Texture, TextureSource } from 'pixi.js';
 import { ReadFileAsAudioBuffer, generateImageBitmap } from '@/utils/file';
 import { GameAudio } from '@/audio';
 import {
@@ -167,16 +167,21 @@ export class GameSkin {
           const file = element.file[qualityName];
           generateImageBitmap(file, useHighQuality ? 1 : 2)
             .then((bitmap) => {
-              const result = Texture.from(bitmap);
-              result.label = `${name}: ${file.name}`,
-              element.texture = result;
-              res(result);
+              element.texture = new Texture({
+                source: TextureSource.from(bitmap),
+                label: `${name}: ${file.name}`,
+                defaultAnchor: {
+                  x: element.anchor ? element.anchor.x : 0,
+                  y: element.anchor ? element.anchor.y : 0,
+                }
+              });
+              res(element.texture);
             })
             .catch(e => rej(e));
         });
       } else {
         promise = new Promise((res, rej) => {
-          const { file: _files } = (element as TGameSkinElementFiledArray);
+          const { file: _files, anchor } = (element as TGameSkinElementFiledArray & { anchor?: TGameSkinElementCoordinate });
           const files = _files[qualityName];
           const subPromises: Promise<[ string, Texture ]>[] = [];
 
@@ -185,8 +190,14 @@ export class GameSkin {
             subPromises.push(new Promise((res, rej) => {
               generateImageBitmap(file, useHighQuality ? 1 : 2)
                 .then((bitmap) => {
-                  const result = Texture.from(bitmap);
-                  result.label = `${name}: ${file.name}`,
+                  const result = new Texture({
+                    source: TextureSource.from(bitmap),
+                    label: `${name}: ${file.name}`,
+                    defaultAnchor: {
+                      x: anchor ? anchor.x : 0,
+                      y: anchor ? anchor.y : 0,
+                    },
+                  });
                   res([ name, result ]);
                 })
                 .catch(e => rej(e));

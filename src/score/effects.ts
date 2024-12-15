@@ -37,7 +37,6 @@ class GameScoreEffectHitParticle {
       sprites[i] = new Sprite({
         texture, x, y,
         scale: 1,
-        anchor: 0.5,
         tint: type === 3 ? 0xFFECA0 : 0xB4E1FF,
       });
       i++;
@@ -114,11 +113,10 @@ export class GameScoreEffects {
     const { playlist } = audioChannel;
 
     if (judgeType >= EGameScoreJudgeType.GOOD) {
-      const { speed, anchor } = hitEffect;
+      const { speed } = hitEffect;
       const animation = new AnimatedSprite(hitEffects, true);
 
       animation.position.set(x, y);
-      animation.anchor.set(anchor.x, anchor.y);
       animation.scale.set(noteScale * 5.6);
       animation.tint = judgeType === 3 ? 0xFFECA0 : 0xB4E1FF;
       animation.animationSpeed = speed;

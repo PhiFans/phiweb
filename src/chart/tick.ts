@@ -161,7 +161,7 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
       isFake &&
       (
         (type !== EGameChartNoteType.HOLD && currentTime >= time) ||
-        currentTime >= holdEndTime!
+        (type === EGameChartNoteType.HOLD && currentTime >= holdEndTime!)
       )
     ) {
       if (sprite.parent) sprite.removeFromParent();

@@ -35,7 +35,6 @@ export class GameScoreUI {
   constructor(skin: GameSkin, container: Container, size: IGameRendererSize, options: { autoPlay: boolean }) {
     this.elements = [ ...skin.elements ]
       .filter(e => e.type !== 'hit-effect')
-      .filter(e => e.enabled)
       .map<TGameScoreUIElement | undefined>((e) => {
         if (e.type === 'animation') return void 0; // TODO: We will work on that later.
         const result: Partial<TGameScoreUIElement> & Omit<TGameScoreUIElement, 'sprite'> = { ...e };

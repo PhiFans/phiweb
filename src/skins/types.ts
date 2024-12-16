@@ -32,7 +32,6 @@ export type TGameSkinElementCoordinate = {
 
 export type TGameSkinElementBase = {
   type: TGameSkinElementType,
-  enabled: boolean,
   stickTo: {
     x: 'left' | 'center' | 'right',
     y: 'top' | 'center' | 'bottom',
@@ -90,12 +89,8 @@ export type TGameSkinElementComboText = TGameSkinElementPathed & TGameSkinElemen
   autoHide: boolean,
 };
 
-export type TGameSkinElementHitEffect = {
-  texture: any;
+export type TGameSkinElementHitEffect = Omit<TGameSkinElementPathed & TGameSkinElementAnchored, 'position'> & {
   type: 'hit-effect',
-  path: string,
-  anchor: TGameSkinElementCoordinate,
-  scale: number,
   speed: number,
 };
 

@@ -93,6 +93,7 @@ export class Game {
 
     audio.stop();
     chart.reset();
+    chart.reszie(this.renderer.size);
     audio.play();
 
     stage.set(null);

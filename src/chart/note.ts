@@ -159,6 +159,12 @@ export class GameChartNote {
     this.score.timeBetween = 0;
     this.score.isHolding = false;
     this.score.animationTime = null;
+
+    if (this.sprite && this.type === EGameChartNoteType.HOLD) {
+      const holdLength = (this.isOfficial ? this.holdTime! / 1000 : this.holdLength!) * this.speed;
+      this.sprite.children[1].height = holdLength;
+      this.sprite.children[2].position.y = -holdLength;
+    }
   }
 
   private createSpriteNonHold(game: Game, skin: GameSkin) {

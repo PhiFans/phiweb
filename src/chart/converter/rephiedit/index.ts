@@ -93,12 +93,15 @@ const calculateRealTime = (BPMs: TChartBPM[], beat: number) => {
 
 const calculateEventValue = (Easings: ((pos: number) => number)[], event: TRPEChartEvent & TimeExtra, beat: number, precision: number = 6): number => {
   const { startBeat, endBeat, start, end } = event;
+  const easingLeft = !isNaN(event.easingLeft) ? event.easingLeft : 0;
+  const easingRight = !isNaN(event.easingRight) ? event.easingRight : 1;
+
   const BezierFn = event.bezierPoints ? BezierEasing(...event.bezierPoints) : Easings[0];
   const EasingFn = event.bezier === 1 ? BezierFn : Easings[event.easingType - 1];
 
   const timePercentEnd = (beat - startBeat) / (endBeat - startBeat);
-  const easePercent = EasingFn(event.easingLeft * (1 - timePercentEnd) + event.easingRight * timePercentEnd);
-  const resultPercentEnd = (easePercent - EasingFn(event.easingLeft)) / (EasingFn(event.easingRight) - EasingFn(event.easingLeft));
+  const easePercent = EasingFn(easingLeft * (1 - timePercentEnd) + easingRight * timePercentEnd);
+  const resultPercentEnd = (easePercent - EasingFn(easingLeft)) / (EasingFn(easingRight) - EasingFn(easingLeft));
 
   return parseDoublePrecist(start * (1 - resultPercentEnd) + end * resultPercentEnd, precision);
 };

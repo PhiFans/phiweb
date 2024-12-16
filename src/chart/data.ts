@@ -59,9 +59,9 @@ export class GameChartData {
     this.container.boundsArea = new Rectangle(0, 0, 0, 0);
     this.container.zIndex = 1;
 
-    for (const line of this.lines) {
+    for (let i = 0; i < this.lines.length; i++) {
       // TODO: Line texture maybe
-      line.createSprites(this.container);
+      this.lines[i].createSprites(this.container, i);
     }
 
     const lineLength = this.lines.length;

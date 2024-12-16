@@ -33,7 +33,7 @@ export class GameChartJudgeLine {
     this.parentID = parentID;
   }
 
-  createSprites(container: Container) {
+  createSprites(container: Container, zIndex: number = 0) {
     if (!this.sprite) this.sprite = new Sprite(Texture.WHITE); // TODO: Skin loader
 
     this.sprite.width = 1920;
@@ -41,8 +41,9 @@ export class GameChartJudgeLine {
     this.sprite.anchor.set(0.5);
 
     this.sprite.cullable = true;
+    this.sprite.zIndex = zIndex;
 
-    this.sprite.label = 'JudgeLine';
+    this.sprite.label = `JudgeLine ${zIndex}`;
     container.addChild(this.sprite);
   }
 

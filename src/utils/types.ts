@@ -27,3 +27,16 @@ export interface IFileAudio extends IFileBasic {
 }
 
 export type IFile = IFileChart | IFileImage | IFileAudio;
+
+
+/* ==================== Math ==================== */
+export type TAreaPoint = [
+  /** Start X */
+  number,
+  /** Start Y */
+  number,
+  /** End X */
+  number,
+  /** End Y */
+  number
+];

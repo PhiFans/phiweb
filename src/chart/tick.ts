@@ -2,19 +2,9 @@ import { Container } from 'pixi.js';
 import { GameChart } from '.';
 import { GameChartEvent } from './event';
 import { ArrayIndexed } from '@/utils/class';
+import { isLineInArea } from '@/utils/math';
 import { EGameChartNoteType } from './note';
 import { EGameScoreJudgeType } from '@/score/types';
-
-interface IAreaPoint extends Array<number> {
-  /** Start X */
-  0: number,
-  /** Start Y */
-  1: number,
-  /** End X */
-  2: number,
-  /** End Y */
-  3: number,
-}
 
 const valueCalculator = (events: ArrayIndexed<GameChartEvent>, currentTime: number, defaultValue = 0) => {
   const { lastIndex, length } = events;
@@ -36,16 +26,6 @@ const valueCalculator = (events: ArrayIndexed<GameChartEvent>, currentTime: numb
   }
 
   return defaultValue;
-};
-
-const isPointInArea = (x: number, y: number, area: IAreaPoint): Boolean => {
-  return x >= area[0] && x <= area[2] && y >= area[1] && y <= area[3];
-};
-
-const isInArea = (point: IAreaPoint, area: IAreaPoint): Boolean => {
-  const [ pointStartX, pointStartY, pointEndX, pointEndY ] = point;
-  if (isPointInArea(pointStartX, pointStartY, area) || isPointInArea(pointEndX, pointEndY, area)) return true;
-  return false;
 };
 
 export function onChartTick(this: GameChart, currentTime: number, container: Container) {
@@ -208,7 +188,7 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
       note.realHoldEndPosY = note.realLinePosY + realHoldLengthY * judgeline.cosr;
     }
 
-    if (!isInArea(
+    if (!isLineInArea(
       [ note.realPosX, note.realPosY, note.realHoldEndPosX, note.realHoldEndPosY ],
       [ -widthHalfBorder, -heightHalfBorder, widthHalfBorder, heightHalfBorder ]
     )) {

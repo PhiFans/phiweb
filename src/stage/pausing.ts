@@ -1,4 +1,4 @@
-import { Graphics, Sprite, Texture } from 'pixi.js';
+import { Graphics, Sprite, Text, Texture } from 'pixi.js';
 import { FancyButton, Slider } from '@pixi/ui';
 import { Layout } from '@pixi/layout';
 import { Game } from '@/game';
@@ -31,6 +31,15 @@ const createSliderView = (
   return slider;
 };
 
+const fillZero = (number: number, count = 2) => {
+  let result = `${number}`;
+  while (result.length < count) {
+    result = '0' + result;
+  }
+  return result;
+}
+const numberToTime = (number: number) => `${fillZero(Math.floor(number / 60))}:${fillZero(Math.floor(number % 60))}`
+
 export class GameStagePausing implements IGameStageBase {
   readonly game: Game;
   readonly layout: Layout;
@@ -41,12 +50,20 @@ export class GameStagePausing implements IGameStageBase {
 
   readonly sliderProgress: Slider;
 
+  private isUpdating: boolean = false;
+
   constructor(game: Game) {
     this.buttonResume = createButtonView('Resume');
     this.buttonRestart = createButtonView('Restart');
     this.buttonQuit = createButtonView('Quit');
 
     this.sliderProgress = createSliderView(400, 20);
+
+    this.buttonResume.onPress.connect(() => this.game.resumeChart());
+    this.buttonRestart.onPress.connect(() => this.game.restartChart());
+    this.buttonQuit.onPress.connect(() => window.history.go(0));
+
+    this.sliderProgress.onUpdate.connect((value) => this.onProgressChange(value));
 
     this.game = game;
     this.layout = new Layout({
@@ -86,6 +103,7 @@ export class GameStagePausing implements IGameStageBase {
             sliderView: {
               content: [
                 {
+                  id: 'currentTime',
                   content: '00:00',
                   styles: {
                     marginRight: 12,
@@ -99,6 +117,7 @@ export class GameStagePausing implements IGameStageBase {
                   },
                 },
                 {
+                  id: 'totalTime',
                   content: '11:45',
                   styles: {
                     marginLeft: 12,
@@ -128,5 +147,30 @@ export class GameStagePausing implements IGameStageBase {
     });
 
     this.layout.zIndex = 10;
+  }
+
+  updateData(currentTime: number, totalTime: number) {
+    const currentTimeText = this.layout.getChildByID('currentTime')!.children[0] as Text;
+    const totalTimeText = this.layout.getChildByID('totalTime')!.children[0] as Text;
+
+    currentTimeText.text = numberToTime(currentTime / 1000);
+    totalTimeText.text = numberToTime(totalTime);
+
+    this.isUpdating = true;
+
+    this.sliderProgress.max = Math.floor(totalTime);
+    this.sliderProgress.value = Math.floor(currentTime / 1000);
+
+    setTimeout(() => this.isUpdating = false, 100);
+  }
+
+  private onProgressChange(value: number) {
+    if (this.isUpdating) return;
+    this.game.seekChart(value);
+
+    const currentTimeText = this.layout.getChildByID('currentTime')!.children[0] as Text;
+    currentTimeText.text = numberToTime(value);
+
+    console.log(value);
   }
 }

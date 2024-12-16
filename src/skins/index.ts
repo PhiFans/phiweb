@@ -162,7 +162,10 @@ export class GameSkin {
       ) continue;
 
       let promise: Promise<unknown>;
-      if (element.type === 'image') {
+      if (
+        element.type === 'image' ||
+        element.type === 'pause-button'
+      ) {
         promise = new Promise((res, rej) => {
           const file = element.file[qualityName];
           generateImageBitmap(file, useHighQuality ? 1 : 2)
@@ -293,6 +296,7 @@ export class GameSkin {
           newElements.push({ ...e });
           break;
         }
+        case 'pause-button':
         case 'image': {
           newElements.push({
             ...e,

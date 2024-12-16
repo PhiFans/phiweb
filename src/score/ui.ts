@@ -1,5 +1,5 @@
+import { Game } from '@/game';
 import { IGameRendererSize } from '@/renderer';
-import { GameSkin } from '@/skins';
 import { TGameSkinElement, TGameSkinElementAnchored, TGameSkinElementTypeText } from '@/skins/types';
 import { GameUITexturedNumber } from '@/ui/textured-number';
 import { parseDoublePrecist } from '@/utils/math';
@@ -15,7 +15,7 @@ type TGameScoreUIElementNumber = TGameScoreUIElementBase & {
 };
 
 type TGameScoreUIElementTexture = TGameScoreUIElementBase & {
-  type: 'combo-text' | 'image',
+  type: 'combo-text' | 'image' | 'pause-button',
   sprite: Sprite,
 };
 
@@ -29,10 +29,20 @@ type TGameScoreUIElement = TGameScoreUIElementNumber | TGameScoreUIElementTextur
 const accurateToText = (number: number) => `${parseDoublePrecist(number * 100, 2)}%`;
 
 export class GameScoreUI {
+  readonly game: Game;
   readonly container = new Container();
   readonly elements: TGameScoreUIElement[] = [];
+  private readonly elementStats = {
+    lastPauseClick: 0,
+    pauseClickCount: 0,
+  };
 
-  constructor(skin: GameSkin, container: Container, size: IGameRendererSize, options: { autoPlay: boolean }) {
+  constructor(game: Game) {
+    this.game = game;
+    const { skins, renderer, options } = this.game;
+    const { size, containers } = renderer;
+    const skin = skins.currentSkin!;
+
     this.elements = [ ...skin.elements ]
       .filter(e => e.type !== 'hit-effect')
       .map<TGameScoreUIElement | undefined>((e) => {
@@ -68,6 +78,15 @@ export class GameScoreUI {
             });
             break;
           }
+          case 'pause-button': {
+            const sprite = new Sprite(e.texture!);
+            sprite.interactive = true;
+            sprite.eventMode = 'static';
+            sprite.on('pointerdown', () => this.onButtonPauseClick());
+
+            result.sprite = sprite;
+            break;
+          }
           case 'text': {
             result.sprite = new Text({
               text: e.text,
@@ -87,8 +106,8 @@ export class GameScoreUI {
           return (void 0);
         }
 
-        // TODO: Pause button
-        result.sprite.interactive = result.sprite.interactiveChildren = false;
+        // TODO: Progress bar
+        if (e.type !== 'pause-button') result.sprite.interactive = result.sprite.interactiveChildren = false;
         if (e.alpha) result.sprite.alpha = e.alpha;
         if ((e as TGameSkinElementAnchored).anchor && (result.sprite as Sprite | Text).anchor) {
           const { anchor } = (e as TGameSkinElementAnchored);
@@ -100,7 +119,7 @@ export class GameScoreUI {
       .filter((e) => (e !== (void 0)));
 
     for (const e of this.elements) this.container.addChild(e.sprite);
-    container.addChild(this.container);
+    containers.ui.addChild(this.container);
     this.resize(size);
   }
 
@@ -153,6 +172,25 @@ export class GameScoreUI {
           }
           break;
       }
+    }
+  }
+
+  private onButtonPauseClick() {
+    const { elementStats } = this;
+    const currentTime = performance.now();
+
+    if (currentTime - elementStats.lastPauseClick <= 200) {
+      elementStats.lastPauseClick = currentTime;
+      elementStats.pauseClickCount++;
+
+      if (elementStats.pauseClickCount >= 2) {
+        this.game.pauseChart();
+        elementStats.lastPauseClick = 0;
+        elementStats.pauseClickCount = 0;
+      }
+    } else {
+      elementStats.lastPauseClick = currentTime;
+      elementStats.pauseClickCount = 1;
     }
   }
 }

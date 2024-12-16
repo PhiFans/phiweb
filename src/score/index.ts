@@ -79,7 +79,7 @@ export class GameScore {
     const { game } = this.chart;
     const { renderer, audio, options } = game;
     this.size = renderer.size;
-    this.ui = new GameScoreUI(skin, containers.ui, this.size, options);
+    this.ui = new GameScoreUI(game);
     this.effects = new GameScoreEffects(
       skin,
       containers.game,

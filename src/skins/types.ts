@@ -23,7 +23,7 @@ export type TGameSkinFontFamily = {
 
 export type TGameSkinElementTypeTexture = 'score' | 'accurate' | 'combo' | 'image';
 export type TGameSkinElementTypeText = 'song-name' | 'song-level' | 'song-artist' | 'text';
-export type TGameSkinElementType = TGameSkinElementTypeTexture | TGameSkinElementTypeText | 'hit-effect' | 'combo-text' | 'animation';
+export type TGameSkinElementType = TGameSkinElementTypeTexture | TGameSkinElementTypeText | 'hit-effect' | 'combo-text' | 'animation' | 'pause-button';
 
 export type TGameSkinElementCoordinate = {
   x: number,
@@ -94,6 +94,10 @@ export type TGameSkinElementHitEffect = Omit<TGameSkinElementPathed & TGameSkinE
   speed: number,
 };
 
+export type TGameSkinElementButtonPause = TGameSkinElementPathed & TGameSkinElementAnchored & {
+  type: 'pause-button',
+};
+
 export type TGameSkinElement = (
   TGameSkinElementNumber |
   TGameSkinElementNumberCombo |
@@ -102,7 +106,8 @@ export type TGameSkinElement = (
   TGameSkinElementTextCustom |
   TGameSkinElementAnimation |
   TGameSkinElementComboText |
-  TGameSkinElementHitEffect
+  TGameSkinElementHitEffect |
+  TGameSkinElementButtonPause
 );
 
 export interface IGameSkinElementCoordinate {
@@ -127,7 +132,7 @@ export type TGameSkinElementFiledArray = TGameSkinElement & {
 };
 
 export type TGameSkinElementFiledBase = TGameSkinElement & {
-  type: 'image',
+  type: 'image' | 'pause-button',
   file: TGameSkinFile,
   texture?: Texture,
 };

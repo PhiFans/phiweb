@@ -3,6 +3,7 @@ import { Container } from 'pixi.js';
 import { GameStageTitle } from './title';
 import { Game } from '@/game';
 import { Nullable } from '@/utils/types';
+import { GameStagePausing } from './pausing';
 
 export abstract class GameStageBase {
   abstract readonly game: Game;
@@ -26,6 +27,7 @@ export class GameStage {
 
     this.stages = {
       title: new GameStageTitle(this.game),
+      pausing: new GameStagePausing(this.game),
     };
 
     this.set('title');

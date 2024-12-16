@@ -1,33 +1,12 @@
-import { Graphics, Text } from 'pixi.js';
-import { FancyButton, Select } from '@pixi/ui';
+import { Graphics } from 'pixi.js';
+import { Select } from '@pixi/ui';
 import { Layout } from '@pixi/layout';
 import { PopupReadFiles } from '@/utils/file';
 import { IGameStageBase } from '.';
 import { Game } from '@/game';
 import { GameChartData } from '@/chart/data';
 import { GameAudioClip } from '@/audio/clip';
-
-const createButtonView = (textStr: string, width: number = 160, height: number = 40) => {
-  const button = new FancyButton({
-    defaultView: new Graphics()
-      .rect(0, 0, width, height)
-      .fill(0x666666),
-    hoverView: new Graphics()
-      .rect(0, 0, width, height)
-      .fill(0xAAAAAA),
-    pressedView: new Graphics()
-      .rect(0, 0, width, height)
-      .fill(0x222222),
-    text: new Text({
-      text: textStr,
-      style: {
-        fill: 0xFFFFFF,
-        fontWeight: 'bold',
-      }
-    })
-  });
-  return button;
-};
+import { createButtonView } from './utils';
 
 const createSelectItem = (textStr: string[]) => {
   const item = {
@@ -160,9 +139,9 @@ export class GameStageTitle implements IGameStageBase {
           this.selectedAudio = this.listsAudio[this.selectorAudio.value];
 
           // Update the button's text to autofit
-          // @ts-ignore 
+          // @ts-ignore
           this.selectorChart.openButton.setState('default', true); this.selectorChart.closeButton.setState('default', true);
-          // @ts-ignore 
+          // @ts-ignore
           this.selectorAudio.openButton.setState('default', true); this.selectorAudio.closeButton.setState('default', true);
         });
     });

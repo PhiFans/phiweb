@@ -470,6 +470,7 @@ export const ConvertFromPhiEdit = (_chartRaw: string) => {
       isSameTime: false,
       holdTime: holdTimeLength,
       holdLength: null,
+      scaleX: oldNote.scaleX,
     });
   }
 
@@ -488,9 +489,11 @@ export const ConvertFromPhiEdit = (_chartRaw: string) => {
       oldNote.posX,
       sameTimeNote[`${oldNote.time}`] === 2,
       floorPosition,
-      oldNote.isFake,
       oldNote.holdTime,
-      holdLength
+      holdLength,
+      false,
+      oldNote.isFake,
+      oldNote.scaleX,
     ));
   }
 

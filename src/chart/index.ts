@@ -50,7 +50,7 @@ export class GameChart {
         note.sprite!.children[2].position.y = -holdLength
       }
 
-      note.sprite!.scale.set(sizer.noteScale);
+      note.sprite!.scale.set(sizer.noteScale * note.scaleX, sizer.noteScale);
     }
 
     this.score.resize(sizer);

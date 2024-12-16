@@ -297,7 +297,7 @@ export const ConvertFromRePhiEdit = (_chartRaw: TRPEChart) => {
       const realTime = calculateRealTime(bpmList, beatToNumber(oldNote.startTime));
       const holdTime = oldNote.type === 2 ? Math.floor(calculateRealTime(bpmList, beatToNumber(oldNote.endTime)) - realTime) : null;
 
-      // TODO: xScale, yOffset, etc.
+      // TODO: yOffset, etc.
       noteList.push({
         judgeline: newLine,
         type: (
@@ -315,6 +315,7 @@ export const ConvertFromRePhiEdit = (_chartRaw: TRPEChart) => {
         isSameTime: false,
         floorPosition: 0,
         holdLength: null,
+        scaleX: oldNote.size,
       });
     });
   });
@@ -335,9 +336,11 @@ export const ConvertFromRePhiEdit = (_chartRaw: TRPEChart) => {
       oldNote.posX,
       sameTimeNote[`${oldNote.time}`] === 2,
       floorPosition,
-      oldNote.isFake,
       oldNote.holdTime,
-      holdLength
+      holdLength,
+      false,
+      oldNote.isFake,
+      oldNote.scaleX
     ));
   }
 

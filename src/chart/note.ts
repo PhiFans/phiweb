@@ -17,22 +17,18 @@ export interface IGameChartNote {
   type: EGameChartNoteType;
   isAbove: boolean;
   time: number;
-  /**
-   * The time length of hold.
-   */
-  holdTime: Nullable<number>;
   speed: number;
-  /**
-   * Wether if another note have the same time to this note.
-   */
+  posX: number;
+  /** Wether if another note have the same time to this note. */
   isSameTime: boolean;
   floorPosition: number;
-  /**
-   * The floor position length of hold time length
-   */
+  /** The time length of hold. */
+  holdTime: Nullable<number>;
+  /** The floor position length of hold time length */
   holdLength: Nullable<number>;
-  posX: number;
+
   isFake?: boolean,
+  scaleX?: number,
 }
 
 const getNoteSkinTexture = (skin: GameSkin, type: string, useHighQuality = true, useHighlight = true) => {
@@ -46,34 +42,27 @@ export class GameChartNote {
   readonly type: EGameChartNoteType;
   readonly isAbove: boolean;
   readonly time: number;
-  /**
-   * The time length of hold.
-   */
-  readonly holdTime: Nullable<number>;
-  /**
-   * The end time of hold.
-   */
-  readonly holdEndTime: Nullable<number>;
   readonly speed: number;
-  /**
-   * Wether if another note have the same time to this note.
-   */
+  /** Wether if another note have the same time to this note. */
   readonly isSameTime: boolean;
   readonly floorPosition: number;
-  /**
-   * The floor position length of hold time length
-   */
-  readonly holdLength: Nullable<number>;
-  /**
-   * The end floor position of hold end time
-   */
-  readonly holdFloorPosition: Nullable<number>;
   readonly posX: number;
-  readonly isFake: boolean;
-  /**
-   * Wether this note comes from official chart, used for hold length calculation.
-   */
+
+  // Hold props
+  /** The time length of hold. */
+  readonly holdTime: Nullable<number>;
+  /** The end time of hold. */
+  readonly holdEndTime: Nullable<number>;
+  /** The floor position length of hold time length */
+  readonly holdLength: Nullable<number>;
+  /** The end floor position of hold end time */
+  readonly holdFloorPosition: Nullable<number>;
+
+  // Extra props
+  /** Wether this note comes from official chart, used for hold length calculation. */
   readonly isOfficial: boolean;
+  readonly isFake: boolean;
+  readonly scaleX: number;
 
   /** The real note position when on line. Only be used & calculaed when ticking */
   realLinePosX: number = 0;
@@ -114,25 +103,33 @@ export class GameChartNote {
     posX: number,
     isSameTime: boolean,
     floorPosition: number,
-    isFake: boolean = false,
+
+    // Hold props
     holdTime: Nullable<number>,
     holdLength: Nullable<number>,
-    isOfficial: boolean = false
+
+    // Extra props
+    isOfficial: boolean = false,
+    isFake: boolean = false,
+    scaleX: number = 1
   ) {
     this.judgeline = judgeline;
     this.type = type;
     this.isAbove = isAbove;
     this.time = time;
-    this.holdTime = holdTime;
     this.speed = speed;
     this.posX = posX;
-    this.isFake = isFake;
     this.isSameTime = isSameTime;
     this.floorPosition = floorPosition;
+
+    this.holdTime = holdTime;
     this.holdEndTime = this.type === EGameChartNoteType.HOLD ? this.time + this.holdTime! : null;
     this.holdLength = holdLength;
     this.holdFloorPosition = this.type === EGameChartNoteType.HOLD ? this.floorPosition + this.holdLength! : null;
+
     this.isOfficial = isOfficial;
+    this.isFake = isFake;
+    this.scaleX = scaleX;
   }
 
   createSprite(game: Game, skin: GameSkin, zIndex: number = 24) {

@@ -185,10 +185,10 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
       parseDoublePrecist(oldNote.posX, 6),
       oldNote.isSameTime,
       oldNote.floorPosition,
-      false,
       oldNote.holdTime,
       oldNote.holdLength,
-      true
+      true,
+      false
     ));
   });
   newChart.notes.sort((a, b) => a.time - b.time);

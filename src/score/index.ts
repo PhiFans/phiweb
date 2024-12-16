@@ -147,6 +147,9 @@ export class GameScore {
     this.score = 0;
     this.accurate = 0;
 
+    this.judges.length = 0;
+    this.inputs.reset();
+
     this.ui.updateUI(0, 0, 1);
     this.effects.reset();
   }

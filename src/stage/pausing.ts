@@ -170,7 +170,5 @@ export class GameStagePausing implements IGameStageBase {
 
     const currentTimeText = this.layout.getChildByID('currentTime')!.children[0] as Text;
     currentTimeText.text = numberToTime(value);
-
-    console.log(value);
   }
 }

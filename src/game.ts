@@ -70,6 +70,34 @@ export class Game {
     console.log(this);
   })}
 
+  pauseChart() {
+    if (!this.chart) return;
+    const { chart, stage } = this;
+    const { audio } = chart;
+
+    audio.pause();
+    stage.set('pausing');
+    stage.stages.pausing.updateData(audio.pauseTime - audio.startTime, audio.source.duration);
+  }
+
+  resumeChart() {
+    if (!this.chart) return;
+    this.chart.audio.play();
+    this.stage.set(null);
+  }
+
+  restartChart() {
+    if (!this.chart) return;
+    const { chart, stage } = this;
+    const { audio } = chart;
+
+    audio.stop();
+    chart.reset();
+    audio.play();
+
+    stage.set(null);
+  }
+
   /**
    * @param seconds Seek seconds
    */

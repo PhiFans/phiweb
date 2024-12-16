@@ -72,6 +72,10 @@ export class GameChartScoreInputs {
     this.size = size;
   }
 
+  reset() {
+    this.list.length = 0;
+  }
+
   private add(type: TGameScoreInputType, id: number | string, x: number, y: number) {
     const { list, size } = this;
     this.remove(type, id);

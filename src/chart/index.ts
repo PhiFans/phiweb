@@ -64,16 +64,22 @@ export class GameChart {
     this.audio.play();
   }
 
+  reset() {
+    const { data, score } = this;
+    data.reset();
+    score.reset();
+  }
+
   private onTick() {
     const { data, audio } = this;
-    const { startTime, clock, status } = audio;
+    const { startTime, pauseTime, clock, status } = audio;
     const { time } = clock;
     const { offset, container } = data;
 
-    if (status !== 1) return;
-    const currentTime = (time - (startTime || time)) - offset;
+    if (status === 0) return;
+    const currentTime = ((status === 2 ? pauseTime : time) - (startTime || time)) - offset;
 
     this.onChartTick(currentTime, container!);
-    this.score.onScoreTick(currentTime);
+    if (status === 1) this.score.onScoreTick(currentTime);
   }
 }

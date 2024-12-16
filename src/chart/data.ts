@@ -74,6 +74,11 @@ export class GameChartData {
     container.addChild(this.container);
   }
 
+  reset() {
+    for (const line of this.lines) line.reset();
+    for (const note of this.notes) note.reset();
+  }
+
   get notesTotal() {
     return this.notes.length;
   }

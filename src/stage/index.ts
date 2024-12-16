@@ -5,21 +5,21 @@ import { Game } from '@/game';
 import { Nullable } from '@/utils/types';
 import { GameStagePausing } from './pausing';
 
-export abstract class GameStageBase {
-  abstract readonly game: Game;
-  abstract readonly layout: Layout;
-}
-
 export interface IGameStageBase {
   readonly game: Game;
   readonly layout: Layout;
 }
 
+type TGameStages = {
+  title: GameStageTitle,
+  pausing: GameStagePausing,
+};
+
 export class GameStage {
   private _currentStage?: IGameStageBase;
   readonly game: Game;
   readonly stageContainer: Container;
-  readonly stages: Record<string, IGameStageBase>;
+  readonly stages: TGameStages;
 
   constructor(game: Game) {
     this.game = game;
@@ -38,12 +38,13 @@ export class GameStage {
   }
 
   unsetAll() {
-    for (const name in this.stages) {
+    const stageNames = Object.keys(this.stages) as (keyof TGameStages)[];
+    for (const name of stageNames) {
       this.stages[name].layout.removeFromParent();
     }
   }
 
-  set(name: Nullable<string>) {
+  set(name: Nullable<keyof TGameStages>) {
     if (name === null) {
       this.unsetAll();
       return;
@@ -59,7 +60,8 @@ export class GameStage {
   }
 
   resize(width: number, height: number) {
-    for (const name in this.stages) {
+    const stageNames = Object.keys(this.stages) as (keyof TGameStages)[];
+    for (const name of stageNames) {
       this.stages[name].layout.resize(width, height);
     }
   }

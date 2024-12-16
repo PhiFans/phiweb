@@ -7,7 +7,7 @@ import { GameAudioClip } from './clip';
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 const GlobalAudioCtx = new AudioCtx({ latencyHint: 'interactive' });
 const GlobalAudioTicker = new Ticker();
-const GlobalAudioClock = new GameAudioClock(GlobalAudioCtx, GlobalAudioTicker);
+const GlobalAudioClock = new GameAudioClock(GlobalAudioCtx, GlobalAudioTicker, GlobalAudioCtx.baseLatency);
 
 export class GameAudio {
   readonly audioCtx: AudioContext;

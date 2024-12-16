@@ -12,10 +12,12 @@ export class GameAudioClock {
 
   private readonly audioCtx: AudioContext;
   private readonly ticker: Ticker;
+  private readonly baseOffset;
 
-  constructor(audioCtx: AudioContext, ticker: Ticker) {
+  constructor(audioCtx: AudioContext, ticker: Ticker, baseOffset: number = 0) {
     this.audioCtx = audioCtx;
     this.ticker = ticker;
+    this.baseOffset = baseOffset * 1000;
 
     this.calcTick = this.calcTick.bind(this);
     this.init();
@@ -31,16 +33,17 @@ export class GameAudioClock {
   }
 
   private calcTick() {
+    const { audioCtx, baseOffset, offsets } = this;
     const realTime = performance.now();
-    const delta = realTime - (this.audioCtx.currentTime * 1000);
+    const delta = realTime - (audioCtx.currentTime * 1000) - baseOffset;
 
-    this.offsets.push(delta);
+    offsets.push(delta);
     this.sum += delta;
 
-    while(this.offsets.length > 60) {
-      this.sum -= this.offsets.shift()!;
+    while(offsets.length > 60) {
+      this.sum -= offsets.shift()!;
     }
 
-    this.time = realTime - this.sum / this.offsets.length;
+    this.time = realTime - this.sum / offsets.length;
   }
 }

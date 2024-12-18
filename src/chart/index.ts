@@ -81,5 +81,6 @@ export class GameChart {
 
     this.onChartTick(currentTime, container!);
     if (status === 1) this.score.onScoreTick(currentTime);
+    this.score.ui.updateUIProgress(currentTime / audio.duration);
   }
 }

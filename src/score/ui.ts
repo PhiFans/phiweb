@@ -1,6 +1,6 @@
 import { Game } from '@/game';
 import { IGameRendererSize } from '@/renderer';
-import { TGameSkinElement, TGameSkinElementAnchored, TGameSkinElementTypeText } from '@/skins/types';
+import { TGameSkinElement, TGameSkinElementAnchored, TGameSkinElementCoordinate, TGameSkinElementStickTo, TGameSkinElementTypeText } from '@/skins/types';
 import { GameUITexturedNumber } from '@/ui/textured-number';
 import { parseDoublePrecist } from '@/utils/math';
 import { Container, Sprite, Text } from 'pixi.js';
@@ -15,7 +15,7 @@ type TGameScoreUIElementNumber = TGameScoreUIElementBase & {
 };
 
 type TGameScoreUIElementTexture = TGameScoreUIElementBase & {
-  type: 'combo-text' | 'image' | 'pause-button',
+  type: 'combo-text' | 'image' | 'pause-button' | 'progress-bar',
   sprite: Sprite,
 };
 
@@ -30,6 +30,7 @@ const accurateToText = (number: number) => `${parseDoublePrecist(number * 100, 2
 
 export class GameScoreUI {
   readonly game: Game;
+  readonly gameSize: IGameRendererSize;
   readonly container = new Container();
   readonly elements: TGameScoreUIElement[] = [];
   private readonly elementStats = {
@@ -41,6 +42,7 @@ export class GameScoreUI {
     this.game = game;
     const { skins, renderer, options } = this.game;
     const { size, containers } = renderer;
+    this.gameSize = size;
     const skin = skins.currentSkin!;
 
     this.elements = [ ...skin.elements ]
@@ -99,6 +101,10 @@ export class GameScoreUI {
             });
             break;
           }
+          case 'progress-bar': {
+            result.sprite = new Sprite(e.texture!);
+            break;
+          }
         }
 
         if (!result.sprite) {
@@ -125,27 +131,17 @@ export class GameScoreUI {
 
   resize(size: IGameRendererSize) {
     const { elements } = this;
-    const { heightPercent, width, widthHalf, widthOffset, height, heightHalf } = size;
+    const { heightPercent } = size;
 
     for (const e of elements) {
       const { stickTo, position, scale, sprite } = e;
-      const posX = widthOffset + (
-        stickTo.x === 'left' ? position.x * heightPercent :
-        stickTo.x === 'center' ? widthHalf + position.x * heightPercent :
-        width - position.x * heightPercent
-      );
-      const posY = (
-        stickTo.y === 'top' ? position.y * heightPercent :
-        stickTo.y === 'center' ? heightHalf + position.y * heightPercent :
-        height - position.y * heightPercent
-      );
-
+      const newPos = this.calculatePosition(size, stickTo, position);
       sprite.scale.set(heightPercent * (scale || 1));
-      sprite.position.set(posX, posY);
+      sprite.position.set(newPos.x, newPos.y);
     }
   }
 
-  updateUI(score: number, combo: number, accurate: number) {
+  updateUIScore(score: number, combo: number, accurate: number) {
     const { elements } = this;
     const accurateText = accurateToText(accurate);
 
@@ -173,6 +169,42 @@ export class GameScoreUI {
           break;
       }
     }
+  }
+
+  updateUIProgress(progress: number) {
+    const { elements, gameSize } = this;
+    for (const element of elements) {
+      if (element.type !== 'progress-bar') continue;
+      const { stickTo, stickToEnd, position, positionEnd } = element;
+      const startPos = this.calculatePosition(gameSize, stickTo, position);
+      const endPos = this.calculatePosition(gameSize, stickToEnd, positionEnd);
+
+      element.sprite.position.set(
+        startPos.x * (1 - progress) + endPos.x * progress,
+        startPos.y * (1 - progress) + endPos.y * progress
+      );
+    }
+  }
+
+  /**
+   * **[Note]**: With width offset
+   */
+  private calculatePosition(size: IGameRendererSize, stickTo: TGameSkinElementStickTo, position: TGameSkinElementCoordinate): TGameSkinElementCoordinate {
+    const { heightPercent, widthOffset, width, widthHalf, height, heightHalf } = size;
+    const posXPercent = position.x * heightPercent;
+    const posYPercent = position.y * heightPercent;
+
+    const posX = widthOffset + (
+      stickTo.x === 'left' ? posXPercent :
+      stickTo.x === 'center' ? widthHalf + posXPercent :
+      width - posXPercent
+    );
+    const posY = (
+      stickTo.y === 'top' ? posYPercent :
+      stickTo.y === 'center' ? heightHalf + posYPercent :
+      height - posYPercent
+    );
+    return { x: posX, y: posY };
   }
 
   private onButtonPauseClick() {

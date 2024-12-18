@@ -102,7 +102,7 @@ export class GameScore {
     this.inputs = new GameChartScoreInputs(this.chart.game);
     this.onScoreTick = onScoreTick.bind(this);
 
-    this.ui.updateUI(this.score, this.combo, this.accurate);
+    this.ui.updateUIScore(this.score, this.combo, this.accurate);
   }
 
   resize(size: IGameRendererSize) {
@@ -130,7 +130,7 @@ export class GameScore {
     );
     this.accurate = (judgeCount[3] + judgeCount[2] * 0.65) / this.scoredNotes;
 
-    ui.updateUI(this.score, this.combo, this.accurate);
+    ui.updateUIScore(this.score, this.combo, this.accurate);
   }
 
   reset() {
@@ -150,7 +150,7 @@ export class GameScore {
     this.judges.length = 0;
     this.inputs.reset();
 
-    this.ui.updateUI(0, 0, 1);
+    this.ui.updateUIScore(0, 0, 1);
     this.effects.reset();
   }
 }

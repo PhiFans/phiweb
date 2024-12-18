@@ -164,7 +164,8 @@ export class GameSkin {
       let promise: Promise<unknown>;
       if (
         element.type === 'image' ||
-        element.type === 'pause-button'
+        element.type === 'pause-button' ||
+        element.type === 'progress-bar'
       ) {
         promise = new Promise((res, rej) => {
           const file = element.file[qualityName];
@@ -297,6 +298,7 @@ export class GameSkin {
           break;
         }
         case 'pause-button':
+        case 'progress-bar':
         case 'image': {
           newElements.push({
             ...e,

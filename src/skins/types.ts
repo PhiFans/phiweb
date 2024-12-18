@@ -23,7 +23,12 @@ export type TGameSkinFontFamily = {
 
 export type TGameSkinElementTypeTexture = 'score' | 'accurate' | 'combo' | 'image';
 export type TGameSkinElementTypeText = 'song-name' | 'song-level' | 'song-artist' | 'text';
-export type TGameSkinElementType = TGameSkinElementTypeTexture | TGameSkinElementTypeText | 'hit-effect' | 'combo-text' | 'animation' | 'pause-button';
+export type TGameSkinElementType = TGameSkinElementTypeTexture | TGameSkinElementTypeText | 'hit-effect' | 'combo-text' | 'animation' | 'pause-button' | 'progress-bar';
+
+export type TGameSkinElementStickTo = {
+  x: 'left' | 'center' | 'right',
+  y: 'top' | 'center' | 'bottom',
+}
 
 export type TGameSkinElementCoordinate = {
   x: number,
@@ -32,10 +37,7 @@ export type TGameSkinElementCoordinate = {
 
 export type TGameSkinElementBase = {
   type: TGameSkinElementType,
-  stickTo: {
-    x: 'left' | 'center' | 'right',
-    y: 'top' | 'center' | 'bottom',
-  },
+  stickTo: TGameSkinElementStickTo,
   position: TGameSkinElementCoordinate,
   scale: number,
   alpha: number,
@@ -98,6 +100,12 @@ export type TGameSkinElementButtonPause = TGameSkinElementPathed & TGameSkinElem
   type: 'pause-button',
 };
 
+export type TGameSkinElementProgressBar = TGameSkinElementPathed & TGameSkinElementAnchored & {
+  type: 'progress-bar',
+  stickToEnd: TGameSkinElementStickTo,
+  positionEnd: IGameSkinElementCoordinate,
+};
+
 export type TGameSkinElement = (
   TGameSkinElementNumber |
   TGameSkinElementNumberCombo |
@@ -107,7 +115,8 @@ export type TGameSkinElement = (
   TGameSkinElementAnimation |
   TGameSkinElementComboText |
   TGameSkinElementHitEffect |
-  TGameSkinElementButtonPause
+  TGameSkinElementButtonPause |
+  TGameSkinElementProgressBar
 );
 
 export interface IGameSkinElementCoordinate {
@@ -132,7 +141,7 @@ export type TGameSkinElementFiledArray = TGameSkinElement & {
 };
 
 export type TGameSkinElementFiledBase = TGameSkinElement & {
-  type: 'image' | 'pause-button',
+  type: 'image' | 'pause-button' | 'progress-bar',
   file: TGameSkinFile,
   texture?: Texture,
 };

@@ -29,6 +29,7 @@ export interface IGameChartNote {
 
   isFake?: boolean,
   scaleX?: number,
+  visibleTime?: number,
 }
 
 const getNoteSkinTexture = (skin: GameSkin, type: string, useHighQuality = true, useHighlight = true) => {
@@ -63,6 +64,7 @@ export class GameChartNote {
   readonly isOfficial: boolean;
   readonly isFake: boolean;
   readonly scaleX: number;
+  readonly visibleTime: number;
 
   /** The real note position when on line. Only be used & calculaed when ticking */
   realLinePosX: number = 0;
@@ -111,7 +113,8 @@ export class GameChartNote {
     // Extra props
     isOfficial: boolean = false,
     isFake: boolean = false,
-    scaleX: number = 1
+    scaleX: number = 1,
+    visibleTime: number = -Infinity
   ) {
     this.judgeline = judgeline;
     this.type = type;
@@ -130,6 +133,7 @@ export class GameChartNote {
     this.isOfficial = isOfficial;
     this.isFake = isFake;
     this.scaleX = scaleX;
+    this.visibleTime = visibleTime;
   }
 
   createSprite(game: Game, skin: GameSkin, zIndex: number = 24) {

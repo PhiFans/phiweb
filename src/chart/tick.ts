@@ -132,7 +132,8 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
       holdLength,
       holdFloorPosition,
       isOfficial,
-      isFake
+      isFake,
+      visibleTime
     } = note;
     const floorPositionDiff = (floorPosition - judgeline.floorPosition) * (type === 3 && isOfficial ? 1 : speed);
     const sprite = note.sprite!;
@@ -148,6 +149,10 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
       continue;
     }
     if (score.isScored && (score.isScoreAnimated || score.score === EGameScoreJudgeType.BAD)) continue;
+    if (currentTime < visibleTime) {
+      if (sprite.parent) sprite.removeFromParent();
+      continue;
+    }
     // TODO: Made as an option
     if (floorPositionDiff * 0.6 > 2 || (floorPositionDiff < 0 && time > currentTime && judgeline.isCover)) {
       if (sprite.parent) sprite.removeFromParent();

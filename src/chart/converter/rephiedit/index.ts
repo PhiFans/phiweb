@@ -316,6 +316,7 @@ export const ConvertFromRePhiEdit = (_chartRaw: TRPEChart) => {
         floorPosition: 0,
         holdLength: null,
         scaleX: oldNote.size,
+        visibleTime: oldNote.visibleTime !== 999999 ? Math.floor(realTime - (oldNote.visibleTime * 1000)) : -Infinity,
       });
     });
   });
@@ -340,7 +341,8 @@ export const ConvertFromRePhiEdit = (_chartRaw: TRPEChart) => {
       holdLength,
       false,
       oldNote.isFake,
-      oldNote.scaleX
+      oldNote.scaleX,
+      oldNote.visibleTime
     ));
   }
 

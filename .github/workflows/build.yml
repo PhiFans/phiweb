@@ -10,11 +10,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    outputs:
+      sha_short: ${{ steps.git_sha.outputs.sha_short }}
+
     steps:
     - uses: actions/checkout@v4
     - name: Get git short sha
+      id: git_sha
       shell: bash
-      run: echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_ENV"
+      run: echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_OUTPUT"
     - name: Use pnpm
       uses: pnpm/action-setup@v2
       with:
@@ -30,7 +34,7 @@ jobs:
     - name: Upload build artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        name: build-${{ env.sha_short }}
+        name: build-${{ steps.git_sha.outputs.sha_short }}
         path: dist/
 
   pages:
@@ -50,11 +54,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - uses: actions/checkout@v4
-      - name: Get git short sha
-        shell: bash
-        run: echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_ENV"
       - uses: actions/deploy-pages@v4
         id: deployment
         with:
-          artifact_name: build-${{ env.sha_short }}
+          artifact_name: build-${{ needs.build.outputs.sha_short }}

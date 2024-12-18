@@ -46,7 +46,7 @@ jobs:
       cancel-in-progress: false
 
     environment:
-      name: github-pages
+      name: build-${{ env.sha_short }}
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:

@@ -10,6 +10,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    permissions:
+      pages: write
+      id-token: write
+
+    concurrency:
+      group: 'pages'
+      cancel-in-progress: false
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
     - uses: actions/checkout@v4
     - name: Get git short sha
@@ -32,29 +44,8 @@ jobs:
       with:
         name: build-${{ env.sha_short }}
         path: dist/
-
-  pages:
-    needs: build
-    runs-on: ubuntu-latest
-
-    permissions:
-      pages: write
-      id-token: write
-
-    concurrency:
-      group: 'pages'
-      cancel-in-progress: false
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: Get git short sha
-        shell: bash
-        run: echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_ENV"
-      - uses: actions/deploy-pages@v4
-        id: deployment
-        with:
-          artifact_name: build-${{ env.sha_short }}
+    - name: Deploy to GitHub Pages
+      uses: actions/deploy-pages@v4
+      id: deployment
+      with:
+        artifact_name: build-${{ env.sha_short }}

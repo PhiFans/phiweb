@@ -32,3 +32,23 @@ jobs:
       with:
         name: build-${{ env.sha_short }}
         path: dist/
+
+  pages:
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
+
+    concurrency:
+      group: 'pages'
+      cancel-in-progress: false
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment

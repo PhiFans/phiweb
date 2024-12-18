@@ -3,7 +3,6 @@ import { GameChart } from '.';
 import { GameChartEvent } from './event';
 import { ArrayIndexed } from '@/utils/class';
 import { isLineInArea } from '@/utils/math';
-import { EGameChartNoteType } from './note';
 import { EGameScoreJudgeType } from '@/score/types';
 
 const valueCalculator = (events: ArrayIndexed<GameChartEvent>, currentTime: number, defaultValue = 0) => {
@@ -135,24 +134,21 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
       isFake,
       visibleTime
     } = note;
-    const floorPositionDiff = (floorPosition - judgeline.floorPosition) * (type === 3 && isOfficial ? 1 : speed);
-    const sprite = note.sprite!;
+    if (score.isScored && (score.isScoreAnimated || score.score === EGameScoreJudgeType.BAD)) continue;
 
-    if (
-      isFake &&
-      (
-        (type !== EGameChartNoteType.HOLD && currentTime >= time) ||
-        (type === EGameChartNoteType.HOLD && currentTime >= holdEndTime!)
-      )
-    ) {
+    const sprite = note.sprite!;
+    if (isFake && currentTime >= time && (holdEndTime === null || currentTime >= holdEndTime)) {
+      score.isScored = true;
+      score.isScoreAnimated = true;
       if (sprite.parent) sprite.removeFromParent();
       continue;
     }
-    if (score.isScored && (score.isScoreAnimated || score.score === EGameScoreJudgeType.BAD)) continue;
     if (currentTime < visibleTime) {
       if (sprite.parent) sprite.removeFromParent();
       continue;
     }
+
+    const floorPositionDiff = (floorPosition - judgeline.floorPosition) * (type === 3 && isOfficial ? 1 : speed);
     // TODO: Made as an option
     if (floorPositionDiff * 0.6 > 2 || (floorPositionDiff < 0 && time > currentTime && judgeline.isCover)) {
       if (sprite.parent) sprite.removeFromParent();

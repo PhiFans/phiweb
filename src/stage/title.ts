@@ -1,5 +1,5 @@
 import { Graphics } from 'pixi.js';
-import { Select } from '@pixi/ui';
+import { CheckBox, Select } from '@pixi/ui';
 import { Layout } from '@pixi/layout';
 import { PopupReadFiles } from '@/utils/file';
 import { IGameStageBase } from '.';
@@ -7,6 +7,11 @@ import { Game } from '@/game';
 import { GameChartData } from '@/chart/data';
 import { GameAudioClip } from '@/audio/clip';
 import { createButtonView } from './utils';
+
+const LayerStyle = {
+  marginTop: 8,
+  width: '100%',
+};
 
 const createSelectItem = (textStr: string[]) => {
   const item = {
@@ -41,6 +46,26 @@ const createSelectView = (width: number = 160, height: number = 40) => {
   return select;
 };
 
+const createCheckboxView = (text: string, checked: boolean = false) => {
+  const checkbox = new CheckBox({
+    text, checked,
+    style: {
+      unchecked: new Graphics()
+        .rect(0, 0, 40, 40)
+        .fill(0x666666),
+      checked: new Graphics()
+        .rect(0, 0, 40, 40)
+        .fill(0x666666)
+        .rect(5, 5, 30, 30)
+        .fill(0xAAAAAA),
+      text: {
+        fill: 0xFFFFFF,
+      }
+    }
+  });
+  return checkbox;
+};
+
 export class GameStageTitle implements IGameStageBase {
   readonly game: Game;
   readonly layout: Layout;
@@ -59,6 +84,9 @@ export class GameStageTitle implements IGameStageBase {
     const TitleButtonLoadSkin = createButtonView('Load skin');
     const TitleButtonStart = createButtonView('Start');
 
+    const CheckAutoPlay = createCheckboxView('Auto play', game.options.autoPlay);
+    const CheckHighQualitySkin = createCheckboxView('Use high quality skin', game.options.useHighQualitySkin);
+
     this.selectorChart = createSelectView(240);
     this.selectorAudio = createSelectView(240);
 
@@ -73,43 +101,79 @@ export class GameStageTitle implements IGameStageBase {
     TitleButtonLoadSkin.onPress.connect(() => this.onClickSelectSkin());
     TitleButtonStart.onPress.connect(() => this.onStartGame());
 
+    CheckAutoPlay.onChange.connect((e) => game.options.autoPlay = e as boolean);
+    CheckHighQualitySkin.onChange.connect((e) => game.options.useHighQualitySkin = e as boolean);
+
     this.game = game;
     // XXX: How do i use this??
     this.layout = new Layout({
-      content: [
-        {
-          content: TitleButtonLoadFiles,
-          styles: {
-            margin: 8,
-          },
+      content: {
+        importLayer: {
+          content: [
+            {
+              content: TitleButtonLoadFiles,
+              styles: {
+                marginRight: 4,
+              },
+            },
+            {
+              content: TitleButtonLoadSkin,
+              styles: {
+                marginLeft: 4,
+              },
+            },
+          ],
+          styles: LayerStyle
         },
-        {
-          content: TitleButtonLoadSkin,
-          styles: {
-            margin: 8,
-          },
+        selectorLayer: {
+          content: [
+            {
+              content: this.selectorChart,
+              styles: {
+                marginRight: 4,
+              },
+            },
+            {
+              content: this.selectorAudio,
+              styles: {
+                marginLeft: 4,
+              },
+            },
+          ],
+          styles: LayerStyle
         },
-        {
-          content: TitleButtonStart,
-          styles: {
-            margin: 8,
-          },
+        optionsLayer: {
+          content: [
+            {
+              content: CheckAutoPlay,
+              styles: {
+                marginRight: 4,
+              },
+            },
+            {
+              content: CheckHighQualitySkin,
+              styles: {
+                marginLeft: 4,
+              },
+            },
+          ],
+          styles: LayerStyle
         },
-        {
-          content: this.selectorChart,
-          styles: {
-            margin: 8,
-          },
+        startLayer: {
+          content: [
+            {
+              content: TitleButtonStart,
+            }
+          ],
+          styles: LayerStyle
         },
-        {
-          content: this.selectorAudio,
-          styles: {
-            margin: 8,
-          },
-        },
-      ],
+      },
       styles: {
         padding: 4,
+        paddingLeft: 8,
+        paddingRight: 8,
+        width: '100%',
+        height: '100%',
       }
     });
   }

@@ -10,6 +10,15 @@ import { GameAudioClip } from './audio/clip';
 import { EGameScoreJudgeType } from './score/types';
 
 export class Game {
+  // TODO: Use another class to manage it
+  private videoOptions: Partial<AutoDetectOptions> = {};
+  readonly options = {
+    useHighQualitySkin: true,
+    useHighlight: true,
+    challengeMode: false,
+    autoPlay: true,
+  };
+
   readonly renderer: GameRenderer = new GameRenderer(this);
   readonly skins: GameSkins = new GameSkins(this);
   readonly stage: GameStage = new GameStage(this);
@@ -17,15 +26,6 @@ export class Game {
   readonly files: GameFiles = new GameFiles();
 
   chart?: GameChart;
-
-  // TODO: Use another class to manage it
-  options = {
-    useHighQualitySkin: true,
-    useHighlight: true,
-    challengeMode: false,
-    autoPlay: true,
-  };
-  private videoOptions: Partial<AutoDetectOptions> = {};
 
   constructor() {
     this.resize = this.resize.bind(this);

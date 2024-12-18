@@ -277,7 +277,7 @@ export const getLineSpeedValueByTime = (judgeline: GameChartJudgeLine, time: num
     for (let j = 0, k = speed.length; j < k; j++) {
       const event = speed[j];
 
-      if (event.endTime <= time) continue;
+      if (event.endTime < time) continue;
       if (event.startTime > time) {
         value = j !== 0 ? speed[j - 1].value : i === 0 ? 1 : 0;
         break;

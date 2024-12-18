@@ -30,7 +30,9 @@ jobs:
         node-version: '20.x'
         cache: 'pnpm'
     - run: pnpm install
-    - run: pnpm run build
+    - run: |
+        npx tsc
+        npx vite build --base=/phiweb/
     - name: Upload build artifact
       uses: actions/upload-pages-artifact@v3
       with:

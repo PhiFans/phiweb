@@ -165,3 +165,26 @@ export const unzipFile = (file: File | Blob): Promise<File[]> => new Promise((re
     })
     .catch(e => rej(e));
 });
+
+export const decodeCSV = <T extends { [key: string]: string }>(raw: string): T[] => {
+  const rawLines = raw.split(/[\r\n]+/);
+  const resultKeys: string[] = [];
+  const result: T[] = [];
+
+  for (const rawLine of rawLines) {
+    const rawInfos = rawLine.split(/,/);
+    if (resultKeys.length <= 0) resultKeys.push(...rawInfos);
+    else {
+      const info: Record<string, string> = {};
+      for (let i = 0; i < resultKeys.length; i++) {
+        const key = resultKeys[i];
+        const value = rawInfos[i] || '';
+        info[key] = value;
+      }
+      result.push(info as T);
+    }
+  }
+
+  if (resultKeys.length <= 0 || result.length <= 0) throw new Error('Not a valid .csv file');
+  return result;
+};

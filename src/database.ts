@@ -15,7 +15,7 @@ export type TGameDatabase = {
 };
 
 export type TGameDatabaseData = {
-  [x: string]: string | number | Blob,
+  [x: string]: string | boolean | number | Blob,
 };
 
 const waitFor = (bool: boolean) => new Promise((res) => {
@@ -97,7 +97,7 @@ export class GameDatabase {
     store.add(data);
   })}
 
-  delete(index: string | number) {return new Promise(async (res, rej) => {
+  delete(index: string | number): Promise<void> {return new Promise(async (res, rej) => {
     await waitFor(this.isReady);
     const { db } = this;
 
@@ -113,7 +113,7 @@ export class GameDatabase {
     };
   })}
 
-  get(index: string | number) {return new Promise(async (res, rej) => {
+  get<T extends TGameDatabaseData>(index: string | number): Promise<T | null> {return new Promise(async (res, rej) => {
     await waitFor(this.isReady);
     const { db } = this;
 
@@ -122,14 +122,14 @@ export class GameDatabase {
     const request = store.get(index);
 
     request.onsuccess = () => {
-      res(request.result);
+      res(request.result || null);
     };
     request.onerror = (e) => {
       rej(e);
     };
   })}
 
-  update(index: string | number, data: TGameDatabaseData) {return new Promise(async (res, rej) => {
+  update<T extends TGameDatabaseData>(index: string | number, data: TGameDatabaseData): Promise<T> {return new Promise(async (res, rej) => {
     await waitFor(this.isReady);
     const { db } = this;
 
@@ -143,7 +143,7 @@ export class GameDatabase {
 
       const reqUpdate = store.put(newData);
       reqUpdate.onsuccess = () => {
-        res(reqUpdate.result);
+        res(newData);
       };
       reqUpdate.onerror = (e) => {
         rej(e);

@@ -97,6 +97,22 @@ export class GameDatabase {
     store.add(data);
   })}
 
+  delete(index: string | number) {return new Promise(async (res, rej) => {
+    await waitFor(this.isReady);
+    const { db } = this;
+
+    const transaction = db.transaction([ this.name ], 'readwrite');
+    const store = transaction.objectStore(this.name);
+    const request = store.delete(index);
+
+    request.onsuccess = () => {
+      res(request.result);
+    };
+    request.onerror = (e) => {
+      rej(e);
+    };
+  })}
+
   get(index: string | number) {return new Promise(async (res, rej) => {
     await waitFor(this.isReady);
     const { db } = this;

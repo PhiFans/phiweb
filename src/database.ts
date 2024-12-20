@@ -128,4 +128,29 @@ export class GameDatabase {
       rej(e);
     };
   })}
+
+  update(index: string | number, data: TGameDatabaseData) {return new Promise(async (res, rej) => {
+    await waitFor(this.isReady);
+    const { db } = this;
+
+    const transaction = db.transaction([ this.name ], 'readwrite');
+    const store = transaction.objectStore(this.name);
+    const request = store.get(index);
+
+    request.onsuccess = () => {
+      const oldData = request.result;
+      const newData = { ...oldData, ...data };
+
+      const reqUpdate = store.put(newData);
+      reqUpdate.onsuccess = () => {
+        res(reqUpdate.result);
+      };
+      reqUpdate.onerror = (e) => {
+        rej(e);
+      };
+    };
+    request.onerror = (e) => {
+      rej(e);
+    };
+  })}
 }

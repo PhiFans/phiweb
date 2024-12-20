@@ -96,4 +96,20 @@ export class GameDatabase {
 
     store.add(data);
   })}
+
+  get(index: string | number) {return new Promise(async (res, rej) => {
+    await waitFor(this.isReady);
+    const { db } = this;
+
+    const transaction = db.transaction([ this.name ], 'readonly');
+    const store = transaction.objectStore(this.name);
+    const request = store.get(index);
+
+    request.onsuccess = () => {
+      res(request.result);
+    };
+    request.onerror = (e) => {
+      rej(e);
+    };
+  })}
 }

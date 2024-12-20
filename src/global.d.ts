@@ -7,6 +7,12 @@ declare global {
     webkitAudioContext: AudioContext,
   }
 
+  // Alias
+  interface File {
+    mozSlice: Blob.slice,
+    webkitSlice: Blob.slice,
+  }
+
   // For Devtool
   var __PIXI_APP__ = new Application;
   var __PIXI_STAGE__ = new Container;

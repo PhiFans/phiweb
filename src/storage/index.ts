@@ -33,6 +33,19 @@ export class GameStorage {
       .catch(e => rej(e));
   })}
 
+  getFile(md5: string) {
+    return this.dbFile.get<TGameDBFile>(md5);
+  }
+
+  getFileByName(filename: string) {
+    return this.dbFile.get<TGameDBFile>(filename, 'filename');
+  }
+
+  getFilesByMD5(md5s: string[]) {return new Promise(async (res) => {
+    const allFiles = await this.dbFile.getAll<TGameDBFile>();
+    res(allFiles.filter((e) => md5s.includes(e.md5)));
+  })}
+
   getDecodedFile(md5: string) {
     return this.decodedFiles.find(e => e.md5 === md5);
   }

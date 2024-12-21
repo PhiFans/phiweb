@@ -159,33 +159,9 @@ export const importChartFiles = (
     (await (new Promise(() => {
       throw new Error('Promise chain!');
     })).catch(async () => {
-      // Decode as chart file
-      const fileText = await ReadFileAsText(file);
-      const chartResult = await GameChartData.from(fileText);
-      decodedFiles.push({
-        filename: file.name,
-        type: 'chart',
-        data: chartResult,
-      });
-      isSupportedFile = true;
-    }).catch(async () => {
-      // Decode as image
-      const bitmap = await window.createImageBitmap(file);
-      decodedFiles.push({
-        filename: file.name,
-        type: 'image',
-        data: bitmap
-      });
-      isSupportedFile = true;
-    }).catch(async () => {
-      // Decode as audio file
-      const audioBuffer = await ReadFileAsAudioBuffer(file);
-      const audioResult = GameAudio.from(audioBuffer);
-      decodedFiles.push({
-        filename: file.name,
-        type: 'audio',
-        data: audioResult,
-      });
+      // Decode regular chart files
+      const decodeResult = await decodeFile(file);
+      decodedFiles.push(decodeResult as IFile);
       isSupportedFile = true;
     }).catch(async () => {
       // Read chart info (info.csv)

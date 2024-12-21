@@ -142,7 +142,19 @@ export const importChartFiles = (
 
   // Decode files
   for (const file of allFiles) {
+    const fileMD5 = await getFileMD5(file);
+    const oldFile = game.storage.getDecodedFile(fileMD5);
     let isSupportedFile = false;
+
+    if (oldFile) {
+      decodedFiles.push(oldFile.file);
+      supportedFiles.push({
+        md5: fileMD5,
+        filename: file.name,
+        blob: file,
+      });
+      continue;
+    }
 
     (await (new Promise(() => {
       throw new Error('Promise chain!');
@@ -202,6 +214,8 @@ export const importChartFiles = (
     // Add supported files to storage
     if (isSupportedFile) {
       const fileInfo = await game.storage.addFile(file.name, file);
+
+      game.storage.addDecodedFile(fileMD5, decodedFiles[decodedFiles.length - 1]);
       supportedFiles.push({
         md5: fileInfo.md5,
         filename: file.name,

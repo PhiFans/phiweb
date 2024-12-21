@@ -1,5 +1,6 @@
 import { GameDatabaseEngine } from '@/database/engine';
 import { getFileMD5 } from '@/utils/file';
+import { IFile } from '@/utils/types';
 
 export type TGameDBFile = {
   md5: string,
@@ -9,6 +10,7 @@ export type TGameDBFile = {
 
 export class GameStorage {
   readonly dbFile: GameDatabaseEngine;
+  readonly decodedFiles: { md5: string, file: IFile }[] = [];
 
   constructor() {
     this.dbFile = new GameDatabaseEngine('file_db', 1, {
@@ -30,4 +32,16 @@ export class GameStorage {
     }).then(() => res({ md5, filename }))
       .catch(e => rej(e));
   })}
+
+  getDecodedFile(md5: string) {
+    return this.decodedFiles.find(e => e.md5 === md5);
+  }
+
+  addDecodedFile(md5: string, file: IFile) {
+    const oldFile = this.getDecodedFile(md5);
+    if (oldFile) return null;
+    this.decodedFiles.push({
+      md5, file
+    });
+  }
 }

@@ -1,4 +1,6 @@
 
+export type TGameDatabaseDataType = string | boolean | number | Blob;
+
 export type TGameDatabaseStructure = {
   name: string,
   options?: Partial<{
@@ -15,7 +17,7 @@ export type TGameDatabase = {
 };
 
 export type TGameDatabaseData = {
-  [x: string]: string | boolean | number | Blob,
+  [x: string]: TGameDatabaseDataType | TGameDatabaseDataType[],
 };
 
 const waitFor = (bool: boolean) => new Promise((res) => {
@@ -113,13 +115,13 @@ export class GameDatabaseEngine {
     };
   })}
 
-  get<T extends TGameDatabaseData>(index: string | number): Promise<T | null> {return new Promise(async (res, rej) => {
+  get<T extends TGameDatabaseData>(index: string | number, key?: string): Promise<T | null> {return new Promise(async (res, rej) => {
     await waitFor(this.isReady);
     const { db } = this;
 
     const transaction = db.transaction([ this.name ], 'readonly');
     const store = transaction.objectStore(this.name);
-    const request = store.get(index);
+    const request = key ? store.index(key).get(index) : store.get(index);
 
     request.onsuccess = () => {
       res(request.result || null);

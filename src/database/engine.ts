@@ -131,6 +131,30 @@ export class GameDatabaseEngine {
     };
   })}
 
+  getAll<T extends TGameDatabaseData>(): Promise<T[]> {return new Promise(async (res, rej) => {
+    await waitFor(this.isReady);
+    const { db } = this;
+    const result: T[] = [];
+
+    const transaction = db.transaction([ this.name ], 'readonly');
+    const store = transaction.objectStore(this.name);
+    const cursor = store.openCursor();
+
+    cursor.onsuccess = (e) => {
+      const _cur = (e.target as IDBRequest).result as (IDBCursorWithValue | null);
+      if (_cur) {
+        result.push(_cur.value);
+        _cur.continue();
+      } else {
+        res(result);
+      }
+    };
+
+    cursor.onerror = (e) => {
+      rej(e);
+    };
+  })}
+
   update<T extends TGameDatabaseData>(index: string | number, data: TGameDatabaseData): Promise<T> {return new Promise(async (res, rej) => {
     await waitFor(this.isReady);
     const { db } = this;

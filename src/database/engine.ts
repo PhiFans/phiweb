@@ -27,7 +27,7 @@ const waitFor = (bool: boolean) => new Promise((res) => {
   }, 200);
 });
 
-export class GameDatabase {
+export class GameDatabaseEngine {
   readonly name: string;
   readonly version: number;
 

@@ -1,4 +1,4 @@
-import { GameDatabase } from '@/database';
+import { GameDatabaseEngine } from '@/database/engine';
 import { getFileMD5 } from '@/utils/file';
 
 export type TGameDBFile = {
@@ -8,10 +8,10 @@ export type TGameDBFile = {
 };
 
 export class GameStorage {
-  readonly dbFile: GameDatabase;
+  readonly dbFile: GameDatabaseEngine;
 
   constructor() {
-    this.dbFile = new GameDatabase('file_db', 1, {
+    this.dbFile = new GameDatabaseEngine('file_db', 1, {
       structures: [
         { name: 'md5', options: { key: true } },
         { name: 'filename', options: { index: true, unique: false } },

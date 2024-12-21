@@ -216,7 +216,7 @@ export const importChartFiles = (
 
   // Save chart info to dabatase
   for (const info of chartInfos) {
-    if (!(await game.database.chart.get(info.chart, 'chart'))) game.database.chart.add(info);
+    if (!(await game.database.chart.get(info.chart))) game.database.chart.add(info);
   }
 
   res({

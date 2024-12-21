@@ -8,6 +8,8 @@ import { GameChart } from './chart';
 import { GameChartData } from './chart/data';
 import { GameAudioClip } from './audio/clip';
 import { EGameScoreJudgeType } from './score/types';
+import { GameStorage } from './storage';
+import { GameDatabase } from './database';
 
 export class Game {
   // TODO: Use another class to manage it
@@ -19,6 +21,8 @@ export class Game {
     autoPlay: true,
   };
 
+  readonly storage: GameStorage = new GameStorage();
+  readonly database: GameDatabase = new GameDatabase();
   readonly renderer: GameRenderer = new GameRenderer(this);
   readonly skins: GameSkins = new GameSkins(this);
   readonly stage: GameStage = new GameStage(this);

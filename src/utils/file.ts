@@ -3,8 +3,10 @@ import JSZip from 'jszip';
 import SparkMD5 from 'spark-md5';
 import { GameChartData } from '@/chart/data';
 import { GameAudio } from '@/audio';
-import { Nullable } from './types';
+import { Nullable, TChartInfo, TChartInfoCSV } from './types';
 import { IFile } from './types';
+import { Game } from '@/game';
+import { TGameDBFile } from '@/storage';
 
 export const PopupReadFiles = (multiple = false, accept: string | Array<string> = ''): Promise<Nullable<FileList>> => new Promise((res) => {
   const fileDOM = document.createElement('input');
@@ -105,6 +107,128 @@ export const generateImageBitmap = (file: Blob, scale?: number): Promise<ImageBi
   } catch (e) {
     rej(e);
   }
+});
+
+export const extractZip = (file: File): Promise<File[]> => new Promise((res) => {
+  (new Promise(() => {
+    throw new Error('Promise chain!');
+  })).catch(async () => {
+    // Decode as zip file
+    const files = await unzipFile(file);
+    res(files);
+  }).catch(async () => {
+    // Or just return an array
+    res([ file ]);
+  });
+});
+
+export const importChartFiles = (
+  game: Game,
+  files: File[] | FileList
+): Promise<{
+  files: TGameDBFile[],
+  decodedFiles: IFile[],
+  infos: TChartInfo[],
+}> => new Promise(async (res) => {
+  const allFiles: File[] = [];
+  const chartInfos: TChartInfo[] = [];
+  const supportedFiles: TGameDBFile[] = [];
+  const decodedFiles: IFile[] = [];
+
+  // Extract zip(s)
+  for (const file of files) {
+    allFiles.push(...(await extractZip(file)));
+  }
+
+  // Decode files
+  for (const file of allFiles) {
+    let isSupportedFile = false;
+
+    (await (new Promise(() => {
+      throw new Error('Promise chain!');
+    })).catch(async () => {
+      // Decode as chart file
+      const fileText = await ReadFileAsText(file);
+      const chartResult = await GameChartData.from(fileText);
+      decodedFiles.push({
+        filename: file.name,
+        type: 'chart',
+        data: chartResult,
+      });
+      isSupportedFile = true;
+    }).catch(async () => {
+      // Decode as image
+      const bitmap = await window.createImageBitmap(file);
+      decodedFiles.push({
+        filename: file.name,
+        type: 'image',
+        data: bitmap
+      });
+      isSupportedFile = true;
+    }).catch(async () => {
+      // Decode as audio file
+      const audioBuffer = await ReadFileAsAudioBuffer(file);
+      const audioResult = GameAudio.from(audioBuffer);
+      decodedFiles.push({
+        filename: file.name,
+        type: 'audio',
+        data: audioResult,
+      });
+      isSupportedFile = true;
+    }).catch(async () => {
+      // Read chart info (info.csv)
+      if (file.name !== 'info.csv') throw new Error('This may not a info file');
+      const textRaw = await ReadFileAsText(file);
+      const csvResult = decodeCSV<TChartInfoCSV>(textRaw);
+
+      for (const csv of csvResult) {
+        chartInfos.push({
+          name: csv.Name,
+          artist: 'Unknown',
+          designer: csv.Designer,
+          level: csv.Level,
+          illustrator: csv.Illustrator,
+
+          chart: csv.Chart,
+          audio: csv.Music,
+          image: csv.Image,
+          extraFiles: [],
+        });
+      }
+    }).catch(() => {
+      console.warn(`Unsupported file type. File name: ${file.name}`);
+    }));
+
+    // Add supported files to storage
+    if (isSupportedFile) {
+      const fileInfo = await game.storage.addFile(file.name, file);
+      supportedFiles.push({
+        md5: fileInfo.md5,
+        filename: file.name,
+        blob: file,
+      });
+    }
+  }
+
+  // Push files to chart info
+  for (const chartInfo of chartInfos) {
+    chartInfo.chart = supportedFiles.find((e) => e.filename === chartInfo.chart)!.md5;
+    chartInfo.audio = supportedFiles.find((e) => e.filename === chartInfo.audio)!.md5;
+    chartInfo.image = supportedFiles.find((e) => e.filename === chartInfo.image)!.md5;
+
+    chartInfo.extraFiles = [ ...supportedFiles
+      .filter((e) => e.md5 !== chartInfo.chart)
+      .filter((e) => e.md5 !== chartInfo.audio)
+      .filter((e) => e.md5 !== (chartInfo.image || ''))
+      .map((e) => e.md5)
+    ];
+  }
+
+  res({
+    files: supportedFiles,
+    decodedFiles,
+    infos: chartInfos,
+  });
 });
 
 export const decodeFile = (file: File): Promise<IFile | File[]> => new Promise((res, rej) => {

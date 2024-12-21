@@ -28,6 +28,20 @@ export interface IFileAudio extends IFileBasic {
 
 export type IFile = IFileChart | IFileImage | IFileAudio;
 
+export type TChartInfo = {
+  name: string,
+  artist: string,
+  designer: string,
+  level: string,
+  illustrator: string,
+
+  // Files
+  chart: string,
+  audio: string,
+  image?: string,
+  extraFiles: string[],
+};
+
 export type TChartInfoCSV = {
   Name: string,
   Designer: string,

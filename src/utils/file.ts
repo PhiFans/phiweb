@@ -1,6 +1,7 @@
 import decodeAudio from 'audio-decode';
 import JSZip from 'jszip';
 import SparkMD5 from 'spark-md5';
+import * as StackBlur from 'stackblur-canvas';
 import { GameChartData } from '@/chart/data';
 import { GameAudio } from '@/audio';
 import { Nullable } from './types';
@@ -217,3 +218,20 @@ export const decodeTXT = <T extends { [key: string]: string }>(raw: string): T =
   if (Object.keys(result).length <= 0) throw new Error('Not a valid info.txt file');
   return result as T;
 };
+
+export const blurImage = (image: ImageBitmap, radius: number = 10): Promise<ImageBitmap> => new Promise((res, rej) => {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d')!;
+
+  canvas.width = image.width;
+  canvas.height = image.height;
+
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+  StackBlur.canvasRGB(canvas, 0, 0, canvas.width, canvas.height, radius);
+  window.createImageBitmap(canvas)
+    .then((e) => res(e))
+    .catch((e) => rej(e));
+});

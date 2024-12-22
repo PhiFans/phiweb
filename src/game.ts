@@ -64,9 +64,10 @@ export class Game {
 
     this.chart = new GameChart(
       this,
+      chartInfo,
       (chartFiles.find((e) => e.md5 === chartInfo.chart)!.file as IFileChart).data,
       (chartFiles.find((e) => e.md5 === chartInfo.audio)!.file as IFileAudio).data,
-      (chartFiles.find((e) => e.md5 === chartInfo.image)!.file as IFileImage).data ?? (void 0)
+      (chartFiles.find((e) => e.md5 === chartInfo.image)!.file as IFileImage).data ?? null
     );
     this.chart.audio.setChannel(this.audio.channels.music);
 

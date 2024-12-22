@@ -3,6 +3,7 @@ import { IGameRendererSize } from '@/renderer';
 import { TGameSkinElement, TGameSkinElementAnchored, TGameSkinElementCoordinate, TGameSkinElementStickTo, TGameSkinElementTypeText } from '@/skins/types';
 import { GameUITexturedNumber } from '@/ui/textured-number';
 import { parseDoublePrecist } from '@/utils/math';
+import { TChartInfo } from '@/utils/types';
 import { Container, Sprite, Text } from 'pixi.js';
 
 type TGameScoreUIElementBase = TGameSkinElement & {
@@ -30,6 +31,7 @@ const accurateToText = (number: number) => `${parseDoublePrecist(number * 100, 2
 
 export class GameScoreUI {
   readonly game: Game;
+  readonly info: TChartInfo;
   readonly gameSize: IGameRendererSize;
   readonly container = new Container();
   readonly elements: TGameScoreUIElement[] = [];
@@ -38,8 +40,10 @@ export class GameScoreUI {
     pauseClickCount: 0,
   };
 
-  constructor(game: Game) {
+  constructor(game: Game, info: TChartInfo) {
     this.game = game;
+    this.info = info;
+
     const { skins, renderer, options } = this.game;
     const { size, containers } = renderer;
     this.gameSize = size;
@@ -67,9 +71,9 @@ export class GameScoreUI {
           case 'song-artist': {
             result.sprite = new Text({
               text: (
-                e.type === 'song-name' ? 'Song name' :
-                e.type === 'song-artist' ? 'Song artist' :
-                'IN Lv.?'
+                e.type === 'song-name' ? this.info.name :
+                e.type === 'song-artist' ? this.info.artist :
+                this.info.level
               ),
               style: {
                 fontFamily: e.fontFamily,

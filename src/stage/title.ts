@@ -4,20 +4,18 @@ import { Layout } from '@pixi/layout';
 import { PopupReadFiles } from '@/utils/file';
 import { IGameStageBase } from '.';
 import { Game } from '@/game';
-import { GameChartData } from '@/chart/data';
-import { GameAudioClip } from '@/audio/clip';
 import { createButtonView } from './utils';
+import { Nullable, TChartInfo } from '@/utils/types';
 
 const LayerStyle = {
   marginTop: 8,
   width: '100%',
 };
 
-const createSelectItem = (textStr: string[]) => {
+const createSelectItem = (infos: TChartInfo[], width = 240) => {
   const item = {
-    items: textStr,
-    width: 240,
-    height: 40,
+    items: infos.map((info) => `${info.name} - ${info.level} - ${info.designer}`),
+    width, height: 40,
     backgroundColor: 0x666666,
     hoverColor: 0xAAAAAA,
     textStyle: {
@@ -71,15 +69,16 @@ export class GameStageTitle implements IGameStageBase {
   readonly layout: Layout;
 
   selectorChart: Select;
-  selectorAudio: Select;
 
-  listsChart: string[] = [];
-  listsAudio: string[] = [];
-
-  selectedChart?: string;
-  selectedAudio?: string;
+  listsChart: TChartInfo[] = [];
+  selectedChart: Nullable<TChartInfo> = null;
 
   constructor(game: Game) {
+    game.database.chart.getAll()
+      .then((charts) => {
+        this.updateChartList(charts as TChartInfo[]);
+      });
+
     const TitleButtonLoadFiles = createButtonView('Load files');
     const TitleButtonLoadSkin = createButtonView('Load skin');
     const TitleButtonStart = createButtonView('Start');
@@ -87,14 +86,13 @@ export class GameStageTitle implements IGameStageBase {
     const CheckAutoPlay = createCheckboxView('Auto play', game.options.autoPlay);
     const CheckHighQualitySkin = createCheckboxView('Use high quality skin', game.options.useHighQualitySkin);
 
-    this.selectorChart = createSelectView(240);
-    this.selectorAudio = createSelectView(240);
-
+    this.selectorChart = createSelectView(400);
     this.selectorChart.onSelect.connect((_, text) => {
-      this.selectedChart = text;
-    });
-    this.selectorAudio.onSelect.connect((_, text) => {
-      this.selectedAudio = text;
+      const optionMatch = text.match(/^(.+)\s-\s(.+)\s-\s(.+)$/)!;
+      const [ , optionName, optionLevel, optionDesigner ] = optionMatch;
+      const chartInfo = this.listsChart.find((e) => e.name === optionName && e.level === optionLevel && e.designer === optionDesigner);
+      if (!chartInfo) return;
+      this.selectedChart = chartInfo;
     });
 
     TitleButtonLoadFiles.onPress.connect(() => this.onClickSelect());
@@ -120,23 +118,13 @@ export class GameStageTitle implements IGameStageBase {
               content: TitleButtonLoadSkin,
               styles: {
                 marginLeft: 4,
-              },
-            },
-          ],
-          styles: LayerStyle
-        },
-        selectorLayer: {
-          content: [
-            {
-              content: this.selectorChart,
-              styles: {
                 marginRight: 4,
               },
             },
             {
-              content: this.selectorAudio,
+              content: this.selectorChart,
               styles: {
-                marginLeft: 4,
+                marginLeft: 8,
               },
             },
           ],
@@ -146,15 +134,14 @@ export class GameStageTitle implements IGameStageBase {
           content: [
             {
               content: CheckAutoPlay,
-              styles: {
-                marginRight: 4,
-              },
             },
+          ],
+          styles: LayerStyle
+        },
+        optionsLayer2: {
+          content: [
             {
               content: CheckHighQualitySkin,
-              styles: {
-                marginLeft: 4,
-              },
             },
           ],
           styles: LayerStyle
@@ -180,35 +167,23 @@ export class GameStageTitle implements IGameStageBase {
 
   private onClickSelect() {
     PopupReadFiles(true)
-    .then((files) => {
-      if (!files || files.length <= 0) return;
-      this.game.files.from(files)
-        .then((fileList) => {
-          const allCharts = fileList.getCharts();
-          const allChartLists = [ ...allCharts.keys() ];
-          const newChartLists = allChartLists.filter((e) => this.listsChart.indexOf(e) === -1);
-          this.selectorChart.addItems(createSelectItem(newChartLists));
-          this.listsChart.push(...newChartLists);
+      .then((files) => {
+        if (!files || files.length <= 0) return;
+        this.game.database.chart.importFiles(files)
+          .then((e) => {
+            this.updateChartList(e.infos);
+          });
+      });
+  }
 
-          const allAudios = fileList.getAudios();
-          const allAudioLists = [ ...allAudios.keys() ];
-          const newAudioLists = allAudioLists.filter((e) => this.listsAudio.indexOf(e) === -1);
-          this.selectorAudio.addItems(createSelectItem(newAudioLists));
-          this.listsAudio.push(...newAudioLists);
+  private updateChartList(newList: TChartInfo[]) {
+    this.selectorChart.addItems(createSelectItem(newList, 400));
+    this.listsChart.push(...newList);
 
-          // Select the first files automatically
-          this.selectorChart.value = 0;
-          this.selectorAudio.value = 0;
-          this.selectedChart = this.listsChart[this.selectorChart.value];
-          this.selectedAudio = this.listsAudio[this.selectorAudio.value];
-
-          // Update the button's text to autofit
-          // @ts-ignore
-          this.selectorChart.openButton.setState('default', true); this.selectorChart.closeButton.setState('default', true);
-          // @ts-ignore
-          this.selectorAudio.openButton.setState('default', true); this.selectorAudio.closeButton.setState('default', true);
-        });
-    });
+    // Update the button's text to autofit
+    // @ts-ignore
+    this.selectorChart.openButton.setState('default', true); this.selectorChart.closeButton.setState('default', true);
+    if (this.selectedChart === null) this.selectedChart = this.listsChart[0];
   }
 
   private onClickSelectSkin() {
@@ -221,14 +196,10 @@ export class GameStageTitle implements IGameStageBase {
   }
 
   private onStartGame() {
-    if (!this.selectedChart || !this.selectedAudio) {
-      console.error('No chart or audio selected');
+    if (!this.selectedChart) {
+      console.error('No chart selected');
       return;
     }
-
-    const chartFile = this.game.files.get(this.selectedChart)!;
-    const audioFile = this.game.files.get(this.selectedAudio)!;
-
-    this.game.startChart(chartFile.data as GameChartData, audioFile.data as GameAudioClip);
+    this.game.startChart(this.selectedChart);
   }
 }

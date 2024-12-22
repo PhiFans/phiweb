@@ -41,7 +41,7 @@ export class GameStorage {
     return this.dbFile.get<TGameDBFile>(filename, 'filename');
   }
 
-  getFilesByMD5(md5s: string[]) {return new Promise(async (res) => {
+  getFilesByMD5(md5s: string[]): Promise<TGameDBFile[]> {return new Promise(async (res) => {
     const allFiles = await this.dbFile.getAll<TGameDBFile>();
     res(allFiles.filter((e) => md5s.includes(e.md5)));
   })}

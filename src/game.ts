@@ -5,11 +5,11 @@ import { GameSkins } from './skins';
 import { GameStage } from './stage';
 import { GameFiles } from './files';
 import { GameChart } from './chart';
-import { GameChartData } from './chart/data';
-import { GameAudioClip } from './audio/clip';
 import { EGameScoreJudgeType } from './score/types';
 import { GameStorage } from './storage';
 import { GameDatabase } from './database';
+import { IFile, IFileAudio, IFileChart, IFileImage, TChartInfo } from './utils/types';
+import { decodeFile } from './utils/file';
 
 export class Game {
   // TODO: Use another class to manage it
@@ -48,7 +48,25 @@ export class Game {
       .catch((e) => rej(e));
   });}
 
-  startChart(chartData: GameChartData, audio: GameAudioClip) {return new Promise(async (res) => {
+  startChart(chartInfo: TChartInfo) {return new Promise(async (res) => {
+    const chartFilesMD5: string[] = [
+      chartInfo.chart,
+      chartInfo.audio,
+      chartInfo.image ? chartInfo.image : '',
+      ...chartInfo.extraFiles
+    ];
+    const chartFiles = this.storage.decodedFiles.filter((e) => chartFilesMD5.includes(e.md5));
+    const chartFilesDecodedMD5 = chartFiles.map((e) => e.md5);
+    const chartFilesRaw = await this.storage.getFilesByMD5(chartFilesMD5.filter((e) => !chartFilesDecodedMD5.includes(e)));
+
+    // Decode undecoded files
+    for (const chartUndecoded of chartFilesRaw) {
+      const { md5, filename, blob } = chartUndecoded;
+      const decodedFile = await decodeFile(new File([ blob ], filename)) as IFile;
+      chartFiles.push({ md5, file: decodedFile });
+      this.storage.addDecodedFile(md5, decodedFile);
+    }
+
     const { options, skins } = this;
     const { currentSkin } = skins;
     if (!currentSkin) {
@@ -60,9 +78,9 @@ export class Game {
 
     this.chart = new GameChart(
       this,
-      chartData,
-      audio,
-      (void 0)
+      (chartFiles.find((e) => e.md5 === chartInfo.chart)!.file as IFileChart).data,
+      (chartFiles.find((e) => e.md5 === chartInfo.audio)!.file as IFileAudio).data,
+      (chartFiles.find((e) => e.md5 === chartInfo.image)!.file as IFileImage).data ?? (void 0)
     );
     this.chart.audio.setChannel(this.audio.channels.music);
 

@@ -3,10 +3,8 @@ import JSZip from 'jszip';
 import SparkMD5 from 'spark-md5';
 import { GameChartData } from '@/chart/data';
 import { GameAudio } from '@/audio';
-import { Nullable, TChartInfo, TChartInfoCSV } from './types';
+import { Nullable } from './types';
 import { IFile } from './types';
-import { Game } from '@/game';
-import { TGameDBFile } from '@/storage';
 
 export const PopupReadFiles = (multiple = false, accept: string | Array<string> = ''): Promise<Nullable<FileList>> => new Promise((res) => {
   const fileDOM = document.createElement('input');

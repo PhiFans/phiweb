@@ -186,6 +186,7 @@ export const decodeCSV = <T extends { [key: string]: string }>(raw: string): T[]
   const result: T[] = [];
 
   for (const rawLine of rawLines) {
+    if (rawLine.match(/^\s*$/)) continue;
     const rawInfos = rawLine.split(/,/);
     if (resultKeys.length <= 0) resultKeys.push(...rawInfos);
     else {

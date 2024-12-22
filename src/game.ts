@@ -3,7 +3,6 @@ import { GameAudio } from './audio';
 import { GameRenderer } from './renderer';
 import { GameSkins } from './skins';
 import { GameStage } from './stage';
-import { GameFiles } from './files';
 import { GameChart } from './chart';
 import { EGameScoreJudgeType } from './score/types';
 import { GameStorage } from './storage';
@@ -26,7 +25,6 @@ export class Game {
   readonly skins: GameSkins = new GameSkins(this);
   readonly stage: GameStage = new GameStage(this);
   readonly audio: GameAudio = new GameAudio();
-  readonly files: GameFiles = new GameFiles();
 
   chart?: GameChart;
 

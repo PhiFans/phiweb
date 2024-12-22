@@ -22,7 +22,7 @@ export class Game {
   };
 
   readonly storage: GameStorage = new GameStorage();
-  readonly database: GameDatabase = new GameDatabase();
+  readonly database: GameDatabase = new GameDatabase(this.storage);
   readonly renderer: GameRenderer = new GameRenderer(this);
   readonly skins: GameSkins = new GameSkins(this);
   readonly stage: GameStage = new GameStage(this);

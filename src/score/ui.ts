@@ -4,7 +4,7 @@ import { TGameSkinElement, TGameSkinElementAnchored, TGameSkinElementCoordinate,
 import { GameUITexturedNumber } from '@/ui/textured-number';
 import { parseDoublePrecist } from '@/utils/math';
 import { TChartInfo } from '@/utils/types';
-import { Container, Sprite, Text } from 'pixi.js';
+import { Container, Rectangle, Sprite, Text } from 'pixi.js';
 
 type TGameScoreUIElementBase = TGameSkinElement & {
   sprite: unknown,
@@ -90,6 +90,14 @@ export class GameScoreUI {
             sprite.eventMode = 'static';
             sprite.on('pointerdown', () => this.onButtonPauseClick());
 
+            // Increase hit area
+            sprite.hitArea = new Rectangle(
+              sprite.bounds.width * -0.25,
+              sprite.bounds.height * -0.25,
+              sprite.bounds.width * 1.5,
+              sprite.bounds.height * 1.5
+            );
+
             result.sprite = sprite;
             break;
           }
@@ -127,6 +135,9 @@ export class GameScoreUI {
         return result as TGameScoreUIElement;
       })
       .filter((e) => (e !== (void 0)));
+
+    // Set prop(s) to UI container
+    this.container.boundsArea = new Rectangle(0, 0, 0, 0);
 
     for (const e of this.elements) this.container.addChild(e.sprite);
     containers.ui.addChild(this.container);

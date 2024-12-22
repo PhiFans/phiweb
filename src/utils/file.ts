@@ -203,3 +203,19 @@ export const decodeCSV = <T extends { [key: string]: string }>(raw: string): T[]
   if (resultKeys.length <= 0 || result.length <= 0) throw new Error('Not a valid .csv file');
   return result;
 };
+
+export const decodeTXT = <T extends { [key: string]: string }>(raw: string): T => {
+  const rawLines = raw.split(/[\r\n]+/);
+  const result: Record<string, string> = {};
+
+  for (const rawLine of rawLines) {
+    const rawLineMatch = rawLine.match(/^([a-zA-Z]+):\s(.+)$/);
+    if (!rawLineMatch || rawLineMatch.length !== 3) continue;
+
+    const [ , rawKey, rawValue ] = rawLineMatch;
+    result[rawKey] = rawValue;
+  }
+
+  if (Object.keys(result).length <= 0) throw new Error('Not a valid info.txt file');
+  return result as T;
+};

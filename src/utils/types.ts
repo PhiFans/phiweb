@@ -53,6 +53,17 @@ export type TChartInfoCSV = {
   Image: string,
 }
 
+export type TChartInfoTXT = {
+  Name: string,
+  Charter: string,
+  Level: string,
+  Composer: string,
+
+  Song: string,
+  Picture: string,
+  Chart: string,
+};
+
 /* ==================== Math ==================== */
 export type TAreaPoint = [
   /** Start X */

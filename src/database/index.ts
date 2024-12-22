@@ -1,8 +1,8 @@
 import { GameDatabaseEngine } from './engine';
-import { extractZip, getFileMD5, decodeFile, ReadFileAsText, decodeCSV } from '@/utils/file';
+import { extractZip, getFileMD5, decodeFile, ReadFileAsText, decodeCSV, decodeTXT } from '@/utils/file';
 import { GameStorage } from '@/storage';
 import { TGameDBFile } from '@/storage';
-import { IFile } from '@/utils/types';
+import { IFile, TChartInfoTXT } from '@/utils/types';
 import { TChartInfo, TChartInfoCSV } from '@/utils/types';
 
 export class GameDatabase {
@@ -85,6 +85,24 @@ export class GameDatabaseChart extends GameDatabaseEngine {
             extraFiles: [],
           });
         }
+      }).catch(async () => {
+        // Read chart info (info.txt)
+        if (file.name !== 'info.txt') throw new Error('This may not a info file');
+        const textRaw = await ReadFileAsText(file);
+        const txtResult = decodeTXT<TChartInfoTXT>(textRaw);
+
+        chartInfos.push({
+          name: txtResult.Name,
+          artist: txtResult.Composer,
+          designer: txtResult.Charter,
+          level: txtResult.Level,
+          illustrator: 'Unknown',
+
+          chart: txtResult.Chart,
+          audio: txtResult.Song,
+          image: txtResult.Picture,
+          extraFiles: [],
+        });
       }).catch(() => {
         console.warn(`Unsupported file type. File name: ${file.name}`);
       }));

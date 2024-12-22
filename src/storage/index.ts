@@ -1,5 +1,5 @@
 import { GameDatabaseEngine } from '@/database/engine';
-import { getFileMD5 } from '@/utils/file';
+import { decodeFile, getFileMD5 } from '@/utils/file';
 import { IFile } from '@/utils/types';
 
 export type TGameDBFile = {
@@ -49,6 +49,24 @@ export class GameStorage {
   getDecodedFile(md5: string) {
     return this.decodedFiles.find(e => e.md5 === md5);
   }
+
+  /**
+   * **Note:** Undecoded files will be decoded and added to cache.
+   */
+  getDecodedFilesByMD5(md5s: string[]): Promise<{ md5: string, file: IFile }[]> {return new Promise(async (res) => {
+    const decodedFiles = this.decodedFiles.filter((e) => md5s.includes(e.md5));
+    const decodedMD5 = decodedFiles.map((e) => e.md5);
+    const undecodedFiles = await this.getFilesByMD5(md5s.filter((e) => !decodedMD5.includes(e)));
+
+    for (const undeccodedFile of undecodedFiles) {
+      const { md5: rawMD5, blob, filename } = undeccodedFile;
+      const decodedFile = await decodeFile(new File([ blob ], filename)) as IFile;
+      decodedFiles.push({ md5: rawMD5, file: decodedFile });
+      this.addDecodedFile(rawMD5, decodedFile);
+    }
+
+    res(decodedFiles);
+  })}
 
   addDecodedFile(md5: string, file: IFile) {
     const oldFile = this.getDecodedFile(md5);

@@ -8,8 +8,7 @@ import { GameChart } from './chart';
 import { EGameScoreJudgeType } from './score/types';
 import { GameStorage } from './storage';
 import { GameDatabase } from './database';
-import { IFile, IFileAudio, IFileChart, IFileImage, TChartInfo } from './utils/types';
-import { decodeFile } from './utils/file';
+import { IFileAudio, IFileChart, IFileImage, TChartInfo } from './utils/types';
 
 export class Game {
   // TODO: Use another class to manage it
@@ -55,18 +54,7 @@ export class Game {
       chartInfo.image ? chartInfo.image : '',
       ...chartInfo.extraFiles
     ];
-    const chartFiles = this.storage.decodedFiles.filter((e) => chartFilesMD5.includes(e.md5));
-    const chartFilesDecodedMD5 = chartFiles.map((e) => e.md5);
-    const chartFilesRaw = await this.storage.getFilesByMD5(chartFilesMD5.filter((e) => !chartFilesDecodedMD5.includes(e)));
-
-    // Decode undecoded files
-    for (const chartUndecoded of chartFilesRaw) {
-      const { md5, filename, blob } = chartUndecoded;
-      const decodedFile = await decodeFile(new File([ blob ], filename)) as IFile;
-      chartFiles.push({ md5, file: decodedFile });
-      this.storage.addDecodedFile(md5, decodedFile);
-    }
-
+    const chartFiles = await this.storage.getDecodedFilesByMD5(chartFilesMD5);
     const { options, skins } = this;
     const { currentSkin } = skins;
     if (!currentSkin) {

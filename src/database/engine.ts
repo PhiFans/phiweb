@@ -20,15 +20,6 @@ export type TGameDatabaseData = {
   [x: string]: TGameDatabaseDataType | TGameDatabaseDataType[],
 };
 
-const waitFor = (bool: boolean) => new Promise((res) => {
-  if (bool) return res(bool);
-  const clockId = setInterval(() => {
-    if (!bool) return;
-    res(bool);
-    clearInterval(clockId);
-  }, 200);
-});
-
 export class GameDatabaseEngine {
   readonly name: string;
   readonly version: number;
@@ -83,7 +74,7 @@ export class GameDatabaseEngine {
   }
 
   add(data: TGameDatabaseData) {return new Promise(async (res, rej) => {
-    await waitFor(this.isReady);
+    await this.waitReady();
     const { db } = this;
 
     const transaction = db.transaction([ this.name ], 'readwrite');
@@ -100,7 +91,7 @@ export class GameDatabaseEngine {
   })}
 
   delete(index: string | number): Promise<void> {return new Promise(async (res, rej) => {
-    await waitFor(this.isReady);
+    await this.waitReady();
     const { db } = this;
 
     const transaction = db.transaction([ this.name ], 'readwrite');
@@ -116,7 +107,7 @@ export class GameDatabaseEngine {
   })}
 
   get<T extends TGameDatabaseData>(index: string | number, key?: string): Promise<T | null> {return new Promise(async (res, rej) => {
-    await waitFor(this.isReady);
+    await this.waitReady();
     const { db } = this;
 
     const transaction = db.transaction([ this.name ], 'readonly');
@@ -132,7 +123,7 @@ export class GameDatabaseEngine {
   })}
 
   getAll<T extends TGameDatabaseData>(): Promise<T[]> {return new Promise(async (res, rej) => {
-    await waitFor(this.isReady);
+    await this.waitReady();
     const { db } = this;
     const result: T[] = [];
 
@@ -156,7 +147,7 @@ export class GameDatabaseEngine {
   })}
 
   update<T extends TGameDatabaseData>(index: string | number, data: TGameDatabaseData): Promise<T> {return new Promise(async (res, rej) => {
-    await waitFor(this.isReady);
+    await this.waitReady();
     const { db } = this;
 
     const transaction = db.transaction([ this.name ], 'readwrite');
@@ -178,5 +169,14 @@ export class GameDatabaseEngine {
     request.onerror = (e) => {
       rej(e);
     };
+  })}
+
+  private waitReady() {return new Promise(async (res) => {
+    if (this.isReady) return res(this.isReady);
+    const clockId = setInterval(() => {
+      if (!this.isReady) return;
+      res(this.isReady);
+      clearInterval(clockId);
+    }, 200);
   })}
 }

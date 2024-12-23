@@ -1,7 +1,12 @@
 import { Texture } from 'pixi.js';
 import { GameAudioClip } from '@/audio/clip';
 
-
+export type SkinInput = File | Blob | string;
+export type SkinFile = {
+  name: string,
+  nameExt: string,
+  file: Blob,
+};
 
 export interface IGameSkinMeta {
   name: string,

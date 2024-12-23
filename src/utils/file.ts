@@ -236,3 +236,19 @@ export const blurImage = (image: ImageBitmap, radius: number = 10): Promise<Imag
     .then((e) => res(e))
     .catch((e) => rej(e));
 });
+
+export const downloadFile = (url: string): Promise<Blob> => new Promise((res, rej) => {
+  const req = new XMLHttpRequest();
+
+  req.onreadystatechange = () => {
+    if (req.readyState !== 4) return;
+    if (req.status >= 400) return rej(new Error(`Server responded with status: ${req.status} (${req.statusText})`));
+
+    res(req.response);
+  };
+  req.onerror = (e) => rej(e);
+
+  req.open('GET', url, true);
+  req.responseType = 'blob';
+  req.send();
+});

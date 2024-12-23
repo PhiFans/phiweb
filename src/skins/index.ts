@@ -2,7 +2,7 @@ import JSZip from 'jszip';
 import { Game } from '@/game';
 import { JSZipFiles, JSZipFilesMap, TGameSkinElementCoordinate } from './types';
 import { Texture, TextureSource } from 'pixi.js';
-import { ReadFileAsAudioBuffer, generateImageBitmap } from '@/utils/file';
+import { ReadFileAsAudioBuffer, ReadFileAsText, downloadFile, generateImageBitmap } from '@/utils/file';
 import { GameAudio } from '@/audio';
 import {
   IGameSkinMeta,
@@ -338,6 +338,7 @@ export class GameSkins extends Map<string, GameSkin> {
 
   load(skin: SkinInput) {
     if (skin instanceof File || skin instanceof Blob) return this.loadFromFile(skin);
+    else return this.loadFromURL(skin);
   }
 
   setSkin(name: string) {
@@ -355,7 +356,7 @@ export class GameSkins extends Map<string, GameSkin> {
     res(rawJson);
   });}
 
-  private loadFromFile(skin: File | Blob) {return new Promise((res, rej) => {
+  private loadFromFile(skin: File | Blob): Promise<GameSkin> {return new Promise((res, rej) => {
     JSZip.loadAsync(skin, { createFolders: false })
       .then(async (result) => {
         const { files } = result;
@@ -388,6 +389,25 @@ export class GameSkins extends Map<string, GameSkin> {
         console.error(e);
       });
   });}
+
+  private loadFromURL(url: string): Promise<GameSkin> {return new Promise(async (res, rej) => {
+    const blob = await downloadFile(url);
+
+    (new Promise(() => {
+      throw new Error('Promise chain!')
+    })).catch(async () => {
+      // Decode as zip skin
+      const skin = await this.loadFromFile(blob);
+      res(skin);
+    }).catch(async () => {
+      // Decode as skin meta
+      const skinMetaRaw = await ReadFileAsText(blob);
+      const skinMeta = JSON.parse(skinMetaRaw) as IGameSkinMeta;
+
+    }).catch(() => {
+      rej(`Cannot load online skin from URL: ${url}`);
+    });
+  })}
 
   get currentSkin() {
     return this._currentSkin;

@@ -1,11 +1,6 @@
-import JSZip from 'jszip';
 import { Texture } from 'pixi.js';
 import { GameAudioClip } from '@/audio/clip';
 
-export type JSZipFiles = {
-  [ key: string ]: JSZip.JSZipObject,
-};
-export type JSZipFilesMap = Map<string, JSZip.JSZipObject>;
 
 
 export interface IGameSkinMeta {

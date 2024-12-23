@@ -1,8 +1,8 @@
 import JSZip from 'jszip';
 import { Game } from '@/game';
-import { JSZipFiles, JSZipFilesMap, TGameSkinElementCoordinate } from './types';
+import { TGameSkinElementCoordinate } from './types';
 import { Texture, TextureSource } from 'pixi.js';
-import { ReadFileAsAudioBuffer, ReadFileAsText, downloadFile, generateImageBitmap } from '@/utils/file';
+import { ReadFileAsAudioBuffer, downloadFile, generateImageBitmap } from '@/utils/file';
 import { GameAudio } from '@/audio';
 import {
   IGameSkinMeta,
@@ -17,47 +17,40 @@ import {
 } from './types';
 
 type SkinInput = File | Blob | string;
+type SkinFile = {
+  name: string,
+  nameExt: string,
+  file: Blob,
+};
 
 const RegFileExt = /\.([a-zA-Z\d]+)$/;
 
-const getFileListFromZip = (files: JSZipFiles): JSZipFilesMap => {
-  const result: [ string, JSZip.JSZipObject ][] = [];
-  for (const name in files) {
-    const file = files[name];
-    if (file.dir) continue;
-    result.push([ name.replace(RegFileExt, ''), file ]);
-  }
-  return new Map(result);
+const getFileByPath = (fileList: SkinFile[], path: string, highQuality = false): File => {
+  const file = fileList.find((e) => e.name === path);
+  const fileHigh = fileList.find((e) => e.name === `${path}@2x`);
+
+  if (!file) throw new Error(`Cannot find skin file: ${path}`);
+  if (fileHigh && highQuality) return new File([ fileHigh.file ], path);
+  else return new File([ file.file ], path);
 };
 
-const getFileByPath = (fileList: JSZipFilesMap, path: string, highQuality = false): Promise<File> => new Promise(async (res) => {
-  const file = fileList.get(path)!;
-  const fileHigh = fileList.get(`${path}@2x`);
-
-  if (fileHigh && highQuality) res(new File([ await fileHigh.async('blob') ], path));
-  else res(new File([ await file.async('blob') ], path));
-});
-
-const getFilesByPath = (fileList: JSZipFilesMap, path: string, highQuality = false): Promise<Record<string, File>> => new Promise(async (res) => {
+const getFilesByPath = (fileList: SkinFile[], path: string, highQuality = false): Record<string, File> => {
   const RegFile = new RegExp(`^${path.replace(/\//, '\\/')}-([\\da-zA-Z]+)(@2x)?$`);
 
-  const fileNames = fileList.keys();
   const result: Record<string, File> = {};
   const resultHigh: Record<string, File> = {};
 
-  for (const filename of fileNames) {
-    if (!RegFile.test(filename)) continue;
+  for (const file of fileList) {
+    if (!RegFile.test(file.name)) continue;
+    const regResult = RegFile.exec(file.name)!;
 
-    const file = fileList.get(filename)!;
-    const regResult = RegFile.exec(filename)!;
-
-    if (regResult[2] === '@2x') resultHigh[regResult[1]] = new File([ await file.async('blob') ], filename);
-    else result[regResult[1]] = new File([ await file.async('blob') ], filename);
+    if (regResult[2] === '@2x') resultHigh[regResult[1]] = new File([ file.file ], file.name);
+    else result[regResult[1]] = new File([ file.file ], file.name);
   }
 
-  if (Object.keys(resultHigh).length > 0 && highQuality) res(resultHigh);
-  else res(result);
-});
+  if (Object.keys(resultHigh).length > 0 && highQuality) return resultHigh;
+  else return result;
+};
 
 const createFontFamily = (name: string, file: Blob) => {
   const dom = document.createElement('style');
@@ -70,23 +63,20 @@ const createFontFamily = (name: string, file: Blob) => {
 };
 
 // TODO: Need a better way to save it
-const getPlayfieldsFromList = (fileList: JSZipFilesMap): Promise<TGameSkinPlayfield[]> => new Promise(async (res) => {
+const getPlayfieldsFromList = (fileList: SkinFile[]): TGameSkinPlayfield[] => {
   const RegPlayfieldTest = /^(note)-/;
   const RegPlayfieldNote = /^note-(tap|drag|hold-(head|body|end)|flick)(-highlight)?(@2x)?$/;
-
-  const fileNames = fileList.keys();
   const result: TGameSkinPlayfield[] = [];
 
-  for (const filename of fileNames) {
-    if (!RegPlayfieldTest.test(filename)) continue;
-    const file = fileList.get(filename)!;
+  for (const file of fileList) {
+    if (!RegPlayfieldTest.test(file.name)) continue;
 
-    if (RegPlayfieldNote.test(filename)) {
-      const testResult = RegPlayfieldNote.exec(filename)!;
+    if (RegPlayfieldNote.test(file.name)) {
+      const testResult = RegPlayfieldNote.exec(file.name)!;
       const id = testResult[1] as TGameSkinPlayfieldIDNote;
       const isHighlight = testResult[3] === '-highlight';
       const isHighQuality = testResult[4] === '@2x';
-      const resultFile = new File([ await file.async('blob') ], filename);
+      const resultFile = new File([ file.file ], file.name);
 
       result.push({
         type: 'note', id,
@@ -102,30 +92,26 @@ const getPlayfieldsFromList = (fileList: JSZipFilesMap): Promise<TGameSkinPlayfi
     }
   }
 
-  res(result);
-});
+  return result;
+};
 
-const getSoundsFromList = (fileList: JSZipFilesMap): Promise<TGameSkinSound[]> => new Promise(async (res) => {
+const getSoundsFromList = (fileList: SkinFile[]): TGameSkinSound[] => {
   const RegHitsound = /^hitsound-(tap|drag|flick)$/;
-
-  const fileNames = fileList.keys();
   const result: TGameSkinSound[] = [];
 
-  for (const filename of fileNames) {
-    const file = fileList.get(filename)!;
-
-    if (RegHitsound.test(filename)) {
-      const id = RegHitsound.exec(filename)![1] as TGameSkinSoundIDHitsound;
+  for (const file of fileList) {
+    if (RegHitsound.test(file.name)) {
+      const id = RegHitsound.exec(file.name)![1] as TGameSkinSoundIDHitsound;
 
       result.push({
         type: 'hitsound', id,
-        file: new File([ await file.async('blob') ], filename),
+        file: new File([ file.file ], file.name),
       });
     }
   }
 
-  return res(result);
-});
+  return result;
+};
 
 export class GameSkin {
   readonly name: string;
@@ -269,8 +255,8 @@ export class GameSkin {
     author: string,
     version: string,
     elements: TGameSkinElement[],
-    fileList: JSZipFilesMap
-  ): Promise<GameSkin> {return new Promise(async (res) => {
+    fileList: SkinFile[]
+  ): GameSkin {
     const newElements: TGameSkinElementFiled[] = [];
 
     for (const e of [ ...elements ]) {
@@ -284,8 +270,8 @@ export class GameSkin {
           newElements.push({
             ...e,
             file: {
-              normal: await getFilesByPath(fileList, e.path, false),
-              high: await getFilesByPath(fileList, e.path, true),
+              normal: getFilesByPath(fileList, e.path, false),
+              high: getFilesByPath(fileList, e.path, true),
             },
           })
           break;
@@ -303,8 +289,8 @@ export class GameSkin {
           newElements.push({
             ...e,
             file: {
-              normal: await getFileByPath(fileList, e.path, false),
-              high: await getFileByPath(fileList, e.path, true),
+              normal: getFileByPath(fileList, e.path, false),
+              high: getFileByPath(fileList, e.path, true),
             }
           });
           break;
@@ -315,15 +301,15 @@ export class GameSkin {
       }
     }
 
-    return res(new GameSkin(
+    return new GameSkin(
       name,
       author,
       version,
       newElements,
-      await getPlayfieldsFromList(fileList),
-      await getSoundsFromList(fileList)
-    ));
-  })}
+      getPlayfieldsFromList(fileList),
+      getSoundsFromList(fileList)
+    );
+  }
 }
 
 export class GameSkins extends Map<string, GameSkin> {
@@ -361,28 +347,20 @@ export class GameSkins extends Map<string, GameSkin> {
       .then(async (result) => {
         const { files } = result;
         const skinMeta = await this.parseSkinMeta(files['skin.json']); // TODO: Skin meta
-        const fileList = getFileListFromZip(files);
-        const resultSkin = await GameSkin.from(skinMeta.name, skinMeta.author, skinMeta.version, skinMeta.elements, fileList);
+        const fileList: SkinFile[] = [];
 
-        for (const font of skinMeta.fontFamilies) {
-          const fontFile = fileList.get(font.path);
-          if (!fontFile) {
-            console.warn(`Font path: ${font.path} not found, skipping...`);
-            continue;
-          }
-
-          // TODO: For some reason `fontfaceobserver` is broken, wait for another implement for loading the font.
-          const fontBlob = await fontFile.async('blob');
-          createFontFamily(font.name, fontBlob);
-          await (new Promise((res) => setTimeout(() => res(void 0), 200)));
+        for (const name in files) {
+          if (files[name].dir) continue;
+          fileList.push({
+            name: name.replace(RegFileExt, ''),
+            nameExt: name,
+            file: await files[name].async('blob'),
+          });
         }
 
-        this.set(skinMeta.name, resultSkin);
-        res(resultSkin);
-        this.setSkin(skinMeta.name);
-
-        console.log(resultSkin);
-        console.log(fileList);
+        this.loadFromFileList(skinMeta, fileList)
+          .then((e) => res(e))
+          .catch((e) => rej(e));
       })
       .catch((e) => {
         rej('Read skin file error, this may not a valid skin file.');
@@ -400,13 +378,34 @@ export class GameSkins extends Map<string, GameSkin> {
       const skin = await this.loadFromFile(blob);
       res(skin);
     }).catch(async () => {
-      // Decode as skin meta
-      const skinMetaRaw = await ReadFileAsText(blob);
-      const skinMeta = JSON.parse(skinMetaRaw) as IGameSkinMeta;
-
+      // TODO: Decode as skin meta
+      throw new Error(`Read from online skin.json are not implemented`);
     }).catch(() => {
       rej(`Cannot load online skin from URL: ${url}`);
     });
+  })}
+
+  private loadFromFileList(meta: IGameSkinMeta, files: SkinFile[]): Promise<GameSkin> {return new Promise(async (res) => {
+    const resultSkin = GameSkin.from(meta.name, meta.author, meta.version, meta.elements, files);
+
+    for (const font of meta.fontFamilies) {
+      const fontFile = files.find((e) => e.name === font.path);
+      if (!fontFile) {
+        console.warn(`Font path: ${font.path} not found, skipping...`);
+        continue;
+      }
+
+      // TODO: For some reason `fontfaceobserver` is broken, wait for another implement for loading the font.
+      createFontFamily(font.name, fontFile.file);
+      await (new Promise((res) => setTimeout(() => res(void 0), 200)));
+    }
+
+    this.set(meta.name, resultSkin);
+    res(resultSkin);
+    this.setSkin(meta.name);
+
+    console.log(resultSkin);
+    console.log(files);
   })}
 
   get currentSkin() {

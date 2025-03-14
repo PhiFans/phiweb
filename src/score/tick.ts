@@ -14,7 +14,7 @@ const isInArea = (
   return Math.abs((pointX - noteX) * cosr + (pointY - noteY) * sinr) <= width;
 };
 
-export function onScoreTick(this: GameScore, currentTime: number) {
+export function onScoreTick(this: GameScore, currentTime: number, frameTime: number) {
   const { notes, inputs, judges, judgeRange, isAutoPlay, size, effects } = this;
   const { list: inputList } = inputs;
 
@@ -75,14 +75,14 @@ export function onScoreTick(this: GameScore, currentTime: number) {
 
     if (isAutoPlay) {
       if (type === 1) {
-        if (timeBetween <= 0) judges[judges.length] = new GameChartScoreJudge(1, realPosX, realPosY);
+        if (timeBetween - frameTime <= 0) judges[judges.length] = new GameChartScoreJudge(1, realPosX, realPosY);
       } else if (type === 2) {
-        if (timeBetween <= 0) judges[judges.length] = new GameChartScoreJudge(3, realPosX, realPosY);
+        if (timeBetween - frameTime <= 0) judges[judges.length] = new GameChartScoreJudge(3, realPosX, realPosY);
       } else if (type === 3) {
         if (score.isHolding) judges[judges.length] = new GameChartScoreJudge(3, realPosX, realPosY);
-        else if (timeBetween <= 0) judges[judges.length] = new GameChartScoreJudge(1, realPosX, realPosY);
+        else if (timeBetween - frameTime <= 0) judges[judges.length] = new GameChartScoreJudge(1, realPosX, realPosY);
       } else if (type === 4) {
-        if (timeBetween <= 0) judges[judges.length] = new GameChartScoreJudge(2, realPosX, realPosY);
+        if (timeBetween - frameTime <= 0) judges[judges.length] = new GameChartScoreJudge(2, realPosX, realPosY);
       }
     }
 
@@ -116,7 +116,7 @@ export function onScoreTick(this: GameScore, currentTime: number) {
         break;
       }
     } else if (type === 2) { // Handle Drag
-      if (score.isScored && score.score !== EGameScoreJudgeType.MISS && timeBetween <= 0) {
+      if (score.isScored && score.score !== EGameScoreJudgeType.MISS && timeBetween - frameTime <= 0) {
         // Calculate score & play effects later
         sprite!.removeFromParent();
         score.isScoreAnimated = true;
@@ -198,7 +198,7 @@ export function onScoreTick(this: GameScore, currentTime: number) {
         this.updateScore(score.score);
       }
     } else if (type === 4) { // Handle Flick
-      if (score.isScored && score.score !== EGameScoreJudgeType.MISS && timeBetween <= 0) {
+      if (score.isScored && score.score !== EGameScoreJudgeType.MISS && timeBetween - frameTime <= 0) {
         // Calculate score & play effects later
         sprite!.removeFromParent();
         score.isScoreAnimated = true;

@@ -132,7 +132,7 @@ export class GameChart {
   }
 
   private onTick() {
-    const { data, audio } = this;
+    const { data, audio, ticker } = this;
     const { startTime, pauseTime, clock, status } = audio;
     const { time } = clock;
     const { offset, container } = data;
@@ -141,7 +141,7 @@ export class GameChart {
     const currentTime = ((status === 2 ? pauseTime : time) - (startTime || time)) - offset;
 
     this.onChartTick(currentTime, container!);
-    if (status === 1) this.score.onScoreTick(currentTime);
+    if (status === 1) this.score.onScoreTick(currentTime, ticker.elapsedMS);
     this.score.ui.updateUIProgress(currentTime / audio.duration);
   }
 }

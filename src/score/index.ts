@@ -56,7 +56,7 @@ export class GameScore {
   readonly effects: GameScoreEffects;
   readonly inputs: GameChartScoreInputs;
   readonly judges: GameChartScoreJudge[] = [];
-  readonly onScoreTick: (currentTime: number) => void;
+  readonly onScoreTick: typeof onScoreTick;
 
   private readonly scorePerCombo: number;
   private readonly scorePerNote: number;

@@ -18,11 +18,12 @@ export function onScoreTick(this: GameScore, currentTime: number) {
   const { notes, inputs, judges, judgeRange, isAutoPlay, size, effects } = this;
   const { list: inputList } = inputs;
 
+  const { widthOffset } = size;
   judges.length = 0;
   if (!isAutoPlay) for (const input of inputList) {
-    if (!input.isTapped) judges[judges.length] = new GameChartScoreJudge(1, input.x, input.y, input);
-    if (input.isFlickable && !input.isFlicked) judges[judges.length] = new GameChartScoreJudge(2, input.x, input.y, input);
-    judges[judges.length] = new GameChartScoreJudge(3, input.x, input.y);
+    if (!input.isTapped) judges[judges.length] = new GameChartScoreJudge(1, input.x - widthOffset, input.y, input);
+    if (input.isFlickable && !input.isFlicked) judges[judges.length] = new GameChartScoreJudge(2, input.x - widthOffset, input.y, input);
+    judges[judges.length] = new GameChartScoreJudge(3, input.x - widthOffset, input.y);
   }
 
   const { noteWidth } = size;

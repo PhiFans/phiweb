@@ -225,7 +225,7 @@ const calculateEventRealTime = (BPMs: TPhiEditBPM[], events: IGameChartEvent[]):
 
 export const ConvertFromPhiEdit = (_chartRaw: string) => {
   const chartRawArr = _chartRaw.split(/[\r\n]+/);
-  const chartOffset = parseInt(chartRawArr.shift()!);
+  const chartOffset = parseInt(chartRawArr.shift()!) - 175;
   if (isNaN(chartOffset)) throw new Error('Not a valid PhiEdit chart file');
 
   const result = new GameChartData(chartOffset);

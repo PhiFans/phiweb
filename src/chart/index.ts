@@ -120,12 +120,15 @@ export class GameChart {
     this.score.resize(sizer);
   }
 
-  start(playOffsetFix: number = 0) {
+  start() {
     this.ticker.add(this.onTick);
     this.ticker.start();
 
     this.game.audio.channels.effect.startTicker();
-    this.audio.play(playOffsetFix);
+    // Prevent audio timer latency for some reason
+    setImmediate(() => {
+      this.audio.play();
+    });
   }
 
   reset() {

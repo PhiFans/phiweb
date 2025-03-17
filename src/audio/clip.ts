@@ -38,7 +38,7 @@ export class GameAudioClip {
     this.channel = null;
   }
 
-  play(playOffsetFix: number = 0) {
+  play() {
     if (!this.channel) throw new Error('Cannot play a clip directly without any channel');
     if (this.status === EGameAudioClipStatus.PLAY) return;
 
@@ -48,7 +48,7 @@ export class GameAudioClip {
 
     if (isNaN(this.pauseTime)) {
       this.buffer.start(0, 0);
-      this.startTime = this.clock.time - playOffsetFix;
+      this.startTime = this.clock.time;
     } else {
       const pausedTime = this.pauseTime - this.startTime;
       this.buffer.start(0, pausedTime / 1000);

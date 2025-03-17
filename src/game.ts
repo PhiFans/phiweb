@@ -60,7 +60,6 @@ export class Game {
       return;
     }
 
-    const playOffsetFixStart = performance.now();
     await currentSkin.create(options.useHighQualitySkin);
     this.stage.set(null);
 
@@ -75,7 +74,7 @@ export class Game {
 
     this.renderer.containers.game.sortChildren();
     this.chart.reszie(this.renderer.size);
-    this.chart.start(playOffsetFixStart - performance.now());
+    this.chart.start();
 
     res(this.chart);
     console.log(this);

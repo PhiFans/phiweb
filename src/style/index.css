@@ -1,4 +1,5 @@
 body {
+  position: relative;
   margin: 0;
   width: 100vw;
   height: 100vh;
@@ -14,4 +15,63 @@ canvas#app {
   display: block;
   width: 100%;
   height: 100%;
+}
+
+div.loading-overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  color: white;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 10;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+div.loading-overlay.show {
+  display: flex;
+}
+
+.loading-overlay .spin {
+  --size: 50px;
+
+  display: block;
+  width: var(--size);
+  height: var(--size);
+  border: 4px solid white;
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+  border-radius: var(--size);
+  animation: spinning 1s linear infinite;
+}
+
+.loading-overlay .main-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.loading-overlay .title {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.loading-overlay .subtitle {
+  font-size: 18px;
+}
+
+@keyframes spinning {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
 }

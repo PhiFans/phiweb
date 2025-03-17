@@ -1,6 +1,7 @@
 import { Ticker } from 'pixi.js';
 import { RecorderClock } from './clock';
 import { onRecordTick } from './tick';
+import * as Overlay from '@/utils/overlay';
 import { Game } from '@/game';
 
 export class GameRecorder {
@@ -41,6 +42,9 @@ export class GameRecorder {
 
     this.resize();
     chart.reszie(renderer.size);
+
+    Overlay.show();
+    Overlay.setTitle('Recording...');
 
     this.ticker.update();
   }

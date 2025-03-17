@@ -1,4 +1,5 @@
 import { GameRecorder } from '.';
+import * as Overlay from '@/utils/overlay';
 
 const sleep = (time: number) => new Promise((res) => setTimeout(() => res(void 0), time));
 
@@ -10,6 +11,8 @@ export async function onRecordTick(this: GameRecorder) {
   } = this;
   const chart = game.chart!;
 
+  Overlay.setSubtitle(`Processing frame ${clock.frameCurrent + 1}/${clock.framesTotal + 1}...`);
+  
   // Ticking chart
   const {
     time: currentTime,

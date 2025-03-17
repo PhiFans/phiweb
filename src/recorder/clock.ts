@@ -45,6 +45,10 @@ export class RecorderClock {
       this._frameCurrent = frame;
   }
 
+  get time() {
+    return this._length * (this._frameCurrent / (this._framesTotal - 1));
+  }
+
   private calcFrames() {
     this._framesTotal = Math.ceil((this._length / 1000) * this._fps);
   }

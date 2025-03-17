@@ -83,6 +83,7 @@ export class GameStageTitle implements IGameStageBase {
     const TitleButtonLoadSkin = createButtonView('Load skin');
     const TitleButtonStart = createButtonView('Start');
 
+    const CheckRecordMode = createCheckboxView('Record Mode', game.options.recordMode);
     const CheckAutoPlay = createCheckboxView('Auto play', game.options.autoPlay);
     const CheckHighQualitySkin = createCheckboxView('Use high quality skin', game.options.useHighQualitySkin);
 
@@ -99,6 +100,7 @@ export class GameStageTitle implements IGameStageBase {
     TitleButtonLoadSkin.onPress.connect(() => this.onClickSelectSkin());
     TitleButtonStart.onPress.connect(() => this.onStartGame());
 
+    CheckRecordMode.onChange.connect((e) => game.options.recordMode = e as boolean);
     CheckAutoPlay.onChange.connect((e) => game.options.autoPlay = e as boolean);
     CheckHighQualitySkin.onChange.connect((e) => game.options.useHighQualitySkin = e as boolean);
 
@@ -133,12 +135,20 @@ export class GameStageTitle implements IGameStageBase {
         optionsLayer: {
           content: [
             {
-              content: CheckAutoPlay,
+              content: CheckRecordMode,
             },
           ],
           styles: LayerStyle
         },
         optionsLayer2: {
+          content: [
+            {
+              content: CheckAutoPlay,
+            },
+          ],
+          styles: LayerStyle
+        },
+        optionsLayer3: {
           content: [
             {
               content: CheckHighQualitySkin,

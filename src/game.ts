@@ -1,6 +1,7 @@
 import { AutoDetectOptions } from 'pixi.js';
 import { GameAudio } from './audio';
 import { GameRenderer } from './renderer';
+import { GameRecorder } from './recorder';
 import { GameSkins } from './skins';
 import { GameStage } from './stage';
 import { GameChart } from './chart';
@@ -17,11 +18,13 @@ export class Game {
     useHighlight: true,
     challengeMode: false,
     autoPlay: true,
+    recordMode: false,
   };
 
   readonly storage: GameStorage = new GameStorage();
   readonly database: GameDatabase = new GameDatabase(this.storage);
   readonly renderer: GameRenderer = new GameRenderer(this);
+  readonly recorder: GameRecorder = new GameRecorder(this);
   readonly skins: GameSkins = new GameSkins(this);
   readonly stage: GameStage = new GameStage(this);
   readonly audio: GameAudio = new GameAudio();
@@ -152,8 +155,11 @@ export class Game {
     const { resolution } = this;
     const { clientWidth, clientHeight } = document.documentElement;
 
-    this.renderer.resize(clientWidth, clientHeight, resolution);
+    if (!(this.options.recordMode && this.chart)) {
+      this.renderer.resize(clientWidth, clientHeight, resolution);
+      if (this.chart) this.chart.reszie(this.renderer.size);
+    }
+
     this.stage.resize(clientWidth, clientHeight);
-    if (this.chart) this.chart.reszie(this.renderer.size);
   }
 }

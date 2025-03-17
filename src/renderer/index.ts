@@ -170,8 +170,8 @@ export class GameRenderer {
     size.lineScale = size.width > size.height * 0.75 ? size.height / 18.75 : size.width / 14.0625;
     size.heightPercent = size.height / 1080;
 
-    // this._stageRectangle.width = width * resolution;
-    // this._stageRectangle.height = height * resolution;
+    this._stageRectangle.width = width;
+    this._stageRectangle.height = height;
 
     // this.stage.boundsArea = this._stageRectangle;
     // this.containers.ui.boundsArea = this._stageRectangle;

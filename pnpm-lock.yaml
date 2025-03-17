@@ -4,16 +4,21 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  pixi.js:
+    hash: a12e37a732f31eedbe8afc0af32664b6636d7fe097975cb1072e162b8b80a23d
+    path: patches/pixi.js.patch
+
 importers:
 
   .:
     dependencies:
       '@pixi/layout':
         specifier: ^2.0.1
-        version: 2.0.1(pixi.js@8.5.2)
+        version: 2.0.1(pixi.js@8.5.2(patch_hash=a12e37a732f31eedbe8afc0af32664b6636d7fe097975cb1072e162b8b80a23d))
       '@pixi/ui':
         specifier: ^2.1.5
-        version: 2.1.5(pixi.js@8.5.2)
+        version: 2.1.5(pixi.js@8.5.2(patch_hash=a12e37a732f31eedbe8afc0af32664b6636d7fe097975cb1072e162b8b80a23d))
       '@types/spark-md5':
         specifier: ^3.0.5
         version: 3.0.5
@@ -28,7 +33,7 @@ importers:
         version: 3.10.1
       pixi.js:
         specifier: ^8.5.2
-        version: 8.5.2
+        version: 8.5.2(patch_hash=a12e37a732f31eedbe8afc0af32664b6636d7fe097975cb1072e162b8b80a23d)
       spark-md5:
         specifier: ^3.0.2
         version: 3.0.2
@@ -600,13 +605,13 @@ snapshots:
 
   '@pixi/colord@2.9.6': {}
 
-  '@pixi/layout@2.0.1(pixi.js@8.5.2)':
+  '@pixi/layout@2.0.1(pixi.js@8.5.2(patch_hash=a12e37a732f31eedbe8afc0af32664b6636d7fe097975cb1072e162b8b80a23d))':
     dependencies:
-      pixi.js: 8.5.2
+      pixi.js: 8.5.2(patch_hash=a12e37a732f31eedbe8afc0af32664b6636d7fe097975cb1072e162b8b80a23d)
 
-  '@pixi/ui@2.1.5(pixi.js@8.5.2)':
+  '@pixi/ui@2.1.5(pixi.js@8.5.2(patch_hash=a12e37a732f31eedbe8afc0af32664b6636d7fe097975cb1072e162b8b80a23d))':
     dependencies:
-      pixi.js: 8.5.2
+      pixi.js: 8.5.2(patch_hash=a12e37a732f31eedbe8afc0af32664b6636d7fe097975cb1072e162b8b80a23d)
       tweedle.js: 2.1.0
       typed-signals: 2.5.0
 
@@ -806,7 +811,7 @@ snapshots:
 
   picocolors@1.1.1: {}
 
-  pixi.js@8.5.2:
+  pixi.js@8.5.2(patch_hash=a12e37a732f31eedbe8afc0af32664b6636d7fe097975cb1072e162b8b80a23d):
     dependencies:
       '@pixi/colord': 2.9.6
       '@types/css-font-loading-module': 0.0.12

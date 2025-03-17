@@ -1,0 +1,48 @@
+diff --git a/lib/rendering/renderers/shared/extract/ExtractSystem.js b/lib/rendering/renderers/shared/extract/ExtractSystem.js
+index 8d6035f1dc3112847743e73bbb0d4ff74374fb3e..e4be3744a9c96b174eb4ee89e3511677713e642a 100644
+--- a/lib/rendering/renderers/shared/extract/ExtractSystem.js
++++ b/lib/rendering/renderers/shared/extract/ExtractSystem.js
+@@ -91,7 +91,8 @@ const _ExtractSystem = class _ExtractSystem {
+     }
+     const texture = renderer.textureGenerator.generateTexture(options);
+     const canvas = renderer.texture.generateCanvas(texture);
+-    texture.destroy();
++    texture.source.unload();
++    texture.destroy(true);
+     return canvas;
+   }
+   /**
+@@ -107,7 +108,8 @@ const _ExtractSystem = class _ExtractSystem {
+     const texture = target instanceof Texture.Texture ? target : renderer.textureGenerator.generateTexture(options);
+     const pixelInfo = renderer.texture.getPixels(texture);
+     if (target instanceof Container.Container) {
+-      texture.destroy();
++      texture.source.unload();
++      texture.destroy(true);
+     }
+     return pixelInfo;
+   }
+diff --git a/lib/rendering/renderers/shared/extract/ExtractSystem.mjs b/lib/rendering/renderers/shared/extract/ExtractSystem.mjs
+index 6f6d6da58296544378b17579f787927017760298..7651d8b0b67ad1b2fc614c0aa431f65f49b3eb76 100644
+--- a/lib/rendering/renderers/shared/extract/ExtractSystem.mjs
++++ b/lib/rendering/renderers/shared/extract/ExtractSystem.mjs
+@@ -89,7 +89,8 @@ const _ExtractSystem = class _ExtractSystem {
+     }
+     const texture = renderer.textureGenerator.generateTexture(options);
+     const canvas = renderer.texture.generateCanvas(texture);
+-    texture.destroy();
++    texture.source.unload();
++    texture.destroy(true);
+     return canvas;
+   }
+   /**
+@@ -105,7 +106,8 @@ const _ExtractSystem = class _ExtractSystem {
+     const texture = target instanceof Texture ? target : renderer.textureGenerator.generateTexture(options);
+     const pixelInfo = renderer.texture.getPixels(texture);
+     if (target instanceof Container) {
+-      texture.destroy();
++      texture.source.unload();
++      texture.destroy(true);
+     }
+     return pixelInfo;
+   }

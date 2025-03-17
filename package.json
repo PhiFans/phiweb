@@ -26,5 +26,10 @@
     "pixi.js": "^8.5.2",
     "spark-md5": "^3.0.2",
     "stackblur-canvas": "^2.7.0"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "pixi.js": "patches/pixi.js.patch"
+    }
   }
 }

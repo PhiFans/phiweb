@@ -166,6 +166,9 @@ export class GameChartNote {
 
     if (this.sprite && this.type === EGameChartNoteType.HOLD) {
       const holdLength = (this.isOfficial ? this.holdTime! / 1000 : this.holdLength!) * this.speed;
+
+      this.sprite.children[0].visible = true;
+      this.sprite.children[1].scale.y = 1;
       this.sprite.children[1].height = holdLength;
       this.sprite.children[2].position.y = -holdLength;
     }

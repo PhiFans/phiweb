@@ -10,8 +10,11 @@ export async function onRecordTick(this: GameRecorder) {
     ticker,
   } = this;
   const chart = game.chart!;
+  const {
+    renderer
+  } = game;
 
-  Overlay.setSubtitle(`Processing frame ${clock.frameCurrent + 1}/${clock.framesTotal + 1}...`);
+  Overlay.setSubtitle(`Processing frame ${clock.frameCurrent + 1}/${clock.framesTotal}...`);
   
   // Ticking chart
   const {
@@ -23,7 +26,11 @@ export async function onRecordTick(this: GameRecorder) {
   chart.score.onScoreTick(currentTime, (fps / 1000));
   chart.score.ui.updateUIProgress(currentTime / timeLength);
 
-  await sleep(1);
+  // Grab canvas content
+  const framePixleData = renderer.renderer.extract.pixels({
+    target: renderer.stage,
+  });
+  await sleep(0);
 
   if (clock.frameCurrent + 1 < clock.framesTotal) {
     clock.tick();

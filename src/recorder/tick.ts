@@ -5,10 +5,12 @@ const sleep = (time: number) => new Promise((res) => setTimeout(() => res(void 0
 export async function onRecordTick(this: GameRecorder) {
   const {
     game,
-    clock
+    clock,
+    ticker,
   } = this;
   const chart = game.chart!;
 
+  // Ticking chart
   const {
     time: currentTime,
     length: timeLength,
@@ -22,6 +24,7 @@ export async function onRecordTick(this: GameRecorder) {
 
   if (clock.frameCurrent + 1 < clock.framesTotal) {
     clock.tick();
+    ticker.update();
   } else {
     // Handle end recording
   }

@@ -26,15 +26,23 @@ export class GameRecorder {
     this.ticker.stop();
 
     this.tick = onRecordTick.bind(this);
+    this.ticker.add(this.tick);
   }
 
   start() {
     const {
-      chart
+      renderer,
+      chart,
     } = this.game;
     if (!chart) return;
+    
+    this.clock.fps = this.options.fps;
+    this.clock.length = chart.audio.duration;
 
     this.resize();
+    chart.reszie(renderer.size);
+
+    this.ticker.update();
   }
 
   resize() {

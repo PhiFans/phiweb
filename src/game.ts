@@ -72,11 +72,16 @@ export class Game {
       (chartFiles.find((e) => e.md5 === chartInfo.audio)!.file as IFileAudio).data,
       (chartFiles.find((e) => e.md5 === chartInfo.image)!.file as IFileImage).data ?? null
     );
-    this.chart.audio.setChannel(this.audio.channels.music);
 
+    this.chart.audio.setChannel(this.audio.channels.music);
     this.renderer.containers.game.sortChildren();
-    this.chart.reszie(this.renderer.size);
-    this.chart.start();
+
+    if (!options.recordMode) {
+      this.chart.reszie(this.renderer.size);
+      this.chart.start();
+    } else {
+      this.recorder.start();
+    }
 
     res(this.chart);
     console.log(this);

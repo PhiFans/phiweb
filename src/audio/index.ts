@@ -51,8 +51,6 @@ const handleWindowLoaded = () => {
 
   if (GlobalAudioCtx.state === 'running') return;
   window.addEventListener('pointerdown', resumeAudio);
-  window.addEventListener('pointerover', resumeAudio);
-  window.addEventListener('pointerleave', resumeAudio);
 };
 
 GlobalAudioCtx.addEventListener('statechange', () => {
@@ -60,7 +58,5 @@ GlobalAudioCtx.addEventListener('statechange', () => {
 
   console.info('[Audio]', 'Resume audio success');
   window.removeEventListener('pointerdown', resumeAudio);
-  window.removeEventListener('pointerover', resumeAudio);
-  window.removeEventListener('pointerleave', resumeAudio);
 });
 window.addEventListener('load', handleWindowLoaded);

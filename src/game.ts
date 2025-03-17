@@ -59,6 +59,8 @@ export class Game {
       console.error('No skin loaded');
       return;
     }
+
+    const playOffsetFixStart = performance.now();
     await currentSkin.create(options.useHighQualitySkin);
     this.stage.set(null);
 
@@ -73,7 +75,7 @@ export class Game {
 
     this.renderer.containers.game.sortChildren();
     this.chart.reszie(this.renderer.size);
-    this.chart.start();
+    this.chart.start(playOffsetFixStart - performance.now());
 
     res(this.chart);
     console.log(this);

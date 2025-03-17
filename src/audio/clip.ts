@@ -38,7 +38,7 @@ export class GameAudioClip {
     this.channel = null;
   }
 
-  play() {
+  play(playOffsetFix: number = 0) {
     if (!this.channel) throw new Error('Cannot play a clip directly without any channel');
     if (this.status === EGameAudioClipStatus.PLAY) return;
 
@@ -47,12 +47,12 @@ export class GameAudioClip {
     this.buffer.connect(this.channel.gain);
 
     if (isNaN(this.pauseTime)) {
-      this.startTime = this.clock.time;
       this.buffer.start(0, 0);
+      this.startTime = this.clock.time - playOffsetFix;
     } else {
       const pausedTime = this.pauseTime - this.startTime;
-      this.startTime = this.clock.time - pausedTime;
       this.buffer.start(0, pausedTime / 1000);
+      this.startTime = this.clock.time - pausedTime;
     }
 
     this.pauseTime = NaN;

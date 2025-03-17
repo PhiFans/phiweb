@@ -9,6 +9,11 @@ export default defineConfig(({ mode }) => {
         strategy: 'default',
       }),
     ],
+    optimizeDeps: {
+      exclude: [
+        '@ffmpeg/ffmpeg'
+      ],
+    },
     server: {
       host: '0.0.0.0',
     },

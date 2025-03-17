@@ -1,4 +1,5 @@
 import { Ticker } from 'pixi.js';
+import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { RecorderClock } from './clock';
 import { onRecordTick } from './tick';
 import * as Overlay from '@/utils/overlay';
@@ -14,12 +15,19 @@ export class GameRecorder {
   readonly game: Game;
 
   readonly clock = new RecorderClock();
+  readonly ffmpeg = new FFmpeg();
   readonly ticker: Ticker;
 
   readonly tick: typeof onRecordTick;
+  _beginFrame = 0;
 
   constructor(game: Game) {
     this.game = game;
+
+    this.ffmpeg.on('log', (e) => {
+      console.debug('[FFmpeg]', e.message);
+      Overlay.setSubtitle(e.message);
+    });
 
     // We will manually ticking
     this.ticker = new Ticker();
@@ -32,11 +40,11 @@ export class GameRecorder {
 
   start() {
     const {
-      renderer,
       chart,
+      renderer,
     } = this.game;
     if (!chart) return;
-    
+
     this.clock.fps = this.options.fps;
     this.clock.length = chart.audio.duration;
 
@@ -45,8 +53,18 @@ export class GameRecorder {
 
     Overlay.show();
     Overlay.setTitle('Recording...');
+    Overlay.setSubtitle('Loading FFmpeg...');
 
-    this.ticker.update();
+    this.ffmpeg
+      .load()
+      .then(() => {
+        Overlay.setSubtitle('Rendering...');
+        this.ticker.update();
+      })
+      .catch((e) => {
+        Overlay.setSubtitle(`Failed to load FFmpeg: ${e.toString()}`);
+        console.error(e);
+      });
   }
 
   resize() {

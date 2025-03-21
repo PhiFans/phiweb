@@ -119,12 +119,19 @@ export class GameDatabaseChart extends GameDatabaseEngine {
         });
       }
     }
-
+    
+    const chartInfosLegit: TChartInfo[] = [];
     // Push files to chart info
     for (const chartInfo of chartInfos) {
-      chartInfo.chart = supportedFiles.find((e) => e.filename === chartInfo.chart)!.md5;
-      chartInfo.audio = supportedFiles.find((e) => e.filename === chartInfo.audio)!.md5;
-      chartInfo.image = supportedFiles.find((e) => e.filename === chartInfo.image)!.md5;
+      const chartFileInfo = supportedFiles.find((e) => e.filename === chartInfo.chart);
+      const audioFileInfo = supportedFiles.find((e) => e.filename === chartInfo.audio);
+      const imageFileInfo = supportedFiles.find((e) => e.filename === chartInfo.image);
+
+      if (!chartFileInfo || !audioFileInfo || !imageFileInfo) continue;
+
+      chartInfo.chart = chartFileInfo.md5;
+      chartInfo.audio = audioFileInfo.md5;
+      chartInfo.image = imageFileInfo.md5;
 
       chartInfo.extraFiles = [ ...supportedFiles
         .filter((e) => e.md5 !== chartInfo.chart)
@@ -132,17 +139,18 @@ export class GameDatabaseChart extends GameDatabaseEngine {
         .filter((e) => e.md5 !== (chartInfo.image || ''))
         .map((e) => e.md5)
       ];
+      chartInfosLegit.push(chartInfo);
     }
 
     // Save chart info to dabatase
-    for (const info of chartInfos) {
+    for (const info of chartInfosLegit) {
       if (!(await this.get(info.chart))) this.add(info);
     }
 
     res({
       files: supportedFiles,
       decodedFiles,
-      infos: chartInfos,
+      infos: chartInfosLegit,
     });
   })}
 

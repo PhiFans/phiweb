@@ -1,14 +1,14 @@
 import { AutoDetectOptions } from 'pixi.js';
 import { EventEmitter } from 'eventemitter3';
-import { GameAudio } from './audio';
-import { GameRenderer } from './renderer';
-import { GameSkins } from './skins';
-import { GameStage } from './stage';
-import { GameChart } from './chart';
-import { EGameScoreJudgeType } from './score/types';
-import { GameStorage } from './storage';
-import { GameDatabase } from './database';
-import { IFileAudio, IFileChart, IFileImage, TChartInfo } from './utils/types';
+import { GameAudio } from '@/audio';
+import { GameRenderer } from '@/renderer';
+import { GameSkins } from '@/skins';
+import { GameStage } from '@/stage';
+import { GameChart } from '@/chart';
+import { EGameScoreJudgeType } from '@/score/types';
+import { GameStorage } from '@/storage';
+import { GameDatabase } from '@/database';
+import { IFileAudio, IFileChart, IFileImage, TChartInfo } from '@/utils/types';
 import { GameEvents } from './events';
 
 export class Game {

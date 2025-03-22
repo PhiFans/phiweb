@@ -1,4 +1,4 @@
-import { GameChart } from './chart';
+import { GameChart } from '@/chart';
 
 export interface GameEvents {
   /**

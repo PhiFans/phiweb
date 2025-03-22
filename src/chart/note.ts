@@ -32,6 +32,8 @@ export interface IGameChartNote {
   visibleTime?: number,
 }
 
+export type TNoteRaw = Readonly<Omit<IGameChartNote, 'judgeline' | 'isSameTime' | 'floorPosition'>>;
+
 const getNoteSkinTexture = (skin: GameSkin, type: string, useHighQuality = true, useHighlight = true) => {
   const { playfields } = skin;
   const targetTextures = playfields.filter((e) => e.type === 'note' && e.id === type);
@@ -39,6 +41,8 @@ const getNoteSkinTexture = (skin: GameSkin, type: string, useHighQuality = true,
 };
 
 export class GameChartNote {
+  readonly raw: TNoteRaw;
+
   readonly judgeline: GameChartJudgeLine;
   readonly type: EGameChartNoteType;
   readonly isAbove: boolean;
@@ -134,6 +138,17 @@ export class GameChartNote {
     this.isFake = isFake;
     this.scaleX = scaleX;
     this.visibleTime = visibleTime;
+
+    // Save to raw
+    this.raw = Object.freeze<TNoteRaw>({
+      type: this.type,
+      isAbove: this.isAbove,
+      time: this.time,
+      speed: this.speed,
+      posX: this.posX,
+      holdTime: this.holdTime,
+      holdLength: this.holdLength,
+    });
   }
 
   createSprite(game: Game, skin: GameSkin, zIndex: number = 24) {

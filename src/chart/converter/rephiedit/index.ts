@@ -309,7 +309,7 @@ export const ConvertFromRePhiEdit = (_chartRaw: TRPEChart) => {
         time: realTime,
         holdTime: holdTime,
         speed: oldNote.speed,
-        posX: parseDoublePrecist(oldNote.positionX / (675 * (9 / 80)), 6),
+        posX: parseDoublePrecist(oldNote.positionX / 675, 4),
         isAbove: oldNote.above === 1,
         isFake: oldNote.isFake === 1,
         isSameTime: false,

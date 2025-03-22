@@ -32,7 +32,6 @@ export interface IGameRendererSize {
   widthRealHalf: number,
   /** `widthRealHalf - widthHalf` */
   widthOffset: number,
-  widthPercent: number,
   /** Used for culling notes */
   widthHalfBorder: number,
   /** Used for culling notes */
@@ -66,7 +65,6 @@ export class GameRenderer {
     widthReal: 0,
     widthRealHalf: 0,
     widthOffset: 0,
-    widthPercent: 0,
     widthHalfBorder: 0,
     heightHalfBorder: 0,
 
@@ -158,8 +156,6 @@ export class GameRenderer {
 
     size.widthHalfBorder = size.widthHalf * 1.2;
     size.heightHalfBorder = size.heightHalf * 1.2;
-
-    size.widthPercent = size.width * (9 / 160);
 
     size.noteScale = size.width / 8080; // TODO: Settings
     size.noteWidth = size.width * 0.117775;

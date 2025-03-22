@@ -155,7 +155,7 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
       continue;
     }
 
-    const posX = size.widthPercent * notePosX;
+    const posX = widthHalf * notePosX;
     const posY = floorPositionDiff * size.noteSpeed * (isAbove ? -1 : 1);
     const realXSin = posY * judgeline.sinr * -1;
     const realYCos = posY * judgeline.cosr;

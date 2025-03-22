@@ -182,7 +182,7 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
       oldNote.isAbove,
       oldNote.time,
       oldNote.speed,
-      parseDoublePrecist(oldNote.posX, 6),
+      parseDoublePrecist(oldNote.posX * (9 / 80), 4),
       oldNote.isSameTime,
       oldNote.floorPosition,
       oldNote.holdTime,

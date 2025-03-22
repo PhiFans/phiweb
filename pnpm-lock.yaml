@@ -23,6 +23,9 @@ importers:
       bezier-easing:
         specifier: ^2.1.0
         version: 2.1.0
+      eventemitter3:
+        specifier: ^5.0.1
+        version: 5.0.1
       jszip:
         specifier: ^3.10.1
         version: 3.10.1

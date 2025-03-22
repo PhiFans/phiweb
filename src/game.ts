@@ -1,4 +1,5 @@
 import { AutoDetectOptions } from 'pixi.js';
+import { EventEmitter } from 'eventemitter3';
 import { GameAudio } from './audio';
 import { GameRenderer } from './renderer';
 import { GameSkins } from './skins';
@@ -8,6 +9,7 @@ import { EGameScoreJudgeType } from './score/types';
 import { GameStorage } from './storage';
 import { GameDatabase } from './database';
 import { IFileAudio, IFileChart, IFileImage, TChartInfo } from './utils/types';
+import { GameEvents } from './events';
 
 export class Game {
   // TODO: Use another class to manage it
@@ -25,6 +27,7 @@ export class Game {
   readonly skins: GameSkins = new GameSkins(this);
   readonly stage: GameStage = new GameStage(this);
   readonly audio: GameAudio = new GameAudio();
+  readonly event = new EventEmitter<GameEvents>();
 
   chart?: GameChart;
 
@@ -72,12 +75,15 @@ export class Game {
     );
     this.chart.audio.setChannel(this.audio.channels.music);
 
+    this.event.emit('chart.prestart', this.chart);
+
     this.renderer.containers.game.sortChildren();
     this.chart.reszie(this.renderer.size);
     this.chart.start();
 
+    this.event.emit('chart.poststart', this.chart);
+
     res(this.chart);
-    console.log(this);
   })}
 
   pauseChart() {

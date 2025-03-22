@@ -11,3 +11,5 @@ app.init({
   globalThis.__PIXI_RENDERER__ = app.renderer.renderer;
   globalThis.__PIXI_STAGE__ = app.renderer.stage;
 });
+
+console.log(app);

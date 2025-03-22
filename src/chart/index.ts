@@ -125,10 +125,7 @@ export class GameChart {
     this.ticker.start();
 
     this.game.audio.channels.effect.startTicker();
-    // Prevent audio timer latency for some reason
-    setImmediate(() => {
-      this.audio.play();
-    });
+    this.audio.play();
   }
 
   reset() {

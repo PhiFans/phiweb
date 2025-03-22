@@ -42,22 +42,10 @@ export class GameAudioClip {
     if (!this.channel) throw new Error('Cannot play a clip directly without any channel');
     if (this.status === EGameAudioClipStatus.PLAY) return;
 
-    this.buffer = this.audioCtx.createBufferSource();
-    this.buffer.buffer = this.source;
-    this.buffer.connect(this.channel.gain);
-
-    if (isNaN(this.pauseTime)) {
-      this.buffer.start(0, 0);
-      this.startTime = this.clock.time;
-    } else {
-      const pausedTime = this.pauseTime - this.startTime;
-      this.buffer.start(0, pausedTime / 1000);
-      this.startTime = this.clock.time - pausedTime;
-    }
-
-    this.pauseTime = NaN;
-    this.status = EGameAudioClipStatus.PLAY;
-    this.buffer.onended = () => this.stop();
+    // Prevent audio timer latency for some reason
+    setImmediate(() => {
+      this._play();
+    });
   }
 
   pause() {
@@ -103,6 +91,25 @@ export class GameAudioClip {
 
   set speed(value: number) {
     if (this.buffer) this.buffer.playbackRate.value = value;
+  }
+
+  private _play() {
+    this.buffer = this.audioCtx.createBufferSource();
+    this.buffer.buffer = this.source;
+    this.buffer.connect(this.channel!.gain);
+
+    if (isNaN(this.pauseTime)) {
+      this.buffer.start(0, 0);
+      this.startTime = this.clock.time;
+    } else {
+      const pausedTime = this.pauseTime - this.startTime;
+      this.buffer.start(0, pausedTime / 1000);
+      this.startTime = this.clock.time - pausedTime;
+    }
+
+    this.pauseTime = NaN;
+    this.status = EGameAudioClipStatus.PLAY;
+    this.buffer.onended = () => this.stop();
   }
 
   private disconnectBuffer() {

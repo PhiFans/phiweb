@@ -170,7 +170,7 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
       let realHoldLength = holdLength! * size.height / size.noteScale;
       if (time <= currentTime) {
         realHoldLength = (
-          isOfficial ? (holdEndTime! - currentTime) / 1000 : (holdFloorPosition! - judgeline.floorPosition)
+          isOfficial ? (holdEndTime! - currentTime) * 0.0006 : (holdFloorPosition! - judgeline.floorPosition)
         ) * speed * size.height / size.noteScale;
 
         const [ spriteHead, spriteBody, spriteEnd ] = sprite.children;

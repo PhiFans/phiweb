@@ -180,7 +180,7 @@ export class GameChartNote {
     this.score.animationTime = null;
 
     if (this.sprite && this.type === EGameChartNoteType.HOLD) {
-      const holdLength = (this.isOfficial ? this.holdTime! / 1000 : this.holdLength!) * this.speed;
+      const holdLength = (this.isOfficial ? this.holdTime! * 0.0006 : this.holdLength!) * this.speed;
 
       this.sprite.children[0].visible = true;
       this.sprite.children[1].scale.y = 1;

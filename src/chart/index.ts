@@ -106,7 +106,7 @@ export class GameChart {
     for (const note of data.notes) {
       if (note.type === 3) {
         const { isOfficial } = note;
-        const holdLength = (isOfficial ? note.holdTime! / 1000 : note.holdLength!) * note.speed * sizer.noteSpeed / sizer.noteScale;
+        const holdLength = (isOfficial ? note.holdTime! / 1000 : note.holdLength!) * note.speed * sizer.height / sizer.noteScale;
 
         note.sprite!.children[0].visible = true;
         note.sprite!.children[1].scale.y = 1;

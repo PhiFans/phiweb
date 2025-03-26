@@ -31,7 +31,8 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
   const { data, game } = this;
 
   const { renderer } = game;
-  const { widthHalf, heightHalf } = renderer.size;
+  const { size } = renderer;
+  const { widthHalf, heightHalf } = size;
 
   for (const line of data.lines) {
     const { eventLayers, parent } = line;
@@ -115,7 +116,6 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
     sprite.alpha = line.alpha;
   }
 
-  const { size } = renderer;
   const { widthHalfBorder, heightHalfBorder } = size;
   for (const note of data.notes) {
     const {
@@ -156,7 +156,7 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
     }
 
     const posX = widthHalf * notePosX;
-    const posY = floorPositionDiff * size.noteSpeed * (isAbove ? -1 : 1);
+    const posY = floorPositionDiff * size.height * (isAbove ? -1 : 1);
     const realXSin = posY * judgeline.sinr * -1;
     const realYCos = posY * judgeline.cosr;
 
@@ -167,11 +167,11 @@ export function onChartTick(this: GameChart, currentTime: number, container: Con
     note.realHoldEndPosY = note.realPosY = note.realLinePosY + realYCos;
 
     if (type === 3) {
-      let realHoldLength = holdLength! * size.noteSpeed / size.noteScale;
+      let realHoldLength = holdLength! * size.height / size.noteScale;
       if (time <= currentTime) {
         realHoldLength = (
           isOfficial ? (holdEndTime! - currentTime) / 1000 : (holdFloorPosition! - judgeline.floorPosition)
-        ) * speed * size.noteSpeed / size.noteScale;
+        ) * speed * size.height / size.noteScale;
 
         const [ spriteHead, spriteBody, spriteEnd ] = sprite.children;
 

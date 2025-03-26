@@ -39,7 +39,6 @@ export interface IGameRendererSize {
 
   noteScale: number,
   noteWidth: number,
-  noteSpeed: number,
 
   hitParticleScale: number,
 
@@ -70,7 +69,6 @@ export class GameRenderer {
 
     noteScale: 0,
     noteWidth: 0,
-    noteSpeed: 0,
 
     hitParticleScale: 0,
 
@@ -159,7 +157,6 @@ export class GameRenderer {
 
     size.noteScale = size.width / 8080; // TODO: Settings
     size.noteWidth = size.width * 0.117775;
-    size.noteSpeed = size.height * 0.6;
 
     size.hitParticleScale = size.noteScale * 6;
 

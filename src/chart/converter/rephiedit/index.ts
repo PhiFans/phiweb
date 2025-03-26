@@ -231,8 +231,8 @@ export const ConvertFromRePhiEdit = (_chartRaw: TRPEChart) => {
       if (oldLayer.speedEvents) oldLayer.speedEvents.forEach((oldEvent) => {
         newEvents.speed.push(...calculateSpeedEventEase({
           ...oldEvent,
-          start: parseDoublePrecist(oldEvent.start / 4.5, 6),
-          end: parseDoublePrecist(oldEvent.end / 4.5, 6),
+          start: parseDoublePrecist(oldEvent.start / (900 / 120), 6),
+          end: parseDoublePrecist(oldEvent.end / (900 / 120), 6),
         }).map((e) => ({
           ...e,
           startTime: calculateRealTime(bpmList, e.startTime),
@@ -326,14 +326,14 @@ export const ConvertFromRePhiEdit = (_chartRaw: TRPEChart) => {
   for (const note of noteList) sameTimeNote[`${note.time}`] = sameTimeNote[`${note.time}`] ? 2 : 1;
   for (const oldNote of noteList) {
     const floorPosition = getFloorPositionByTime(oldNote.judgeline, oldNote.time);
-    const holdLength = oldNote.type === 3 ? parseDoublePrecist(getFloorPositionByTime(oldNote.judgeline, (oldNote.time + oldNote.holdTime!)) - floorPosition, 3, -1) : null;
+    const holdLength = oldNote.type === 3 ? parseDoublePrecist(getFloorPositionByTime(oldNote.judgeline, (oldNote.time + oldNote.holdTime!)) - floorPosition, 4, -1) : null;
 
     result.notes.push(new GameChartNote(
       oldNote.judgeline,
       oldNote.type,
       oldNote.isAbove,
       oldNote.time,
-      oldNote.speed,
+      parseDoublePrecist(oldNote.speed, 6),
       oldNote.posX,
       sameTimeNote[`${oldNote.time}`] === 2,
       floorPosition,

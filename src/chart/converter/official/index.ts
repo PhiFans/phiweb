@@ -81,7 +81,7 @@ export const ConvertFromOfficial = (_chartRaw: IChartOfficial) => {
       _newEvents.speed.push({
         startTime: calcRealTime(oldEvent.startTime, oldLine.bpm),
         endTime: oldEvent.endTime < 999999999 ? calcRealTime(oldEvent.endTime, oldLine.bpm) : Infinity,
-        value: parseDoublePrecist(oldEvent.value, 6),
+        value: parseDoublePrecist(oldEvent.value * 0.6, 6),
       });
     });
 

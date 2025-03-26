@@ -285,7 +285,7 @@ export const ConvertFromPhiEdit = (_chartRaw: string) => {
         break;
       }
       case '&': { // Note scale X
-        noteList[noteList.length - 1].scaleX = parseNumber(commandArr[1], 1);
+        noteList[noteList.length - 1].scaleX = parseNumber(commandArr[1], 1, 4);
         break;
       }
       // Parse line events
@@ -293,7 +293,7 @@ export const ConvertFromPhiEdit = (_chartRaw: string) => {
         pushEventToLine(lineList, commandArr[1], 'speed', {
           startBeat: parseNumber(commandArr[2], 0),
           endBeat: NaN,
-          value: parseNumber(parseFloat(commandArr[3]) / 7, 1),
+          value: parseNumber(parseFloat(commandArr[3]) / (1400 / 120), 1),
         });
         break;
       }

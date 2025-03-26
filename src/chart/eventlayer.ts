@@ -11,6 +11,9 @@ export interface IGameChartEventLayer {
 }
 
 export class GameChartEventLayer {
+  /**
+   * 1 Speed = 100vh/s
+   */
   readonly speed: ArrayIndexed<GameChartEventSingle> = new ArrayIndexed();
   /**
    * Use percentage. The center of the X-axis is `0%`.

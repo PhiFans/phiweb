@@ -224,9 +224,10 @@ export function onScoreTick(this: GameScore, currentTime: number, frameTime: num
   const { hitParticleScale } = size;
   const { particles } = effects;
   for (const particle of particles) {
-    const { time, particleLength, sprites, distance, cosr, sinr, x, y } = particle;
+    const { time, particleLength, sprites, distance, cosr, sinr, x, y, animate, animateFrameCount } = particle;
     const progress = (currentTime - time) / 500;
-    if (progress >= 1) {
+    const progressReverse = 1 - progress;
+    if (progress >= 1 || progress < 0) {
       particle.destroy();
       continue;
     }
@@ -237,10 +238,13 @@ export function onScoreTick(this: GameScore, currentTime: number, frameTime: num
       const sprite = sprites[i];
       const _distance = distance[i] * (9 * progress / (8 * progress + 1)) * hitParticleScale;
 
-      sprite.alpha = 1 - progress;
+      sprite.alpha = progressReverse;
       sprite.scale.set(scale);
       sprite.position.set(_distance * cosr[i] + x, _distance * sinr[i] + y);
     }
+
+    animate.alpha = progressReverse;
+    animate.currentFrame = Math.floor(progress * animateFrameCount);
   }
 
   for (let i = 0; i < particles.length; i++) {

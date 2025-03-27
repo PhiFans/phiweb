@@ -16,10 +16,24 @@ class GameScoreEffectHitParticle {
   readonly sinr: number[] = [];
   readonly distance: number[] = [];
   readonly sprites: Sprite[] = [];
+  readonly animateFrameCount: number;
+  readonly animateSpeed: number;
+  readonly animate: AnimatedSprite;
   isDestroyed = false;
 
   // TODO: Use `ParticleContainer` and `Particle`
-  constructor(type: EGameScoreJudgeType, time: number, x: number, y: number, texture: Texture, container: Container) {
+  // TODO: Animation speed
+  constructor(
+    type: EGameScoreJudgeType,
+    time: number,
+    x: number,
+    y: number,
+    texture: Texture,
+    animationTextures: Texture[],
+    animationSpeed: number,
+    animationScale: number,
+    container: Container
+  ) {
     this.time = time;
     this.x = x;
     this.y = y;
@@ -42,12 +56,22 @@ class GameScoreEffectHitParticle {
       i++;
     }
 
-    container.addChild(...sprites);
+    this.animateFrameCount = animationTextures.length;
+    this.animateSpeed = animationSpeed;
+
+    this.animate = new AnimatedSprite(animationTextures);
+    this.animate.position.set(x, y);
+    this.animate.tint = type === 3 ? 0xFFECA0 : 0xB4E1FF;
+    this.animate.scale = animationScale;
+    this.animate.autoUpdate = false;
+
+    container.addChild(this.animate, ...sprites);
   }
 
   destroy() {
     this.isDestroyed = true;
     for (const particle of this.sprites) particle.removeFromParent();
+    this.animate.removeFromParent();
   }
 }
 
@@ -113,29 +137,17 @@ export class GameScoreEffects {
     const { playlist } = audioChannel;
 
     if (judgeType >= EGameScoreJudgeType.GOOD) {
-      const { speed } = hitEffect;
-      const animation = new AnimatedSprite(hitEffects, true);
-
-      animation.position.set(x, y);
-      animation.scale.set(noteScale * 5.6);
-      animation.tint = judgeType === 3 ? 0xFFECA0 : 0xB4E1FF;
-      animation.animationSpeed = speed;
-      animation.loop = false;
-
-      animation.onFrameChange = () => {
-        animation.alpha = 1 - (animation.currentFrame / animation.totalFrames);
-      };
-
-      animation.onComplete = () => {
-        animation.removeFromParent();
-        animation.stop();
-        animation.destroy();
-      };
-
-      container.addChild(animation);
-      animation.play();
-
-      particles[particles.length] = new GameScoreEffectHitParticle(judgeType, currentTime, x, y, hitParticle, container);
+      particles[particles.length] = new GameScoreEffectHitParticle(
+        judgeType,
+        currentTime,
+        x,
+        y,
+        hitParticle,
+        hitEffects,
+        hitEffect.speed,
+        noteScale * 5.6,
+        container
+      );
     }
 
     if (!playHitsound) return;

@@ -80,6 +80,7 @@ const parseBPM = (oldBPMs: TRPEChartBPM[]) => {
 
 const calculateRealTime = (BPMs: TChartBPM[], beat: number) => {
   if (!isFinite(beat)) return beat;
+  if (beat < 0) return Math.floor(BPMs[0].startTime! + ((beat - BPMs[0].startBeat) * BPMs[0].beatTime!));
 
   for (const bpm of BPMs) {
     if (bpm.endBeat <= beat) continue;

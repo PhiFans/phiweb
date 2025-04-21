@@ -150,6 +150,7 @@ export const arrangeEvents = (events: IGameChartEventLayer) => {
 
 export const parseFirstLayerEvents = (events: IGameChartEventLayer) => {
   const parseFirstLayerEvent = <T extends (IGameChartEvent | IGameChartEventSingle)>(events: T[]) => {
+    if (events.length <= 0) return [];
     const startEvent = events[0] as IGameChartEvent;
 
     if (!isNaN(startEvent.start)) {

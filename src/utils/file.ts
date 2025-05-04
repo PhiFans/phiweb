@@ -1,9 +1,8 @@
-import decodeAudio from 'audio-decode';
 import JSZip from 'jszip';
 import SparkMD5 from 'spark-md5';
 import * as StackBlur from 'stackblur-canvas';
+import { Clip } from '@phifans/audio';
 import { GameChartData } from '@/chart/data';
-import { GameAudio } from '@/audio';
 import { Nullable } from './types';
 import { IFile } from './types';
 
@@ -47,16 +46,6 @@ export const ReadFileAsArrayBuffer = (file: File | Blob): Promise<ArrayBuffer> =
   };
 
   reader.readAsArrayBuffer(file);
-});
-
-export const ReadFileAsAudioBuffer = (file: File | Blob): Promise<AudioBuffer> => new Promise(async (res, rej) => {
-  try {
-    const arrayBuffer = await ReadFileAsArrayBuffer(file);
-    const audioBuffer = await decodeAudio(arrayBuffer);
-    res(audioBuffer);
-  } catch (e) {
-    rej(e);
-  }
 });
 
 export const getFileMD5 = (file: Blob, chunkSize = 2097152): Promise<string> => new Promise((res, rej) => {
@@ -147,8 +136,7 @@ export const decodeFile = (file: File): Promise<IFile | File[]> => new Promise((
     });
   }).catch(async () => {
     // Decode as audio file
-    const audioBuffer = await ReadFileAsAudioBuffer(file);
-    const audioResult = GameAudio.from(audioBuffer);
+    const audioResult = await Clip.from(file);
     res({
       filename: file.name,
       type: 'audio',

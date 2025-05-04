@@ -17,10 +17,10 @@
     "vite-plugin-chunk-split": "^0.5.0"
   },
   "dependencies": {
+    "@phifans/audio": "^0.0.6",
     "@pixi/layout": "^2.0.1",
     "@pixi/ui": "^2.1.5",
     "@types/spark-md5": "^3.0.5",
-    "audio-decode": "^2.2.2",
     "bezier-easing": "^2.1.0",
     "eventemitter3": "^5.0.1",
     "jszip": "^3.10.1",

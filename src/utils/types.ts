@@ -1,5 +1,5 @@
+import { Clip } from '@phifans/audio';
 import { GameChartData } from '@/chart/data';
-import { GameAudioClip } from '@/audio/clip';
 
 export type Nullable<T> = T | null;
 
@@ -23,7 +23,7 @@ export interface IFileImage extends IFileBasic {
 
 export interface IFileAudio extends IFileBasic {
   type: 'audio',
-  data: GameAudioClip,
+  data: Clip,
 }
 
 export type IFile = IFileChart | IFileImage | IFileAudio;

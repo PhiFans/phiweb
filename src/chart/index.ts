@@ -1,6 +1,6 @@
 import { Container, Graphics, Sprite, Texture, Ticker } from 'pixi.js';
+import { Clip } from '@phifans/audio';
 import { GameChartData } from './data';
-import { GameAudioClip } from '@/audio/clip';
 import { GameScore } from '../score';
 import { onChartTick } from './tick';
 import { Game } from '@/game';
@@ -27,7 +27,7 @@ export class GameChart {
   readonly game: Game;
   readonly info: TChartInfo;
   readonly data: GameChartData;
-  readonly audio: GameAudioClip;
+  readonly audio: Clip;
   readonly score: GameScore;
   readonly background?: ImageBitmap;
   readonly ticker: Ticker = new Ticker();
@@ -39,7 +39,7 @@ export class GameChart {
 
   readonly onChartTick: (currentTime: number, container: Container) => void;
 
-  constructor(game: Game, info: TChartInfo, data: GameChartData, audio: GameAudioClip, background?: ImageBitmap) {
+  constructor(game: Game, info: TChartInfo, data: GameChartData, audio: Clip, background?: ImageBitmap) {
     this.game = game;
     this.info = info;
     this.data = data;
@@ -124,7 +124,7 @@ export class GameChart {
     this.ticker.add(this.onTick);
     this.ticker.start();
 
-    this.game.audio.channels.effect.startTicker();
+    this.game.audio.channels.get('effect')!.startTick();
     this.audio.play();
   }
 
@@ -136,15 +136,14 @@ export class GameChart {
 
   private onTick() {
     const { data, audio, ticker } = this;
-    const { startTime, pauseTime, clock, status } = audio;
-    const { time } = clock;
+    const { currentTime: _currentTime, status } = audio;
     const { offset, container } = data;
 
-    if (status === 0) return;
-    const currentTime = ((status === 2 ? pauseTime : time) - (startTime || time)) - offset;
+    if (status === -1) return;
+    const currentTime = _currentTime * 1000 - offset;
 
     this.onChartTick(currentTime, container!);
     if (status === 1) this.score.onScoreTick(currentTime, ticker.elapsedMS);
-    this.score.ui.updateUIProgress(currentTime / audio.duration);
+    this.score.ui.updateUIProgress(currentTime / audio.duration / 1000);
   }
 }

@@ -3,10 +3,6 @@
 import type { Application, Container, AbstractRenderer } from "pixi.js";
 
 declare global {
-  interface Window {
-    webkitAudioContext: AudioContext,
-  }
-
   // Alias
   interface File {
     mozSlice: Blob.slice,

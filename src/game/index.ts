@@ -1,6 +1,6 @@
 import { AutoDetectOptions } from 'pixi.js';
 import { EventEmitter } from 'eventemitter3';
-import { GameAudio } from '@/audio';
+import { Bus } from '@phifans/audio';
 import { GameRenderer } from '@/renderer';
 import { GameSkins } from '@/skins';
 import { GameStage } from '@/stage';
@@ -26,12 +26,15 @@ export class Game {
   readonly renderer: GameRenderer = new GameRenderer(this);
   readonly skins: GameSkins = new GameSkins(this);
   readonly stage: GameStage = new GameStage(this);
-  readonly audio: GameAudio = new GameAudio();
+  readonly audio: Bus = new Bus();
   readonly event = new EventEmitter<GameEvents>();
 
   chart?: GameChart;
 
   constructor() {
+    this.audio.createChannel('music');
+    this.audio.createChannel('effect');
+
     this.resize = this.resize.bind(this);
   }
 
@@ -73,7 +76,7 @@ export class Game {
       (chartFiles.find((e) => e.md5 === chartInfo.audio)!.file as IFileAudio).data,
       (chartFiles.find((e) => e.md5 === chartInfo.image)!.file as IFileImage).data ?? null
     );
-    this.chart.audio.setChannel(this.audio.channels.music);
+    this.chart.audio.channel = this.audio.channels.get('music')!;
 
     this.event.emit('chart.prestart', this.chart);
 
@@ -93,7 +96,7 @@ export class Game {
 
     audio.pause();
     stage.set('pausing');
-    stage.stages.pausing.updateData(audio.pauseTime - audio.startTime, audio.source.duration);
+    stage.stages.pausing.updateData(audio.currentTime, audio.duration);
   }
 
   resumeChart() {

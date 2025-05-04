@@ -83,7 +83,7 @@ export class GameScore {
     this.effects = new GameScoreEffects(
       skin,
       containers.game,
-      audio.channels.effect,
+      audio.channels.get('effect')!,
       this.size
     );
 

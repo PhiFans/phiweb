@@ -1,5 +1,5 @@
 import { Sprite, Container, Texture, Rectangle, AnimatedSprite } from 'pixi.js';
-import { GameAudioChannel } from '@/audio/channel';
+import { Channel } from '@phifans/audio';
 import { EGameScoreJudgeType } from './types';
 import { EGameChartNoteType } from '@/chart/note';
 import { IGameRendererSize } from '@/renderer';
@@ -77,7 +77,7 @@ class GameScoreEffectHitParticle {
 
 export class GameScoreEffects {
   readonly container: Container;
-  readonly audioChannel: GameAudioChannel;
+  readonly audioChannel: Channel;
   readonly size: IGameRendererSize;
   readonly skin: {
     hitEffect: TGameSkinElementFiledHitEffect,
@@ -92,7 +92,7 @@ export class GameScoreEffects {
   constructor(
     { elements, hitsounds }: GameSkin,
     container: Container,
-    audioChannel: GameAudioChannel,
+    audioChannel: Channel,
     size: IGameRendererSize
   ) {
     this.container = new Container();
@@ -134,7 +134,6 @@ export class GameScoreEffects {
     const { noteScale } = size;
     const { hitEffect, sounds } = skin;
     const { hitEffects, hitParticle } = skinTextures;
-    const { playlist } = audioChannel;
 
     if (judgeType >= EGameScoreJudgeType.GOOD) {
       particles[particles.length] = new GameScoreEffectHitParticle(
@@ -151,9 +150,9 @@ export class GameScoreEffects {
     }
 
     if (!playHitsound) return;
-    if (noteType === 1 || noteType === 3) playlist[playlist.length] = sounds.tap;
-    if (noteType === 2) playlist[playlist.length] = sounds.drag;
-    if (noteType === 4) playlist[playlist.length] = sounds.flick;
+    if (noteType === 1 || noteType === 3) audioChannel.pushClipToQueue(sounds.tap);
+    if (noteType === 2) audioChannel.pushClipToQueue(sounds.drag);
+    if (noteType === 4) audioChannel.pushClipToQueue(sounds.flick);
   }
 
   reset() {

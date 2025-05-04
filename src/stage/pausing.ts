@@ -153,13 +153,13 @@ export class GameStagePausing implements IGameStageBase {
     const currentTimeText = this.layout.getChildByID('currentTime')!.children[0] as Text;
     const totalTimeText = this.layout.getChildByID('totalTime')!.children[0] as Text;
 
-    currentTimeText.text = numberToTime(currentTime / 1000);
+    currentTimeText.text = numberToTime(currentTime);
     totalTimeText.text = numberToTime(totalTime);
 
     this.isUpdating = true;
 
     this.sliderProgress.max = Math.floor(totalTime);
-    this.sliderProgress.value = Math.floor(currentTime / 1000);
+    this.sliderProgress.value = Math.floor(currentTime);
 
     setTimeout(() => this.isUpdating = false, 100);
   }

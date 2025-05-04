@@ -1,8 +1,8 @@
 import JSZip from 'jszip';
 import { Texture, TextureSource } from 'pixi.js';
+import { Clip } from '@phifans/audio';
 import { Game } from '@/game';
-import { GameAudio } from '@/audio';
-import { ReadFileAsAudioBuffer, downloadFile, generateImageBitmap } from '@/utils/file';
+import { downloadFile, generateImageBitmap } from '@/utils/file';
 import {
   createFontFamily,
   getFileByPath,
@@ -136,11 +136,10 @@ export class GameSkin {
       const { file } = sound;
 
       promiseSounds.push(new Promise((res, rej) => {
-        ReadFileAsAudioBuffer(file)
-          .then((buffer) => {
-            const result = GameAudio.from(buffer);
-            sound.clip = result;
-            res(result);
+        Clip.from(file)
+          .then((clip) => {
+            sound.clip = clip;
+            res(clip);
           })
           .catch(e => rej(e));
       }));

@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@phifans/audio':
+        specifier: ^0.0.6
+        version: 0.0.6
       '@pixi/layout':
         specifier: ^2.0.1
         version: 2.0.1(pixi.js@8.5.2)
@@ -17,9 +20,6 @@ importers:
       '@types/spark-md5':
         specifier: ^3.0.5
         version: 3.0.5
-      audio-decode:
-        specifier: ^2.2.2
-        version: 2.2.2
       bezier-easing:
         specifier: ^2.1.0
         version: 2.1.0
@@ -198,6 +198,9 @@ packages:
   '@jridgewell/sourcemap-codec@1.5.0':
     resolution: {integrity: sha512-gv3ZRaISU3fjPAgNsriBRqGWQL6quFx04YMPW/zD8XMLsU32mhCCbfbO6KZFLjvYpCZ8zyDEgqsgf+PwPaM7GQ==}
 
+  '@phifans/audio@0.0.6':
+    resolution: {integrity: sha512-a5isTb0l8HsKTexwTrG5YvwUsYNce7b+gvi9W4vCeUMB659KSTtZ/oODaVrjHL9NXnzuuzxYAXIAQDy8CV+GHA==}
+
   '@pixi/colord@2.9.6':
     resolution: {integrity: sha512-nezytU2pw587fQstUu1AsJZDVEynjskwOL+kibwcdxsMBFqPsFFNA7xl0ii/gXuDi6M0xj3mfRJj8pBSc2jCfA==}
 
@@ -320,6 +323,9 @@ packages:
 
   '@types/node@22.9.0':
     resolution: {integrity: sha512-vuyHg81vvWA1Z1ELfvLko2c8f34gyA0zaic0+Rllc5lbCnbSyuvb2Oxpm6TAUAC/2xZN3QGqxBNggD1nNR2AfQ==}
+
+  '@types/setimmediate@1.0.4':
+    resolution: {integrity: sha512-rWPw1drMVf5zInxNpgH3nn/h6KkWqwgLT2y/ciAYQ16RAsbXOXe0AmtZ/HyzwPNw+r4GMJuI7IV7YNKO7Fs/xA==}
 
   '@types/spark-md5@3.0.5':
     resolution: {integrity: sha512-lWf05dnD42DLVKQJZrDHtWFidcLrHuip01CtnC2/S6AMhX4t9ZlEUj4iuRlAnts0PQk7KESOqKxeGE/b6sIPGg==}
@@ -601,6 +607,12 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.5.0': {}
 
+  '@phifans/audio@0.0.6':
+    dependencies:
+      '@types/setimmediate': 1.0.4
+      audio-decode: 2.2.2
+      setimmediate: 1.0.5
+
   '@pixi/colord@2.9.6': {}
 
   '@pixi/layout@2.0.1(pixi.js@8.5.2)':
@@ -682,6 +694,8 @@ snapshots:
   '@types/node@22.9.0':
     dependencies:
       undici-types: 6.19.8
+
+  '@types/setimmediate@1.0.4': {}
 
   '@types/spark-md5@3.0.5': {}
 

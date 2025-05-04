@@ -1,5 +1,5 @@
 import { Texture } from 'pixi.js';
-import { GameAudioClip } from '@/audio/clip';
+import { Clip } from '@phifans/audio';
 
 export type SkinInput = File | Blob | string;
 export type SkinFile = {
@@ -183,7 +183,7 @@ export type TGameSkinSoundBase = {
   type: TGameSkinSoundType,
   id: string,
   file: File,
-  clip?: GameAudioClip,
+  clip?: Clip,
 };
 
 export type TGameSkinSoundHitsound = TGameSkinSoundBase & {
@@ -194,7 +194,7 @@ export type TGameSkinSoundHitsound = TGameSkinSoundBase & {
 export type TGameSkinSound = TGameSkinSoundHitsound;
 
 export type TGameSkinHitsounds = {
-  tap: GameAudioClip,
-  drag: GameAudioClip,
-  flick: GameAudioClip,
+  tap: Clip,
+  drag: Clip,
+  flick: Clip,
 };

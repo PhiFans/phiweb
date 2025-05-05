@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@phifans/audio':
-        specifier: ^0.0.6
-        version: 0.0.6
+        specifier: ^0.0.7
+        version: 0.0.7
       '@pixi/layout':
         specifier: ^2.0.1
         version: 2.0.1(pixi.js@8.5.2)
@@ -198,8 +198,8 @@ packages:
   '@jridgewell/sourcemap-codec@1.5.0':
     resolution: {integrity: sha512-gv3ZRaISU3fjPAgNsriBRqGWQL6quFx04YMPW/zD8XMLsU32mhCCbfbO6KZFLjvYpCZ8zyDEgqsgf+PwPaM7GQ==}
 
-  '@phifans/audio@0.0.6':
-    resolution: {integrity: sha512-a5isTb0l8HsKTexwTrG5YvwUsYNce7b+gvi9W4vCeUMB659KSTtZ/oODaVrjHL9NXnzuuzxYAXIAQDy8CV+GHA==}
+  '@phifans/audio@0.0.7':
+    resolution: {integrity: sha512-w/OfBMWjQ0H7MPrnQxG/grS3JUE1nCiiut9QBtf2hNO33J5I1aLsb9MY+NQptfst54A7KpMiE1wcE1Nb3Czf2A==}
 
   '@pixi/colord@2.9.6':
     resolution: {integrity: sha512-nezytU2pw587fQstUu1AsJZDVEynjskwOL+kibwcdxsMBFqPsFFNA7xl0ii/gXuDi6M0xj3mfRJj8pBSc2jCfA==}
@@ -607,7 +607,7 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.5.0': {}
 
-  '@phifans/audio@0.0.6':
+  '@phifans/audio@0.0.7':
     dependencies:
       '@types/setimmediate': 1.0.4
       audio-decode: 2.2.2
